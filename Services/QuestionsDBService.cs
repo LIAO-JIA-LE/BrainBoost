@@ -1,11 +1,11 @@
-﻿using QuestAI.Models;
-using QuestAI.Parameter;
+﻿using BrainBoost.Models;
+using BrainBoost.Parameter;
 using System.Data.SqlClient;
 using Dapper;
 using System.Text;
 using System.Drawing.Printing;
 
-namespace QuestAI.Services
+namespace BrainBoost.Services
 {
     public class QuestionsDBService
     {

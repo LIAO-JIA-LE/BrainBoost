@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using Microsoft.AspNetCore.Authorization;
 
 
 
@@ -18,6 +19,7 @@ namespace QuestAI.Controllers
 {
     [Route("QuestAI/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Teacher, Manager, Admin")]
     public class FileController : Controller
     {
         #region 呼叫Service
@@ -186,6 +188,7 @@ namespace QuestAI.Controllers
                     question_content = dataRow["Question"].ToString()
                 };
 
+                //後續新增上傳圖片功能需更改為new List<Option>
                 question.Options = new List<string>
                 {
                     dataRow["OptionA"].ToString(),
