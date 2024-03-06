@@ -1,6 +1,6 @@
-﻿using QuestAI.Models;
+﻿using BrainBoost.Models;
 
-namespace QuestAI.Parameter
+namespace BrainBoost.Parameter
 {
     public class QuestionList
     {

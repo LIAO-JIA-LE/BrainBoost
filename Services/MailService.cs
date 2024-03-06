@@ -1,6 +1,6 @@
 ﻿using System.Net.Mail;
 
-namespace QuestAI.Services
+namespace BrainBoost.Services
 {
     public class MailService
     {
@@ -35,7 +35,7 @@ namespace QuestAI.Services
                 Credentials = new System.Net.NetworkCredential(g_Account, g_Password),
                 EnableSsl = true
             };
-            MailMessage mail = new(g_Email, ToMail, "QuestAI註冊會員驗證信", MailBody)
+            MailMessage mail = new(g_Email, ToMail, "BrainBoost註冊會員驗證信", MailBody)
             {
                 IsBodyHtml = true
             };

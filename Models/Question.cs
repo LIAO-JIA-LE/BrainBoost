@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace QuestAI.Models
+namespace BrainBoost.Models
 {
     public class Question
     {

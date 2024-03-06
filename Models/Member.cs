@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace QuestAI.Models;
+namespace BrainBoost.Models;
 
 public class Member
 {

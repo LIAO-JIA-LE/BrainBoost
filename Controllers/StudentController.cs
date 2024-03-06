@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace QuestAI.Controllers;
+namespace BrainBoost.Controllers;
 
 [Route("[controller]")]
 public class StudentController : Controller

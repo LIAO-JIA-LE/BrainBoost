@@ -1,11 +1,11 @@
-using QuestAI.Services;
+using BrainBoost.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using QuestAI.Parameter;
+using BrainBoost.Parameter;
 
-namespace QuestAI.Controllers;
+namespace BrainBoost.Controllers;
 // 登入
-[Route("QuestAI/[controller]")]
+[Route("BrainBoost/[controller]")]
 [ApiController]
 [AllowAnonymous]
 public class LoginController : ControllerBase

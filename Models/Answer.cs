@@ -1,4 +1,4 @@
-﻿namespace QuestAI.Models
+﻿namespace BrainBoost.Models
 {
     public class Answer
     {

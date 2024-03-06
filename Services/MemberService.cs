@@ -1,11 +1,11 @@
 using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
-using QuestAI.Models;
-using QuestAI.Parameter;
+using BrainBoost.Models;
+using BrainBoost.Parameter;
 using Dapper;
 
-namespace QuestAI.Services;
+namespace BrainBoost.Services;
 
 public class MemberService
 {

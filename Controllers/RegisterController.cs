@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using QuestAI.Services;
-using QuestAI.Models;
+using BrainBoost.Services;
+using BrainBoost.Models;
 using Microsoft.AspNetCore.Authorization;
 
-namespace QuestAI.Controllers
+namespace BrainBoost.Controllers
 {
-    [Route("QuestAI/[controller]")]
+    [Route("BrainBoost/[controller]")]
     [ApiController]
     [AllowAnonymous]
     public class RegisterController : ControllerBase
@@ -53,7 +53,7 @@ namespace QuestAI.Controllers
                     Scheme = request.Scheme, // 使用請求的協議 (http/https)
                     Host = request.Host.Host, // 使用請求的主機名
                     Port = request.Host.Port ?? 80, // 使用請求的端口，如果未指定則默認使用80
-                    Path = "/QuestAI/Register/MailValidate?" + querystr
+                    Path = "/BrainBoost/Register/MailValidate?" + querystr
                 };
                 string finalUrl = ValidateUrl.ToString().Replace("%3F","?");
 

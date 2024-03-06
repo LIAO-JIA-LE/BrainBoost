@@ -1,8 +1,8 @@
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
-using QuestAI.Models;
-using QuestAI.Parameter;
-using QuestAI.Services;
+using BrainBoost.Models;
+using BrainBoost.Parameter;
+using BrainBoost.Services;
 using System.Globalization;
 using System;
 using System.Data;
@@ -15,9 +15,9 @@ using Microsoft.AspNetCore.Authorization;
 
 
 
-namespace QuestAI.Controllers
+namespace BrainBoost.Controllers
 {
-    [Route("QuestAI/[controller]")]
+    [Route("BrainBoost/[controller]")]
     [ApiController]
     [Authorize(Roles = "Teacher, Manager, Admin")]
     public class FileController : Controller

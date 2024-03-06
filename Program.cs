@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using QuestAI.Services;
+using BrainBoost.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);

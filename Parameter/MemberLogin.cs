@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace QuestAI.Parameter;
+namespace BrainBoost.Parameter;
 
 public class MemberLogin
 {
