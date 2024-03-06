@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 namespace QuestAI.Controllers;
 
 [Route("[controller]")]
-public class MemberController : Controller
+public class StudentController : Controller
 {
 
 }

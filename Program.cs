@@ -50,6 +50,7 @@ builder.Services
 //設定生命週期 (有使用到Configuration都要設定)
 builder.Host.ConfigureServices((hostContext,services)=>{
     services.AddScoped<MemberService>();
+    services.AddScoped<QuestionsDBService>();
 });
 
 var app = builder.Build();
