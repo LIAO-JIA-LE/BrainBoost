@@ -30,14 +30,14 @@ namespace BrainBoost.Services
 
             InsertOption(questionList);
         }
-        
+
         // 儲存選項
         public void InsertOption(QuestionList questionList)
         {
             int question_id = GetQuestionId(questionList);
             StringBuilder stringBuilder = new StringBuilder();
-            string sql = $@"INSERT INTO Answer(question_id, option_content, question_parse)
-                            VALUES({question_id},'{questionList.AnswerData.option_content}',
+            string sql = $@"INSERT INTO Answer(question_id, question_answer, question_parse)
+                            VALUES({question_id},'{questionList.AnswerData.question_answer}',
                             '{questionList.AnswerData.question_parse}')";
 
             // 是非題

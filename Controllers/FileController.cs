@@ -1,13 +1,8 @@
-using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 using BrainBoost.Models;
 using BrainBoost.Parameter;
 using BrainBoost.Services;
-using System.Globalization;
-using System;
 using System.Data;
-using System.IO;
-using Microsoft.AspNetCore.Http;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -199,15 +194,14 @@ namespace BrainBoost.Controllers
 
                 question.AnswerData = new Answer()
                 {
-                    option_content = dataRow["Answer"].ToString(),
+                    question_answer = dataRow["Answer"].ToString(),
                     question_parse = dataRow["Parse"].ToString()
                 };
 
                 try
                 {
                     QuestionService.InsertQuestion(question);
-                    //QuestionService.InsertOption(question);
-                    QuestionList.Add(question);
+                    //QuestionList.Add(question);
                 }
                 catch (Exception e)
                 {
