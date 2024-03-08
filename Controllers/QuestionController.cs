@@ -36,7 +36,7 @@ namespace BrainBoost.Controllers
             //題目答案
             questionList.AnswerData = new Answer(){
                 question_answer = question.answer,
-                question_parse = string.IsNullOrEmpty(question.answer) ? question.parse : ""
+                question_parse = question.parse
             };
 
             try

@@ -20,7 +20,5 @@ public class Member
     public string Member_Email { get; set; }
     [DisplayName("驗證碼")]
     public string Member_AuthCode { get; set; }
-    [DisplayName("權限")]
-    public int Member_Role { get; set; }
 }
 
