@@ -43,6 +43,8 @@ namespace BrainBoost.Services
             using var conn = new SqlConnection(cnstr);
             conn.Execute(sql);
         }
+        #endregion
+        
         #region 驗證碼
         public string GenerateAuthCodeFromRoom()
         {
@@ -56,10 +58,13 @@ namespace BrainBoost.Services
             return AuthCode;
         }
         #endregion
-        #endregion
 
-        #region 修改搶答室
-        // public void UpdateRace
+        #region 搶答室列表
+        public List<RaceRooms> RaceRoomList(){
+            string sql = $@" SELECT race_name, race_date, race_code, race_public FROM RaceRooms ORDER BY race_date ASC ";
+            using (var conn = new SqlConnection(cnstr))
+            return new List<RaceRooms>(conn.Query<RaceRooms>(sql));
+        }
         #endregion
     }
 }

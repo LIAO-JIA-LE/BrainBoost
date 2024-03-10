@@ -21,10 +21,10 @@ namespace BrainBoost.Controllers
         #endregion
 
         // 搶答室列表
-        // public List<RaceRooms> RaceRoomList(){
-        //     //return RaceService.RaceRoomList();
-        //     return Ok();
-        // }
+        public List<RaceRooms> RaceRoomList(){
+            return RaceService.RaceRoomList();
+        }
+        
         // 新增搶答室
         [HttpPost("[Action]")]
         public IActionResult InsertRaceRoom([FromBody]RaceData raceData){

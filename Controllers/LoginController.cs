@@ -10,7 +10,7 @@ namespace BrainBoost.Controllers;
 [AllowAnonymous]
 public class LoginController : ControllerBase
 {
-    #region 呼叫Service
+    #region 呼叫函式
     readonly MemberService MemberService;
     readonly JwtHelpers JwtHelpers;
     public LoginController(MemberService _MemberService,JwtHelpers _jwtHelpers){

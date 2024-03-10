@@ -13,8 +13,5 @@ namespace BrainBoost.Models
 
         // 總成績
         public int total_score { get; set; }
-
-        // 排名
-        public int rank_number { get; set; }
     }
 }
