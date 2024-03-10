@@ -10,11 +10,13 @@ namespace BrainBoost.Controllers
     [Route("[controller]")]
     public class QuestionController : Controller
     {
-        private readonly QuestionsDBService questionsDBService;
+        private readonly QuestionsDBService QuestionService;
+        readonly MemberService MemberService;
 
-        public QuestionController(QuestionsDBService _questionsDBService)
+        public QuestionController(QuestionsDBService _questionService,MemberService _memberService)
         {
-            questionsDBService = _questionsDBService;
+            QuestionService = _questionService;
+            MemberService = _memberService;
         }
 
         // 新增 選擇題題目（手動）
@@ -36,12 +38,13 @@ namespace BrainBoost.Controllers
             // 題目答案
             questionList.AnswerData = new Answer(){
                 question_answer = question.answer,
-                question_parse = string.IsNullOrEmpty(question.answer) ? question.parse : ""
+                question_parse = question.parse
             };
 
             try
             {
-                questionsDBService.InsertQuestion(questionList);
+                questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                QuestionService.InsertQuestion(questionList);
             }
             catch (Exception e)
             {
@@ -49,9 +52,18 @@ namespace BrainBoost.Controllers
             }
             return Ok("");
         }
+<<<<<<< HEAD
     
         // 顯示 選擇題題目
         // [HttpPost("[Action]")]
         // public
+=======
+
+        [HttpPost("[Action]")]
+        public IActionResult Get_Question(int page = 1){
+            
+            return Ok();
+        }
+>>>>>>> 9fd1f1e39c62f7a74ad358760084067b6ebcc4e3
     }
 }

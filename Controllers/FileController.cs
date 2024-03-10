@@ -21,10 +21,12 @@ namespace BrainBoost.Controllers
     {
         #region 呼叫函式
         private readonly QuestionsDBService QuestionService;
+        private readonly MemberService MemberService;
 
-        public FileController(QuestionsDBService questionService)
+        public FileController(QuestionsDBService _questionService,MemberService _memberService)
         {
-            QuestionService = questionService;
+            QuestionService = _questionService;
+            MemberService = _memberService;
         }
         #endregion
 
@@ -374,6 +376,7 @@ namespace BrainBoost.Controllers
 
                 try
                 {
+                    question.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
                     QuestionService.InsertQuestion(question);
                 }
                 catch (Exception e)

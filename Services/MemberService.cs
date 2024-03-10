@@ -15,7 +15,10 @@ public class MemberService
     }
     public int GetRole(string member_Account)
     {
-        return GetDataByAccount(member_Account).Member_Role;
+        string sql = $@"SELECT m_r.role_id FROM Member m INNER JOIN Member_Role m_r ON m.member_id = m_r.member_id WHERE m.member_account = '{member_Account}'";
+        using var conn = new SqlConnection(cnstr);
+        int role_id = conn.QueryFirstOrDefault<int>(sql);
+        return role_id;
     }
 
     public string LoginCheck(string member_Account, string member_Password)
@@ -77,7 +80,11 @@ public class MemberService
     public void Register(Member member)
     {
         string sql = @$"INSERT INTO Member(member_name,member_account,member_password,member_email,member_authcode)
-                                    VALUES('{member.Member_Name}','{member.Member_Account}','{member.Member_Password}','{member.Member_Email}','{member.Member_AuthCode}')";
+                                    VALUES('{member.Member_Name}','{member.Member_Account}','{member.Member_Password}','{member.Member_Email}','{member.Member_AuthCode}')
+                        /*設定暫時的變數*/
+                        DECLARE @member_id int = (SELECT m.member_id FROM Member m WHERE m.member_account = '{member.Member_Account}');
+                        INSERT INTO Member_Role(member_id,role_id)
+                                    VALUES(@member_id,0)";
         using var conn = new SqlConnection(cnstr);
         conn.Execute(sql);
     }
