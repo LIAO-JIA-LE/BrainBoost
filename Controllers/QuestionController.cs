@@ -17,23 +17,23 @@ namespace BrainBoost.Controllers
             questionsDBService = _questionsDBService;
         }
 
-        //手動輸入選擇題題目
+        // 新增 選擇題題目（手動）
         [HttpPost("[Action]")]
         public IActionResult Insert_Mcq(InsertQuestion question){
             
-            //將題目細節儲存至QuestionList物件
+            // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
             questionList.QuestionData.type_id = 2;
-            //題目敘述
+            // 題目敘述
             questionList.QuestionData.question_content = question.question_content;
-            //題目選項
+            // 題目選項
             questionList.Options = new List<string>(){
                 question.optionA.ToString(),
                 question.optionB.ToString(),
                 question.optionC.ToString(),
                 question.optionD.ToString(),
             };
-            //題目答案
+            // 題目答案
             questionList.AnswerData = new Answer(){
                 question_answer = question.answer,
                 question_parse = string.IsNullOrEmpty(question.answer) ? question.parse : ""
@@ -49,5 +49,9 @@ namespace BrainBoost.Controllers
             }
             return Ok("");
         }
+    
+        // 顯示 選擇題題目
+        // [HttpPost("[Action]")]
+        // public
     }
 }

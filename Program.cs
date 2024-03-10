@@ -51,6 +51,7 @@ builder.Services
 builder.Host.ConfigureServices((hostContext,services)=>{
     services.AddScoped<MemberService>();
     services.AddScoped<QuestionsDBService>();
+    services.AddScoped<MailService>();
 });
 
 var app = builder.Build();

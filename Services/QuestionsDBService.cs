@@ -9,15 +9,16 @@ namespace BrainBoost.Services
 {
     public class QuestionsDBService
     {
-        // 宣告Service
+        #region 宣告連線字串
         private readonly string? cnstr;
 
         public QuestionsDBService(IConfiguration configuration)
         {
             cnstr = configuration.GetConnectionString("ConnectionStrings");
         }
+        #endregion
 
-
+        #region 匯入題目、選項和答案
         // 儲存題目
         public void InsertQuestion(QuestionList questionList)
         {
@@ -57,8 +58,6 @@ namespace BrainBoost.Services
                 {
                     stringBuilder.Append($@"INSERT INTO ""Option""(question_id, option_content)
                                             VALUES('{question_id}', '{questionList.Options[i]}')");
-                    // stringBuilder.Append($@"INSERT INTO Option(question_id, option_content)
-                    //                         VALUES({question_id}, '{questionList.Options[i]}')");
                 }
             }
             
@@ -74,12 +73,17 @@ namespace BrainBoost.Services
             conn.Execute(sql);
             conn.Execute(stringBuilder.ToString());
         }
+        #endregion
 
+        #region 獲得id
         // 獲得題目id
         public int GetQuestionId(QuestionList question){
             string sql = $@" SELECT question_id FROM Question WHERE question_content = '{question.QuestionData.question_content}' ";
             using var conn = new SqlConnection(cnstr);
             return conn.QueryFirstOrDefault<int>(sql);
         }
+        #endregion
+    
+        
     }
 }

@@ -76,7 +76,7 @@ public class MemberService
 
     public void Register(Member member)
     {
-        string sql = @$"INSERT INTO Member(member_name,member_account,member_password,member_email,member_authcode,member_role)
+        string sql = @$"INSERT INTO Member(member_name,member_account,member_password,member_email,member_authcode)
                                     VALUES('{member.Member_Name}','{member.Member_Account}','{member.Member_Password}','{member.Member_Email}','{member.Member_AuthCode}','{member.Member_Role}')";
         using var conn = new SqlConnection(cnstr);
         conn.Execute(sql);
