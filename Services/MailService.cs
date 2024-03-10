@@ -8,6 +8,7 @@ namespace BrainBoost.Services
         readonly string g_Password = "atkgycxstctufqtx";
         readonly string g_Email = "gys52310@gmail.com";
 
+        // 製造驗證碼
         public string GenerateAuthCode()
         {
             string[] Code = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","S","T","U","V","X","Y","Z",
@@ -21,12 +22,16 @@ namespace BrainBoost.Services
             }
             return AuthCode;
         }
+        
+        // 編輯郵件
         public string GetMailBody(string TempMail, string UserName, string ValidateUrl)
         {
             TempMail = TempMail.Replace("{{UserName}}", UserName);
             TempMail = TempMail.Replace("{{ValidateUrl}}", ValidateUrl);
             return TempMail;
         }
+        
+        // 寄郵件
         public void SendMail(string MailBody, string ToMail)
         {
             SmtpClient smtp = new("smtp.gmail.com")
