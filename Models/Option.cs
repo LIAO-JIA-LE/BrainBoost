@@ -6,5 +6,6 @@
         public int question_id { get; set; }
         public string option_content { get; set; }
         public string option_picture { get; set; }
+        public bool is_answer{get;set;}
     }
 }

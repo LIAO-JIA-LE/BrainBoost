@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using Dapper;
 using System.Text;
 using System.Drawing.Printing;
+using BrainBoost.Services;
 
 namespace BrainBoost.Services
 {
@@ -11,19 +12,21 @@ namespace BrainBoost.Services
     {
         // 宣告Service
         private readonly string? cnstr;
+        readonly MemberService MemberService;
 
-        public QuestionsDBService(IConfiguration configuration)
+        public QuestionsDBService(IConfiguration configuration,MemberService _memberService)
         {
-            cnstr = configuration.GetConnectionString("ConnectionStrings");
+            cnstr = configuration.GetConnectionString("ConnectionStrings"); 
+            MemberService = _memberService;
         }
 
 
         // 儲存題目
         public void InsertQuestion(QuestionList questionList)
         {
-            string sql = $@"INSERT INTO Question(type_id, question_content, question_picture)
+            string sql = $@"INSERT INTO Question(type_id, question_content, question_picture,member_id)
                             VALUES('{questionList.QuestionData.type_id}', '{questionList.QuestionData.question_content}',
-                            '{questionList.QuestionData.question_picture}')";
+                            '{questionList.QuestionData.question_picture}',{questionList.QuestionData.member_id})";
             // 先執行當前題目內容
             using var conn = new SqlConnection(cnstr);
             conn.Execute(sql);
@@ -39,7 +42,7 @@ namespace BrainBoost.Services
             string sql = $@"INSERT INTO Answer(question_id, question_answer, question_parse)
                             VALUES({question_id},'{questionList.AnswerData.question_answer}',
                             '{questionList.AnswerData.question_parse}')";
-
+            
             // 是非題
             if(questionList.QuestionData.type_id == 1)
             {
@@ -55,10 +58,9 @@ namespace BrainBoost.Services
             {
                 for(int i = 0; i < 4; i++)
                 {
-                    stringBuilder.Append($@"INSERT INTO ""Option""(question_id, option_content)
-                                            VALUES('{question_id}', '{questionList.Options[i]}')");
-                    // stringBuilder.Append($@"INSERT INTO Option(question_id, option_content)
-                    //                         VALUES({question_id}, '{questionList.Options[i]}')");
+                    //新增判斷是否為答案
+                    stringBuilder.Append($@"INSERT INTO ""Option""(question_id, option_content, is_answer)      
+                                            VALUES('{question_id}', '{questionList.Options[i]}','{questionList.Options[i] == questionList.AnswerData.question_answer}')");
                 }
             }
             
@@ -81,5 +83,7 @@ namespace BrainBoost.Services
             using var conn = new SqlConnection(cnstr);
             return conn.QueryFirstOrDefault<int>(sql);
         }
+
+        
     }
 }

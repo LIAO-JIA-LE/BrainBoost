@@ -10,11 +10,13 @@ namespace BrainBoost.Controllers
     [Route("[controller]")]
     public class QuestionController : Controller
     {
-        private readonly QuestionsDBService questionsDBService;
+        private readonly QuestionsDBService QuestionService;
+        readonly MemberService MemberService;
 
-        public QuestionController(QuestionsDBService _questionsDBService)
+        public QuestionController(QuestionsDBService _questionService,MemberService _memberService)
         {
-            questionsDBService = _questionsDBService;
+            QuestionService = _questionService;
+            MemberService = _memberService;
         }
 
         //手動輸入選擇題題目
@@ -41,13 +43,20 @@ namespace BrainBoost.Controllers
 
             try
             {
-                questionsDBService.InsertQuestion(questionList);
+                questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                QuestionService.InsertQuestion(questionList);
             }
             catch (Exception e)
             {
                 return BadRequest($"發生錯誤:  {e}");
             }
             return Ok("");
+        }
+
+        [HttpPost("[Action]")]
+        public IActionResult Get_Question(int page = 1){
+            
+            return Ok();
         }
     }
 }

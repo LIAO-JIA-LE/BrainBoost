@@ -13,5 +13,6 @@ namespace BrainBoost.Models
         public string question_content { get; set; }
 
         public string? question_picture {  get; set; }
+        public int member_id{get;set;}
     }
 }
