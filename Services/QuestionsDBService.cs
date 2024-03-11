@@ -87,6 +87,17 @@ namespace BrainBoost.Services
             return conn.QueryFirstOrDefault<int>(sql);
         }
         #endregion
+
+        #region 題目列表
+        // 選擇題（只顯示題目內容，不包含選項）
+        public List<QuestionList> GetQuestionList(int type, string Search){
+            string sql = String.Empty;
+            if(!String.IsNullOrEmpty(Search))
+                sql = $@" SELECT * FROM Question WHERE question_content LIKE '%{Search}%' AND type_id = '{type}' ";
+            using (var conn = new SqlConnection(cnstr))
+            return new List<QuestionList>(conn.Query<QuestionList>(sql));
+        }
+        #endregion
         
     }
 }

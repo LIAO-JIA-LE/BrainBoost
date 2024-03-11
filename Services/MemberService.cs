@@ -9,10 +9,14 @@ namespace BrainBoost.Services;
 
 public class MemberService
 {
+    #region 宣告連線字串
     private readonly string? cnstr;
     public MemberService(IConfiguration configuration){
         cnstr = configuration.GetConnectionString("ConnectionStrings");
     }
+    #endregion
+
+    // 獲得權限
     public int GetRole(string member_Account)
     {
         string sql = $@"SELECT m_r.role_id FROM Member m INNER JOIN Member_Role m_r ON m.member_id = m_r.member_id WHERE m.member_account = '{member_Account}'";
@@ -21,6 +25,7 @@ public class MemberService
         return role_id;
     }
 
+    // 登入確認
     public string LoginCheck(string member_Account, string member_Password)
     {
         Member Data = GetDataByAccount(member_Account);
@@ -54,16 +59,22 @@ public class MemberService
             return "電子郵件已被註冊";
         return "";
     }
+
+    // 用account獲得資料
     public Member GetDataByAccount(string account){
         string sql = $@"SELECT * FROM Member WHERE member_account = '{account}' ";
         using (var conn = new SqlConnection(cnstr))
         return conn.QueryFirstOrDefault<Member>(sql);
     }
+
+    // 用mail獲得資料
     public Member GetDataByEmail(string mail){
         string sql = $@"SELECT * FROM Member WHERE Member_Email = '{mail}' ";
         using (var conn = new SqlConnection(cnstr))
         return conn.QueryFirstOrDefault<Member>(sql);
     }
+
+    // 雜湊密碼
     public string HashPassword(string Password)
     {
         using (SHA512 sha512 = SHA512.Create())

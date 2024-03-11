@@ -4,6 +4,7 @@ using System.Net.Mail;
 using BrainBoost.Models;
 using BrainBoost.Parameter;
 using Dapper;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BrainBoost.Services
 {
@@ -11,24 +12,34 @@ namespace BrainBoost.Services
     {
         #region 宣告連線字串
         private readonly string? cnstr;
-        public RaceService(IConfiguration configuration){
+        private readonly QuestionsDBService QuestionService;
+
+        public RaceService(IConfiguration configuration, QuestionsDBService _questionService){
             cnstr = configuration.GetConnectionString("ConnectionStrings");
+            QuestionService = _questionService;
         }
         #endregion
 
-        #region 搶答室列表
-        public List<RaceRooms> GetRaceRoomList(){
+        #region 顯示 搶答室資訊
+        // 搶答室列表
+        public List<RaceRooms> GetRoomList(){
             string sql = $@" SELECT	* FROM RaceRooms ORDER BY race_date DESC ";
             using (var conn = new SqlConnection(cnstr))
             return new List<RaceRooms>(conn.Query<RaceRooms>(sql));
         }
+        
+        // 搶答室單一（詳細資料）
+        public RaceRooms GetRoom(int id){
+            string sql = $@" SELECT	* FROM RaceRooms WHERE raceroom_id = '{id}' ";
+            using (var conn = new SqlConnection(cnstr))
+            return conn.QueryFirstOrDefault<RaceRooms>(sql);
+        }
         #endregion
 
         #region 新增搶答室
-        public void InsertRaceRoom(RaceData raceData){
+        public void Insert_Room(RaceData raceData){
             // 驗證碼
-            Random rd = new Random();
-            string ValidateCode = GenerateAuthCodeFromRoom();
+            string ValidateCode = GetCode();
 
             // 新增搶答室資訊
             string sql = $@"INSERT INTO RaceRooms(race_name, race_date, race_code)
@@ -46,7 +57,7 @@ namespace BrainBoost.Services
         #endregion
         
         #region 驗證碼
-        public string GenerateAuthCodeFromRoom()
+        public string GetCode()
         {
             string[] Code = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","S","T","U","V","X","Y","Z",
                             "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","s","t","u","v","x","y","z",
@@ -59,12 +70,31 @@ namespace BrainBoost.Services
         }
         #endregion
 
-        #region 搶答室列表
-        public List<RaceRooms> RaceRoomList(){
-            string sql = $@" SELECT race_name, race_date, race_code, race_public FROM RaceRooms ORDER BY race_date ASC ";
-            using (var conn = new SqlConnection(cnstr))
-            return new List<RaceRooms>(conn.Query<RaceRooms>(sql));
+        #region 修改搶答室（避免）
+        // 修改 搶答室資訊（名稱、時間、公開）
+        public void Update_Information_FromRaceRoom(int id, RaceData raceData){
+            RaceRooms Room = GetRoom(id);
+            // 新增搶答室資訊
+            string sql = $@"INSERT INTO RaceRooms(race_name, race_date, race_code)
+                            VALUES('{raceData.room_information.race_name}', '{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}',
+                            '{ValidateCode}', '{raceData.room_information.race_public}') ";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql);
+        }
+
+        // 新增 搶答室題目
+        public void Insert_Question_FromRaceRoom(RaceData raceData){
+            // 新增題目
+            for(int i = 0; i < raceData.room_question.question_id.Count; i++){
+                string sql = $@"INSERT INTO Race_Question(question_id, time_limit)
+                                VALUES('{raceData.room_question.question_id[i]}', '{raceData.room_question.time_limit}') ";
+            }
         }
         #endregion
+
+        #region 刪除搶答室
+        public void Delete_RaceRoom(int id){
+
+        }        
     }
 }

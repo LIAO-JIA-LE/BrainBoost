@@ -10,7 +10,7 @@ namespace BrainBoost.Controllers
     [AllowAnonymous]
     public class RegisterController : ControllerBase
     {
-        #region 呼叫Service
+        #region 呼叫函式
         readonly MemberService MemberService;
         readonly MailService MailService;
         public RegisterController(MemberService _MemberService,MailService _MailService){
