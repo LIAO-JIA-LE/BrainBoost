@@ -70,31 +70,44 @@ namespace BrainBoost.Services
         }
         #endregion
 
-        #region 修改搶答室（避免）
+        #region 修改搶答室（資訊和問題分開）
         // 修改 搶答室資訊（名稱、時間、公開）
-        public void Update_Information_FromRaceRoom(int id, RaceData raceData){
+        public void Update_Information_ByRoom(int id, RaceData raceData){
             RaceRooms Room = GetRoom(id);
             // 新增搶答室資訊
-            string sql = $@"INSERT INTO RaceRooms(race_name, race_date, race_code)
-                            VALUES('{raceData.room_information.race_name}', '{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}',
-                            '{ValidateCode}', '{raceData.room_information.race_public}') ";
+            string sql = $@"UPDATE RaceRooms SET race_name = '{raceData.room_information.race_name}',
+                            race_date = '{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}' WHERE racerooms_id = '{Room.raceroom_id}'";
             using var conn = new SqlConnection(cnstr);
             conn.Execute(sql);
         }
 
         // 新增 搶答室題目
-        public void Insert_Question_FromRaceRoom(RaceData raceData){
+        public void Insert_Question_ByRoom(RaceData raceData){
+            string sql = String.Empty;
             // 新增題目
             for(int i = 0; i < raceData.room_question.question_id.Count; i++){
-                string sql = $@"INSERT INTO Race_Question(question_id, time_limit)
+                sql = $@"INSERT INTO Race_Question(question_id, time_limit)
                                 VALUES('{raceData.room_question.question_id[i]}', '{raceData.room_question.time_limit}') ";
             }
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql);
+        }
+
+        // 取消選取 搶答室題目
+        public void Delete_Question_ByRoom(int id){
+            string sql = $@"DELETE FROM Race_Question WHERE racerooms_id = '{id}' ";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql);
         }
         #endregion
 
         #region 刪除搶答室
-        public void Delete_RaceRoom(int id){
-
-        }        
+        public void Delete_Room(int id){
+            string sql = $@"DELETE FROM RaceRooms WHERE racerooms_id = '{id}' 
+                            DELETE FROM Race_Question WHERE racerooms_id = '{id}' ";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql);
+        }
+        #endregion  
     }
 }
