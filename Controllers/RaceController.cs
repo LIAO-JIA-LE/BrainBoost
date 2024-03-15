@@ -52,17 +52,32 @@ namespace BrainBoost.Controllers
         #endregion
 
         #region 修改搶答室
+        // 修改 搶答室資訊
         [HttpPost("[Action]")]
-        public IActionResult UpdateRoom([FromRoute]int id, [FromBody]RaceData raceData){
-            RaceService.Update_Room(raceData);
+        public IActionResult Update_Information_ByRoom([FromRoute]int id, [FromBody]RaceData raceData){
+            RaceService.Update_Information_ByRoom(id, raceData);
+            return Ok();
+        }
+
+        // 新增 搶答室題目
+        [HttpPost("[Action]")]
+        public IActionResult Insert_Question_ByRoom([FromBody]RaceData raceData){
+            RaceService.Insert_Question_ByRoom(raceData);
+            return Ok();
+        }
+
+        // 刪除 搶答室題目
+        [HttpPost("[Action]/{Id}")]
+        public IActionResult Delete_Question_ByRoom([FromRoute]int id){
+            RaceService.Delete_Question_ByRoom(id);
             return Ok();
         }
         #endregion
 
         #region 刪除搶答室
         [HttpDelete("[Action]/{id}")]
-        public IActionResult DeleteRaceRoom([FromRoute]int id){
-            RaceService.Delete_RaceRoom(id);
+        public IActionResult DeleteRoom([FromRoute]int id){
+            RaceService.Delete_Room(id);
             return Ok();
         }
         #endregion
