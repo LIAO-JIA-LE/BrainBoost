@@ -111,16 +111,16 @@ namespace BrainBoost.Controllers
         #endregion
         
         #region 顯示問題
-        // 獲得 單一問題
+        // 獲取 題庫資訊
         [HttpPost("[Action]")]
-        public IActionResult Get_Question(int page = 1){
+        public IActionResult Get_QuestionList([FromRoute]int page = 1){
             
             return Ok();
         }
 
-        // 獲得 單一問題
+        // 獲取 單一問題
         [HttpPost("[Action]")]
-        public IActionResult Get_QuestionList(int page = 1){
+        public IActionResult Get_Question([FromRoute]int id){
             
             return Ok();
         }
