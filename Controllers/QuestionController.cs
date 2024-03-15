@@ -112,18 +112,18 @@ namespace BrainBoost.Controllers
         
         #region 顯示問題
         // 獲得 單一問題
-        [HttpPost("[Action]")]
-        public IActionResult Get_Question(int page = 1){
-            
-            return Ok();
-        }
+        // [HttpPost("[Action]")]
+        // public IActionResult Get_Question(int page = 1){
+        //     QuestionService.Get();
+        //     return Ok();
+        // }
 
         // 獲得 單一問題
-        [HttpPost("[Action]")]
-        public IActionResult Get_QuestionList(int page = 1){
+        // [HttpPost("[Action]")]
+        // public IActionResult Get_QuestionList(int page = 1){
             
-            return Ok();
-        }
+        //     return Ok();
+        // }
         #endregion
     }
 }

@@ -1,26 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using BrainBoost.Services;
 using BrainBoost.Models;
 using Microsoft.AspNetCore.Authorization;
+using BrainBoost.Parameter;
 
 namespace BrainBoost.Controllers
 {
     [Route("BrainBoost/[controller]")]
     [ApiController]
     [AllowAnonymous]
-    public class RegisterController : ControllerBase
+    public class MemberController : ControllerBase
     {
         #region 呼叫函式
         readonly MemberService MemberService;
         readonly MailService MailService;
-        public RegisterController(MemberService _MemberService,MailService _MailService){
+        readonly JwtHelpers JwtHelpers;
+        public MemberController(MemberService _MemberService,MailService _MailService, JwtHelpers _jwtHelpers){
             MemberService = _MemberService;
             MailService = _MailService;
+            JwtHelpers = _jwtHelpers;
         }
         #endregion
         
+
+        #region 註冊
         // 註冊 
-        [HttpPost]
+        [HttpPost("[Action]")]
         public IActionResult Register([FromBody]MemberRegister RegisterData)
         {
             if (ModelState.IsValid)
@@ -68,7 +73,7 @@ namespace BrainBoost.Controllers
         }
         
         // 郵件驗證
-        [HttpGet("MailValidate")]
+        [HttpGet("[Action]")]
         public IActionResult MailValidate(string Account,string AuthCode)
         {
             if (MemberService.MailValidate(Account, AuthCode))
@@ -76,5 +81,73 @@ namespace BrainBoost.Controllers
             else
                 return BadRequest("請重新確認或重新註冊");
         }
+    
+        #endregion
+    
+        #region 登入
+        // 登入
+        [HttpPost("[Action]")]
+        public IActionResult Login(MemberLogin Member)
+        {
+            string ValidateStr = MemberService.LoginCheck(Member.Member_Account, Member.Member_Password);
+            if (!string.IsNullOrWhiteSpace(ValidateStr)){
+                var result = new {
+                    ErrorMessage = ValidateStr,
+                    StatusCode = 400
+                };
+                return BadRequest(result);
+            }
+            else
+            {
+                int Role = MemberService.GetRole(Member.Member_Account);
+                var jwt = JwtHelpers.GenerateToken(Member.Member_Account,Role);
+                var result = new { 
+                    SuccessMessage = "登入成功",
+                    StatusCode = 200,
+                    Token = jwt 
+                };
+                return Ok(result);
+            }
+        }
+        #endregion
+
+        #region 無權限 & 未登入
+        // 無權限
+        [HttpGet("[Action]")]
+        public IActionResult NoAccess()
+        {
+            return BadRequest("沒有權限");
+        }
+        
+        // 無登入
+        [HttpGet("[Action]")]
+        public IActionResult NoLogin()
+        {
+            return BadRequest("未登入");
+        }
+        #endregion
+
+        #region 權限
+        // 獲得驗證後名稱
+        [HttpGet("[Action]")]
+        public IActionResult GetName(){
+            return Ok(User.Identity?.Name);
+        }
+        
+        // 獲得權限
+        [HttpGet("[Action]")]
+        [Authorize]
+        public IActionResult GetRole(){
+            int Role = MemberService.GetRole(User.Identity?.Name);
+            if(Role == 1)
+                return Ok("Student");
+            else if(Role == 2)
+                return Ok("Teacher");
+            else if(Role == 3)
+                return Ok("Manager");
+            else
+                return Ok("Admin");
+        }
+        #endregion
     }
 }

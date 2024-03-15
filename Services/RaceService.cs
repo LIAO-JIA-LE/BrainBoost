@@ -104,7 +104,9 @@ namespace BrainBoost.Services
         #region 刪除搶答室
         public void Delete_Room(int id){
             string sql = $@"DELETE FROM RaceRooms WHERE racerooms_id = '{id}' 
-                            DELETE FROM Race_Question WHERE racerooms_id = '{id}' ";
+                            DELETE FROM Race_Question WHERE racerooms_id = '{id}'
+                            DELETE FROM Race_Rank WHERE racerooms_id = '{id}'
+                            DELETE FROM Room_Responses WHERE racerooms_id = '{id}' ";
             using var conn = new SqlConnection(cnstr);
             conn.Execute(sql);
         }

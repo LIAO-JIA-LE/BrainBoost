@@ -159,8 +159,8 @@ namespace BrainBoost.Services
             }
             return dataTable;
         }
-            
         #endregion
+
         #region 匯入題目、選項和答案
         // 儲存題目
         public void InsertQuestion(QuestionList questionList)
@@ -228,8 +228,8 @@ namespace BrainBoost.Services
         }
         #endregion
 
-        #region 題目列表
-        // 選擇題（只顯示題目內容，不包含選項）
+        #region 題目列表（只顯示題目內容，不包含選項）
+        // 選擇題
         public List<QuestionList> GetQuestionList(int type, string Search){
             string sql = String.Empty;
             if(!String.IsNullOrEmpty(Search))
@@ -238,6 +238,7 @@ namespace BrainBoost.Services
             return new List<QuestionList>(conn.Query<QuestionList>(sql));
         }
         #endregion
+
         
     }
 }
