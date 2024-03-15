@@ -56,7 +56,7 @@ namespace BrainBoost.Services
         }
         #endregion
         
-        #region 驗證碼
+        #region 隨機邀請碼
         public string GetCode()
         {
             string[] Code = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","S","T","U","V","X","Y","Z",
