@@ -10,6 +10,10 @@ namespace BrainBoost.Parameter
         [DisplayName("題目")]
         public string question_content {get;set;}
 
+        // 難度
+        [DisplayName("難度")]
+        public int question_level {get;set;}
+
         // 圖片
         [DisplayName("圖片")]
         public IFormFile? photo{get;set;}
@@ -30,8 +34,12 @@ namespace BrainBoost.Parameter
         [DisplayName("選項D")]
         public string optionD {get;set;}
 
+        // 概念
+        [DisplayName("標籤")]
+        public string tag{get;set;}
+
         // 答案
-        //前端用JS回傳已輸入的選項當作正確答案回傳值
+        // 前端用JS回傳已輸入的選項當作正確答案回傳值
         [DisplayName("答案")]
         public string answer{get;set;}
 

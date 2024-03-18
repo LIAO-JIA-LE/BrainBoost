@@ -28,9 +28,16 @@ namespace BrainBoost.Controllers
             
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
+            // 題型
             questionList.QuestionData.type_id = 1;
+            // 題目分類
+            questionList.TagData.tag_name = question.tag;
             // 題目敘述
-            questionList.QuestionData.question_content = question.question_content;
+            questionList.QuestionData = new Question(){
+                question_level = question.question_level,
+                question_content = question.question_content
+            };
+            
             // 題目答案
             questionList.AnswerData = new Answer(){
                 question_answer = question.answer,
@@ -46,7 +53,7 @@ namespace BrainBoost.Controllers
             {
                 return BadRequest($"發生錯誤:  {e}");
             }
-            return Ok("");
+            return Ok("新增成功");
         }
 
         // 新增 選擇題題目（手動）
@@ -55,9 +62,14 @@ namespace BrainBoost.Controllers
             
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
+            // 題目分類
+            questionList.TagData.tag_name = question.tag;
             questionList.QuestionData.type_id = 2;
             // 題目敘述
-            questionList.QuestionData.question_content = question.question_content;
+            questionList.QuestionData = new Question(){
+                question_level = question.question_level,
+                question_content = question.question_content
+            };
             // 題目選項
             questionList.Options = new List<string>(){
                 question.optionA.ToString(),
@@ -80,7 +92,7 @@ namespace BrainBoost.Controllers
             {
                 return BadRequest($"發生錯誤:  {e}");
             }
-            return Ok("");
+            return Ok("新增成功");
         }
 
         // 新增 填充題題目（手動）
@@ -90,13 +102,19 @@ namespace BrainBoost.Controllers
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
             questionList.QuestionData.type_id = 3;
+            // 題目分類
+            questionList.TagData.tag_name = question.tag;
             // 題目敘述
-            questionList.QuestionData.question_content = question.question_content;
+            questionList.QuestionData = new Question(){
+                question_level = question.question_level,
+                question_content = question.question_content
+            };
             // 題目答案
             questionList.AnswerData = new Answer(){
                 question_answer = question.answer,
                 question_parse = question.parse
             };
+            
             try
             {
                 questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
@@ -106,11 +124,11 @@ namespace BrainBoost.Controllers
             {
                 return BadRequest($"發生錯誤:  {e}");
             }
-            return Ok("");
+            return Ok("新增成功");
         }
         #endregion
         
-        #region 顯示問題
+        // #region 顯示問題
         // 獲得 單一問題
         // [HttpPost("[Action]")]
         // public IActionResult Get_Question(int page = 1){
@@ -124,6 +142,6 @@ namespace BrainBoost.Controllers
             
         //     return Ok();
         // }
-        #endregion
+        // #endregion
     }
 }

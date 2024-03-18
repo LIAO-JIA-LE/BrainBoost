@@ -16,6 +16,9 @@ namespace BrainBoost.Models
 
         // 會員編號
         public int member_id { get; set; }
+        
+        // 程度
+        public int question_level{get;set;}
 
         // 題目敘述
         public string question_content { get; set; }

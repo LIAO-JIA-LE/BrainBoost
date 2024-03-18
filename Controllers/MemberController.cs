@@ -40,7 +40,7 @@ namespace BrainBoost.Controllers
                 }
                 Member Member = new()
                 {
-                    Member_Name = RegisterData.Member_Username,
+                    Member_Name = RegisterData.Member_Name,
                     Member_Account = RegisterData.Member_Account,
                     Member_Email = RegisterData.Member_Email,
                     Member_Password = MemberService.HashPassword(RegisterData.Member_Password),
@@ -58,7 +58,7 @@ namespace BrainBoost.Controllers
                     Scheme = request.Scheme, // 使用請求的協議 (http/https)
                     Host = request.Host.Host, // 使用請求的主機名
                     Port = request.Host.Port ?? 80, // 使用請求的端口，如果未指定則默認使用80
-                    Path = "/BrainBoost/Register/MailValidate?" + querystr
+                    Path = "/BrainBoost/Member/MailValidate?" + querystr
                 };
                 string finalUrl = ValidateUrl.ToString().Replace("%3F","?");
 

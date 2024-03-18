@@ -7,7 +7,7 @@ public class MemberRegister
     // 會員名稱
     [DisplayName("用戶名稱")]
     [Required(ErrorMessage = "請輸入用戶名稱")]
-    public required string Member_Username { get; set; }
+    public required string Member_Name { get; set; }
 
     // 會員帳號
     [DisplayName("帳號")]

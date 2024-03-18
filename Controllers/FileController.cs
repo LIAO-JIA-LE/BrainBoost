@@ -42,10 +42,12 @@ namespace BrainBoost.Controllers
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 QuestionList question = new QuestionList();
+                question.TagData.tag_name = dataRow["Tag"].ToString();
 
                 question.QuestionData = new Question()
                 {
                     type_id = 1,
+                    question_level = Convert.ToInt32(dataRow["Level"]),
                     question_content = dataRow["Question"].ToString()
                 };
 
@@ -77,10 +79,12 @@ namespace BrainBoost.Controllers
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 QuestionList question = new QuestionList();
+                question.TagData.tag_name = dataRow["Tag"].ToString();
 
                 question.QuestionData = new Question()
                 {
                     type_id = 2,
+                    question_level = Convert.ToInt32(dataRow["Level"]),
                     question_content = dataRow["Question"].ToString()
                 };
 
@@ -100,7 +104,7 @@ namespace BrainBoost.Controllers
 
                 try
                 {
-                    question.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                    question.QuestionData.member_id = 1;
                     QuestionService.InsertQuestion(question);
                 }
                 catch (Exception e)
@@ -121,13 +125,14 @@ namespace BrainBoost.Controllers
             foreach (DataRow dataRow in dataTable.Rows)
             {
                 QuestionList question = new QuestionList();
+                question.TagData.tag_name = dataRow["Tag"].ToString();
 
                 question.QuestionData = new Question()
                 {
                     type_id = 3,
+                    question_level = Convert.ToInt32(dataRow["Level"]),
                     question_content = dataRow["Question"].ToString()
                 };
-
                 question.AnswerData = new Answer()
                 {
                     question_answer = dataRow["Answer"].ToString(),

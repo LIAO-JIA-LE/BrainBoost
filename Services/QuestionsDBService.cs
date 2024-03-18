@@ -9,6 +9,7 @@ using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Data;
+using NPOI.SS.Formula.Functions;
 
 namespace BrainBoost.Services
 {
@@ -165,9 +166,11 @@ namespace BrainBoost.Services
         // 儲存題目
         public void InsertQuestion(QuestionList questionList)
         {
-            string sql = $@"INSERT INTO Question(type_id, question_content, question_picture,member_id)
-                            VALUES('{questionList.QuestionData.type_id}', '{questionList.QuestionData.question_content}',
-                            '{questionList.QuestionData.question_picture}',{questionList.QuestionData.member_id})";
+            string sql = $@"INSERT INTO Question(type_id, member_id, question_level, question_content, question_picture)
+                            VALUES('{questionList.QuestionData.type_id}',{questionList.QuestionData.member_id},
+                            '{questionList.QuestionData.question_level}','{questionList.QuestionData.question_content}',
+                            '{questionList.QuestionData.question_picture}')";
+            
             // 先執行當前題目內容
             using var conn = new SqlConnection(cnstr);
             conn.Execute(sql);
@@ -175,23 +178,53 @@ namespace BrainBoost.Services
             InsertOption(questionList);
         }
 
+        // 獲得沒有重複的Tag
+        public string NotRepeatQuestionTag(int memberid, string tagname){
+            string sql = $@" SELECT tag_name FROM Tag WHERE member_id = '{memberid}'AND tag_name = '{tagname}' ";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<string>(sql);
+        }
+
+        // 新增Tag
+        public void InsertTag(int member_id, string tag_name){
+            string sql = $@" INSERT Tag(member_id, tag_name)VALUES('{member_id}', '{tag_name}') ";
+            // 執行Sql
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql);
+        }
+
+        // 獲得Tagid
+        public int GetTagId(string tagname){
+            string sql = $@" SELECT tag_id FROM Tag WHERE tag_name = '{tagname}'";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<int>(sql);
+        }
+        
         // 儲存選項
         public void InsertOption(QuestionList questionList)
         {
             int question_id = GetQuestionId(questionList);
             StringBuilder stringBuilder = new StringBuilder();
-            string sql = $@"INSERT INTO Answer(question_id, question_answer, question_parse)
+            // 題目答案
+            stringBuilder.Append($@"INSERT INTO Answer(question_id, question_answer, question_parse)
                             VALUES({question_id},'{questionList.AnswerData.question_answer}',
-                            '{questionList.AnswerData.question_parse}')";
+                            '{questionList.AnswerData.question_parse}')");
+                            
+            // 題目標籤
+            // 看有沒有Tag的資訊
+            if(!String.IsNullOrEmpty(questionList.TagData.tag_name)){
+                // 獲得沒有重複的Tag
+                if(String.IsNullOrEmpty(NotRepeatQuestionTag(questionList.QuestionData.member_id, questionList.TagData.tag_name)))
+                    InsertTag(questionList.QuestionData.member_id, questionList.TagData.tag_name);
+                int tag_id = GetTagId(questionList.TagData.tag_name);
+                stringBuilder.Append($@" INSERT INTO Question_Tag (question_id, tag_id) VALUES ('{question_id}', '{tag_id}') ");
+            }
             
             // 是非題
             if(questionList.QuestionData.type_id == 1)
             {
-                for (int i = 0; i < 2; i++)
-                {
-                    stringBuilder.Append($@"INSERT INTO ""Option""(question_id, option_content)
-                                            VALUES('{question_id}', '{questionList.Options[i]}')");
-                }
+                stringBuilder.Append($@"INSERT INTO ""Option""(question_id, option_content, is_answer)
+                                        VALUES('{question_id}', '{questionList.AnswerData.question_answer}', 1)");
             }
             
             // 選擇題
@@ -214,7 +247,6 @@ namespace BrainBoost.Services
 
             // 執行Sql
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql);
             conn.Execute(stringBuilder.ToString());
         }
         #endregion
