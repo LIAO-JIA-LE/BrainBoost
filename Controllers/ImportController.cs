@@ -1,36 +1,146 @@
-using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 using BrainBoost.Models;
 using BrainBoost.Parameter;
 using BrainBoost.Services;
-using System.Globalization;
-using System;
 using System.Data;
-using System.IO;
-using Microsoft.AspNetCore.Http;
-using NPOI.HSSF.UserModel;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 
 
 namespace BrainBoost.Controllers
 {
     [Route("BrainBoost/[controller]")]
     [ApiController]
-    public class FileController : Controller
+    public class ImportController : Controller
     {
         #region 呼叫函式
         private readonly QuestionsDBService QuestionService;
         private readonly MemberService MemberService;
 
-        public FileController(QuestionsDBService _questionService,MemberService _memberService)
+        public ImportController(QuestionsDBService _questionService,MemberService _memberService)
         {
             QuestionService = _questionService;
             MemberService = _memberService;
         }
         #endregion
 
-        #region 檔案匯入
+        #region 手動新增
+        // 新增 是非題題目（手動）
+        [HttpPost("[Action]")]
+        public IActionResult Insert_Tfq(InsertQuestion question){
+            
+            // 將題目細節儲存至QuestionList物件
+            QuestionList questionList = new();
+
+            // 題目分類
+            questionList.TagData.tag_name = question.tag;
+
+            // 題目敘述
+            questionList.QuestionData = new Question(){
+                type_id = 1,
+                question_level = question.question_level,
+                question_content = question.question_content
+            };
+            
+            // 題目答案
+            questionList.AnswerData = new Answer(){
+                question_answer = question.answer,
+                question_parse = question.parse
+            };
+
+            try
+            {
+                // questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                questionList.QuestionData.member_id = 1;
+                QuestionService.InsertQuestion(questionList);
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"發生錯誤:  {e}");
+            }
+            return Ok("新增成功");
+        }
+
+        // 新增 選擇題題目（手動）
+        [HttpPost("[Action]")]
+        public IActionResult Insert_Mcq(InsertQuestion question){
+            
+            // 將題目細節儲存至QuestionList物件
+            QuestionList questionList = new();
+
+            // 題目分類
+            questionList.TagData.tag_name = question.tag;
+
+            // 題目敘述
+            questionList.QuestionData = new Question(){
+                type_id = 2,
+                question_level = question.question_level,
+                question_content = question.question_content
+            };
+
+            // 題目選項
+            questionList.Options = new List<string>(){
+                question.optionA.ToString(),
+                question.optionB.ToString(),
+                question.optionC.ToString(),
+                question.optionD.ToString(),
+            };
+
+            // 題目答案
+            questionList.AnswerData = new Answer(){
+                question_answer = question.answer,
+                question_parse = question.parse
+            };
+
+            try
+            {
+                // questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                questionList.QuestionData.member_id = 1;
+                QuestionService.InsertQuestion(questionList);
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"發生錯誤:  {e}");
+            }
+            return Ok("新增成功");
+        }
+
+        // 新增 填充題題目（手動）
+        [HttpPost("[Action]")]
+        public IActionResult Insert_Fq(InsertQuestion question){
+            
+            // 將題目細節儲存至QuestionList物件
+            QuestionList questionList = new();
+
+            // 題目分類
+            questionList.TagData.tag_name = question.tag;
+
+            // 題目敘述
+            questionList.QuestionData = new Question(){
+                type_id = 3,
+                question_level = question.question_level,
+                question_content = question.question_content
+            };
+
+            // 題目答案
+            questionList.AnswerData = new Answer(){
+                question_answer = question.answer,
+                question_parse = question.parse
+            };
+            
+            try
+            {
+                // questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                questionList.QuestionData.member_id = 1;
+                QuestionService.InsertQuestion(questionList);
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"發生錯誤:  {e}");
+            }
+            return Ok("新增成功");
+        }
+        #endregion
+        
+        #region 檔案新增
         
         // 讀取 是非題Excel檔案
         [HttpPost("[Action]")]
@@ -59,6 +169,7 @@ namespace BrainBoost.Controllers
 
                 try
                 {
+                    question.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
                     QuestionService.InsertQuestion(question);
                 }
                 catch (Exception e)
@@ -104,7 +215,7 @@ namespace BrainBoost.Controllers
 
                 try
                 {
-                    question.QuestionData.member_id = 1;
+                    question.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
                     QuestionService.InsertQuestion(question);
                 }
                 catch (Exception e)
@@ -141,6 +252,7 @@ namespace BrainBoost.Controllers
 
                 try
                 {
+                    question.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
                     QuestionService.InsertQuestion(question);
                 }
                 catch (Exception e)
