@@ -52,6 +52,7 @@ builder.Host.ConfigureServices((hostContext,services)=>{
     services.AddScoped<MemberService>();
     services.AddScoped<QuestionsDBService>();
     services.AddScoped<MailService>();
+    services.AddScoped<Forpaging>();
 });
 
 var app = builder.Build();

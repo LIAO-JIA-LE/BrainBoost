@@ -134,24 +134,36 @@ public class MemberService
     }
     //無搜尋值查詢的使用者列表
     public List<Member> GetMemberList(Forpaging forpaging){
+        List<Member> data = new();
         string sql = $@"SELECT * FROM (
-                            SELECT ROW_NUMBER() OVER(ORDER BY m.member_id DESC) r_num,m.*,mr.role_id FROM Member m 
+                            SELECT ROW_NUMBER() OVER(ORDER BY m.member_id DESC) r_num,m.member_id,m.member_account,m.member_name,m.member_email,mr.role_id FROM Member m 
                             JOIN Member_Role mr
                             ON m.member_id = mr.member_id
                         )a
                         WHERE a.r_num BETWEEN {(forpaging.NowPage - 1) * forpaging.Item + 1} AND {forpaging.NowPage * forpaging.Item }";
         using var conn = new SqlConnection(cnstr);
-        
+        data = new List<Member>(conn.Query<Member>(sql));
+        return data;
     }
     //有搜尋值查詢的使用者列表
     public List<Member> GetMemberList(string Search,Forpaging forpaging){
-
+        List<Member> data = new();
+        string sql = $@"SELECT * FROM (
+                            SELECT ROW_NUMBER() OVER(ORDER BY m.member_id DESC) r_num,m.member_id,m.member_account,m.member_name,mr.role_id FROM Member m 
+                            JOIN Member_Role mr
+                            ON m.member_id = mr.member_id
+                            WHERE m.member_account LIKE '%{Search}%' OR m.member_name LIKE '%{Search}%'
+                        )a
+                        WHERE a.r_num BETWEEN {(forpaging.NowPage - 1) * forpaging.Item + 1} AND {forpaging.NowPage * forpaging.Item }";
+        using var conn = new SqlConnection(cnstr);
+        data = new List<Member>(conn.Query<Member>(sql));
+        return data;
     }
     //無搜尋值計算所有使用者並設定頁數
     public void SetMaxPage(Forpaging forpaging){
         string sql = $@"SELECT COUNT(*) FROM Member";
         using var conn = new SqlConnection(cnstr);
-        int row = conn.QueryFirst(sql);
+        int row = conn.QueryFirst<int>(sql);
         forpaging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
         forpaging.SetRightPage();
     }
@@ -159,8 +171,15 @@ public class MemberService
     public void SetMaxPage(string Search,Forpaging forpaging){
         string sql = $@"SELECT COUNT(*) FROM Member WHERE member_account LIKE '%{Search}%' OR member_name LIKE '%{Search}%'";
         using var conn = new SqlConnection(cnstr);
-        int row = conn.QueryFirst(sql);
+        int row = conn.QueryFirst<int>(sql);
         forpaging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
         forpaging.SetRightPage();
+    }
+
+    //修改使用者權限(帳號)
+    public void UpdateMemberRole(int member_id,int role){
+        string sql = $@"UPDATE Member_Role = {role} WHERE member_id = {member_id}";
+        using var conn = new SqlConnection(cnstr);
+        conn.Execute(sql);
     }
 }

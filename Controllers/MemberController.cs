@@ -154,15 +154,27 @@ namespace BrainBoost.Controllers
         #endregion
 
         //取得目前所有使用者
-        [Authorize(Roles = "Admin")]
-        [HttpGet]
-        public IActionResult GetMemberList(string Search,int page = 1){
+        // [Authorize(Roles = "Admin")]
+        [HttpGet("[Action]")]
+        public MemberViewModels GetMemberList([FromQuery]string? Search,[FromQuery]int page = 1){
             MemberViewModels data = new(){
-                forpaging = new Forpaging(page),
-                search = Search
+                forpaging = new Forpaging(page)
             };
             data.member = MemberService.GetAllMemberList(Search,data.forpaging);
-
+            data.search = Search;
+            return data;
+        }
+        //取得單一使用者(帳號)
+        [HttpGet("[Action]")]
+        public Member GetMemberByAcc([FromQuery]string account){
+            return MemberService.GetDataByAccount(account);
+        }
+        //修改使用者權限(後臺管理者)
+        [HttpPut("[Action]")]
+        public IActionResult UpdateMemberRole([FromBody]string account, [FromBody]int role){
+            Member data = MemberService.GetDataByAccount(account);
+            MemberService.UpdateMemberRole(data.Member_Id,role);
+            return Ok();
         }
     }
 }
