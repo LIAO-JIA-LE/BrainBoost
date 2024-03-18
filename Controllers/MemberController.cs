@@ -3,6 +3,7 @@ using BrainBoost.Services;
 using BrainBoost.Models;
 using Microsoft.AspNetCore.Authorization;
 using BrainBoost.Parameter;
+using BrainBoost.ViewModels;
 
 namespace BrainBoost.Controllers
 {
@@ -15,10 +16,12 @@ namespace BrainBoost.Controllers
         readonly MemberService MemberService;
         readonly MailService MailService;
         readonly JwtHelpers JwtHelpers;
-        public MemberController(MemberService _MemberService,MailService _MailService, JwtHelpers _jwtHelpers){
-            MemberService = _MemberService;
-            MailService = _MailService;
+        readonly Forpaging Forpaging;
+        public MemberController(MemberService _memberservice,MailService _mailservice, JwtHelpers _jwtHelpers,Forpaging _forpaging){
+            MemberService = _memberservice;
+            MailService = _mailservice;
             JwtHelpers = _jwtHelpers;
+            Forpaging = _forpaging;
         }
         #endregion
         
@@ -149,5 +152,17 @@ namespace BrainBoost.Controllers
                 return Ok("Admin");
         }
         #endregion
+
+        //取得目前所有使用者
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public IActionResult GetMemberList(string Search,int page = 1){
+            MemberViewModels data = new(){
+                forpaging = new Forpaging(page),
+                search = Search
+            };
+            data.member = MemberService.GetAllMemberList(Search,data.forpaging);
+
+        }
     }
 }

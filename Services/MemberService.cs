@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using BrainBoost.Models;
 using BrainBoost.Parameter;
+using BrainBoost.ViewModels;
 using Dapper;
 
 namespace BrainBoost.Services;
@@ -88,6 +89,7 @@ public class MemberService
         }
     }
 
+    //註冊
     public void Register(Member member)
     {
         string sql = @$"INSERT INTO Member(member_name,member_account,member_password,member_email,member_authcode)
@@ -100,6 +102,7 @@ public class MemberService
         conn.Execute(sql);
     }
 
+    //信箱驗證
     public bool MailValidate(string Account, string AuthCode)
     {
         Member Data = GetDataByAccount(Account);
@@ -112,5 +115,52 @@ public class MemberService
             return Data.Member_AuthCode == AuthCode;
         }
         else return false;
+    }
+
+    //(後台管理者)
+    //取得所有使用者
+    public List<Member> GetAllMemberList(string Search,Forpaging forpaging){
+        List<Member> Data = new();
+        //判斷是否有增加搜尋值
+        if(string.IsNullOrEmpty(Search)){
+            SetMaxPage(forpaging);
+            Data = GetMemberList(forpaging);
+        }
+        else{
+            SetMaxPage(Search,forpaging);
+            Data = GetMemberList(Search,forpaging);
+        }
+        return Data;
+    }
+    //無搜尋值查詢的使用者列表
+    public List<Member> GetMemberList(Forpaging forpaging){
+        string sql = $@"SELECT * FROM (
+                            SELECT ROW_NUMBER() OVER(ORDER BY m.member_id DESC) r_num,m.*,mr.role_id FROM Member m 
+                            JOIN Member_Role mr
+                            ON m.member_id = mr.member_id
+                        )a
+                        WHERE a.r_num BETWEEN {(forpaging.NowPage - 1) * forpaging.Item + 1} AND {forpaging.NowPage * forpaging.Item }";
+        using var conn = new SqlConnection(cnstr);
+        
+    }
+    //有搜尋值查詢的使用者列表
+    public List<Member> GetMemberList(string Search,Forpaging forpaging){
+
+    }
+    //無搜尋值計算所有使用者並設定頁數
+    public void SetMaxPage(Forpaging forpaging){
+        string sql = $@"SELECT COUNT(*) FROM Member";
+        using var conn = new SqlConnection(cnstr);
+        int row = conn.QueryFirst(sql);
+        forpaging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
+        forpaging.SetRightPage();
+    }
+    //有搜尋值計算所有使用者並設定頁數
+    public void SetMaxPage(string Search,Forpaging forpaging){
+        string sql = $@"SELECT COUNT(*) FROM Member WHERE member_account LIKE '%{Search}%' OR member_name LIKE '%{Search}%'";
+        using var conn = new SqlConnection(cnstr);
+        int row = conn.QueryFirst(sql);
+        forpaging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
+        forpaging.SetRightPage();
     }
 }

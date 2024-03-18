@@ -19,7 +19,6 @@ public class Member
     // 會員簡介
     // [DisplayName("簡介")]
     // public string Member_Introduce { get; set; }
-    
 
     // 會員帳號
     [DisplayName("帳號")]
@@ -42,7 +41,7 @@ public class Member
     
 
     // 會員權限
-    // [DisplayName("權限")]
-    // public int Member_Role { get; set; }
+    [DisplayName("權限")]
+    public int Member_Role { get; set; }
 }
 
