@@ -137,26 +137,12 @@ namespace BrainBoost.Controllers
             return Ok(User.Identity?.Name);
         }
         
-        // 獲得權限
-        [HttpGet("[Action]")]
-        [Authorize]
-        public IActionResult GetRole(){
-            int Role = MemberService.GetRole(User.Identity?.Name);
-            if(Role == 1)
-                return Ok("Student");
-            else if(Role == 2)
-                return Ok("Teacher");
-            else if(Role == 3)
-                return Ok("Manager");
-            else
-                return Ok("Admin");
-        }
         #endregion
 
         //取得目前所有使用者
         // [Authorize(Roles = "Admin")]
         [HttpGet("[Action]")]
-        public MemberViewModels GetMemberList([FromQuery]string? Search,[FromQuery]int page = 1){
+        public MemberViewModels MemberList([FromQuery]string? Search,[FromQuery]int page = 1){
             MemberViewModels data = new(){
                 forpaging = new Forpaging(page)
             };
@@ -166,7 +152,7 @@ namespace BrainBoost.Controllers
         }
         //取得單一使用者(帳號)
         [HttpGet("[Action]")]
-        public Member GetMemberByAcc([FromQuery]string account){
+        public Member MemberByAcc([FromQuery]string account){
             return MemberService.GetDataByAccount(account);
         }
         

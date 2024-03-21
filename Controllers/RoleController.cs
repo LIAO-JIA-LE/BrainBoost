@@ -17,17 +17,27 @@ namespace BrainBoost.Controllers
             MemberService = _memberservice;
             RoleService = _roleservice;
         }
-
-        [HttpGet("[Action]")]
-        public List<MemberRoleList> MemberRoleLists(){
-            return RoleService.GetMemberRoleList();
-        }
         //修改使用者權限(後臺管理者)
         [HttpPut("[Action]")]
         public IActionResult UpdateMemberRole([FromBody]UpdateRole data){
             Member member = MemberService.GetDataByAccount(data.account);
             RoleService.UpdateMemberRole(member.Member_Id,data.role);
             return Ok();
+        }
+        
+        // 獲得權限
+        [HttpGet("[Action]")]
+        [Authorize]
+        public IActionResult GetRole(){
+            int Role = MemberService.GetRole(User.Identity?.Name);
+            if(Role == 1)
+                return Ok("Student");
+            else if(Role == 2)
+                return Ok("Teacher");
+            else if(Role == 3)
+                return Ok("Manager");
+            else
+                return Ok("Admin");
         }
     }
 }

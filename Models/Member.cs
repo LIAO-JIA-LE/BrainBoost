@@ -42,6 +42,6 @@ public class Member
 
     // 會員權限
     [DisplayName("權限")]
-    public int Member_Role { get; set; }
+    public int Role_Id { get; set; }
 }
 
