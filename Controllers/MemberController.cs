@@ -169,12 +169,6 @@ namespace BrainBoost.Controllers
         public Member GetMemberByAcc([FromQuery]string account){
             return MemberService.GetDataByAccount(account);
         }
-        //修改使用者權限(後臺管理者)
-        [HttpPut("[Action]")]
-        public IActionResult UpdateMemberRole([FromBody]string account, [FromBody]int role){
-            Member data = MemberService.GetDataByAccount(account);
-            MemberService.UpdateMemberRole(data.Member_Id,role);
-            return Ok();
-        }
+        
     }
 }

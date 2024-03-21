@@ -176,10 +176,4 @@ public class MemberService
         forpaging.SetRightPage();
     }
 
-    //修改使用者權限(帳號)
-    public void UpdateMemberRole(int member_id,int role){
-        string sql = $@"UPDATE Member_Role = {role} WHERE member_id = {member_id}";
-        using var conn = new SqlConnection(cnstr);
-        conn.Execute(sql);
-    }
 }
