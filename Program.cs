@@ -55,6 +55,8 @@ builder.Host.ConfigureServices((hostContext,services)=>{
     services.AddScoped<RaceService>();
     services.AddScoped<RaceRepository>();
     services.AddScoped<ImportRepository>();
+    services.AddScoped<Forpaging>();
+    services.AddScoped<RoleService>();
 });
 
 var app = builder.Build();

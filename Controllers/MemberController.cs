@@ -3,6 +3,7 @@ using BrainBoost.Services;
 using BrainBoost.Models;
 using Microsoft.AspNetCore.Authorization;
 using BrainBoost.Parameter;
+using BrainBoost.ViewModels;
 
 namespace BrainBoost.Controllers
 {
@@ -15,10 +16,12 @@ namespace BrainBoost.Controllers
         readonly MemberService MemberService;
         readonly MailService MailService;
         readonly JwtHelpers JwtHelpers;
-        public MemberController(MemberService _MemberService,MailService _MailService, JwtHelpers _jwtHelpers){
-            MemberService = _MemberService;
-            MailService = _MailService;
+        readonly Forpaging Forpaging;
+        public MemberController(MemberService _memberservice,MailService _mailservice, JwtHelpers _jwtHelpers,Forpaging _forpaging){
+            MemberService = _memberservice;
+            MailService = _mailservice;
             JwtHelpers = _jwtHelpers;
+            Forpaging = _forpaging;
         }
         #endregion
         
@@ -134,19 +137,23 @@ namespace BrainBoost.Controllers
             return Ok(User.Identity?.Name);
         }
         
-        // 獲得權限
+        #endregion
+
+        //取得目前所有使用者
+        // [Authorize(Roles = "Admin")]
         [HttpGet("[Action]")]
-        [Authorize]
-        public IActionResult GetRole(){
-            int Role = MemberService.GetRole(User.Identity?.Name);
-            if(Role == 1)
-                return Ok("Student");
-            else if(Role == 2)
-                return Ok("Teacher");
-            else if(Role == 3)
-                return Ok("Manager");
-            else
-                return Ok("Admin");
+        public MemberViewModels MemberList([FromQuery]string? Search,[FromQuery]int page = 1){
+            MemberViewModels data = new(){
+                forpaging = new Forpaging(page)
+            };
+            data.member = MemberService.GetAllMemberList(Search,data.forpaging);
+            data.search = Search;
+            return data;
+        }
+        //取得單一使用者(帳號)
+        [HttpGet("[Action]")]
+        public Member MemberByAcc([FromQuery]string account){
+            return MemberService.GetDataByAccount(account);
         }
         #endregion
 
