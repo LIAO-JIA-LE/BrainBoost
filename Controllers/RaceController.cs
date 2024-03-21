@@ -12,13 +12,13 @@ namespace BrainBoost.Controllers
     public class RaceController : Controller
     {
         #region 呼叫函式
-        readonly RaceService _raceService;
-        readonly QuestionsDBService _questionService;
+        readonly RaceService raceService;
+        readonly QuestionsDBService questionService;
 
-        public RaceController(RaceService raceService, QuestionsDBService questionService)
+        public RaceController(RaceService _raceService, QuestionsDBService _questionService)
         {
-            _raceService = raceService;
-            _questionService = questionService;
+            raceService = _raceService;
+            questionService = _questionService;
         }
         #endregion
 
@@ -26,19 +26,13 @@ namespace BrainBoost.Controllers
         // 搶答室列表
         [HttpGet("[Action]")]
         public List<RaceRooms> GetRoomList(){
-            return _raceService.GetRoomList();
+            return raceService.GetRoomList();
         }
         
         // 搶答室單一
         [HttpGet("[Action]")]
-        public RaceRooms GetRoom([FromRoute]int id){
-            var result = _raceService.GetRoom(id);
-            if (result is null)
-            {
-                Response.StatusCode = 404;
-                return null;
-            }
-            return result;
+        public RaceRooms GetRoom([FromQuery]int id){
+            return raceService.GetRoom(id);
         }
         #endregion
         
@@ -47,22 +41,23 @@ namespace BrainBoost.Controllers
         [HttpPost("[Action]")]
         public IActionResult Room([FromBody]RaceData raceData){
             try{
-                _raceService.Room(raceData);
+                raceService.Room(raceData);
             }
             catch(Exception e){
                 return BadRequest(e.ToString());
             }
-            return Ok();
+            return Ok("新增成功");
         }
         #endregion
 
-        // #region 修改搶答室
-        // // 修改 搶答室資訊
-        // [HttpPost("[Action]")]
-        // public IActionResult Update_Information_ByRoom([FromRoute]int id, [FromBody]RaceData raceData){
-        //     RaceService.Update_Information_ByRoom(id, raceData);
-        //     return Ok();
-        // }
+        #region 修改搶答室
+
+        // 修改 搶答室資訊
+        [HttpPut("[Action]")]
+        public IActionResult RoomInformation([FromQuery]int id, [FromBody]RaceData raceData){
+            raceService.RoomInformation(id, raceData);
+            return Ok();
+        }
 
         // // 新增 搶答室題目
         // [HttpPost("[Action]")]
@@ -93,6 +88,6 @@ namespace BrainBoost.Controllers
         //     var result = QuestionService.GetQuestionList(Question_type, Search);
         //     return result;
         // }
-        // #endregion
+        #endregion
     }
 }

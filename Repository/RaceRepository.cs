@@ -20,10 +20,10 @@ namespace BrainBoost.Services
         public void Room(RaceData raceData){
             string currentTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
             // 新增搶答室資訊
-            string sql = $@"INSERT INTO RaceRoom(race_name, race_date, race_function, race_public)
-                            VALUES(@race_name, @race_date, @race_function, @race_public) ";
+            string sql = $@"INSERT INTO RaceRoom(race_name, race_date, race_function, race_public, is_delete)
+                            VALUES(@race_name, @race_date, @race_function, @race_public, @is_delete) ";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new {race_name = raceData.room_information.race_name, race_date = currentTime, race_function = raceData.room_information.race_function, race_public = raceData.room_information.race_public});
+            conn.Execute(sql, new {race_name = raceData.room_information.race_name, race_date = currentTime, race_function = raceData.room_information.race_function, race_public = raceData.room_information.race_public, is_delete = 0});
             RoomQuestion(raceData);
         }
         #endregion
@@ -31,7 +31,7 @@ namespace BrainBoost.Services
         #region 搶答室id
         public int GetRoomId(RaceData raceData){
             // 跟member_id和race_name尋找raceroom_id
-            string sql = $@" SELECT raceroom_id FROM RaceRoom WHERE race_name = @race_name ";
+            string sql = $@" SELECT raceroom_id FROM RaceRoom WHERE race_name = @race_name AND is_delete = 0";
             using var conn = new SqlConnection(cnstr);
             return conn.QueryFirstOrDefault<int>(sql, new {race_name = raceData.room_information.race_name});
         }
@@ -50,17 +50,28 @@ namespace BrainBoost.Services
 
         #region 搶答室列表
         public List<RaceRooms> GetList(){
-            string sql = $@" SELECT	* FROM RaceRoom ORDER BY race_date DESC ";
+            string sql = $@" SELECT	* FROM RaceRoom WHERE is_delete = 0 ORDER BY race_date DESC ";
             using (var conn = new SqlConnection(cnstr))
             return (List<RaceRooms>)conn.Query<RaceRooms>(sql);
         }
         #endregion
 
-        #region 單一搶答室資料
-        public RaceRooms Get(int Raceroom_id){
-            string sql = $@" SELECT	* FROM RaceRoom WHERE raceroom_id = '{Raceroom_id}' AND is_delete = 0 ";
-            using (var conn = new SqlConnection(cnstr))
-            return conn.QueryFirstOrDefault<RaceRooms>(sql);
+        #region 單一搶答室資訊
+        public RaceRooms GetInformation(int Raceroom_id){
+            string sql = $@" SELECT	* FROM RaceRoom WHERE raceroom_id = @raceroom_id AND is_delete = 0 ";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<RaceRooms>(sql, new { raceroom_id = Raceroom_id });
+        }
+        #endregion
+
+        #region 修改搶答室資訊
+        public void RoomInformation(int id, RaceData raceData){
+            int Raceroom_id = GetRoomId(raceData);
+            // 新增搶答室資訊
+            string sql = $@"UPDATE RaceRooms SET race_name = '{raceData.room_information.race_name}',
+                            race_date = '{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}' WHERE racerooms_id = '{Raceroom_id}'";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql);
         }
         #endregion
     }

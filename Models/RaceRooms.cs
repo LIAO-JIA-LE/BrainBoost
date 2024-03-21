@@ -22,5 +22,8 @@ namespace BrainBoost.Models
 
         // 公開
         public bool race_public{ get; set; }
+
+        // 假刪除
+        public bool is_delete{get;set;}
     }
 }

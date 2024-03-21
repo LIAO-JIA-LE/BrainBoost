@@ -28,7 +28,7 @@ namespace BrainBoost.Services
         
         // 搶答室單一（詳細資料）
         public RaceRooms GetRoom(int id){
-            return _raceRepository.Get(id);
+            return _raceRepository.GetInformation(id);
         }
         #endregion
 
@@ -38,28 +38,13 @@ namespace BrainBoost.Services
         }
         #endregion
         
-        // #region 隨機邀請碼
-        // public string GetCode()
-        // {
-        //     string[] Code = {"1","2","3","4","5","6","7","8","9","0"};
-        //     Random rd = new();
-        //     string AuthCode = string.Empty;
-        //     for (int i = 0; i < 6; i++)
-        //         AuthCode += Code[rd.Next(Code.Length)];
-        //     return AuthCode;
-        // }
-        // #endregion
+        #region 修改搶答室（資訊和問題分開）
+        // 修改 搶答室資訊（名稱、時間、公開）
+        public void RoomInformation(int id, RaceData raceData){
+            _raceRepository.RoomInformation(id, raceData);
+        }
+        #endregion
 
-        // #region 修改搶答室（資訊和問題分開）
-        // // 修改 搶答室資訊（名稱、時間、公開）
-        // public void Update_Information_ByRoom(int id, RaceData raceData){
-        //     RaceRooms Room = GetRoom(id);
-        //     // 新增搶答室資訊
-        //     string sql = $@"UPDATE RaceRooms SET race_name = '{raceData.room_information.race_name}',
-        //                     race_date = '{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}' WHERE racerooms_id = '{Room.raceroom_id}'";
-        //     using var conn = new SqlConnection(cnstr);
-        //     conn.Execute(sql);
-        // }
 
         // // 新增 搶答室題目
         // public void Insert_Question_ByRoom(RaceData raceData){
@@ -91,5 +76,18 @@ namespace BrainBoost.Services
         //     conn.Execute(sql);
         // }
         // #endregion  
+
+        
+        // #region 隨機邀請碼
+        // public string GetCode()
+        // {
+        //     string[] Code = {"1","2","3","4","5","6","7","8","9","0"};
+        //     Random rd = new();
+        //     string AuthCode = string.Empty;
+        //     for (int i = 0; i < 6; i++)
+        //         AuthCode += Code[rd.Next(Code.Length)];
+        //     return AuthCode;
+        // }
+        // #endregion
     }
 }
