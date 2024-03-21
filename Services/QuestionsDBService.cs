@@ -17,12 +17,11 @@ namespace BrainBoost.Services
     {
         #region 宣告連線字串
         private readonly string? cnstr;
-        readonly MemberService MemberService;
-
-        public QuestionsDBService(IConfiguration configuration,MemberService _memberService)
+        private readonly ImportRepository _importRepository;
+        public QuestionsDBService(IConfiguration configuration, ImportRepository importRepository)
         {
             cnstr = configuration.GetConnectionString("ConnectionStrings"); 
-            MemberService = _memberService;
+            _importRepository = importRepository;
         }
         #endregion
 
@@ -166,10 +165,10 @@ namespace BrainBoost.Services
         // 儲存題目
         public void InsertQuestion(QuestionList questionList)
         {
-            string sql = $@"INSERT INTO Question(type_id, member_id, question_level, question_content, question_picture)
+            string sql = $@"INSERT INTO Question(type_id, member_id, question_level, question_content, question_picture, create_time)
                             VALUES('{questionList.QuestionData.type_id}',{questionList.QuestionData.member_id},
                             '{questionList.QuestionData.question_level}','{questionList.QuestionData.question_content}',
-                            '{questionList.QuestionData.question_picture}')";
+                            '{questionList.QuestionData.question_picture}', '{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}')";
             
             // 先執行當前題目內容
             using var conn = new SqlConnection(cnstr);

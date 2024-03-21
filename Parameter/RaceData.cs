@@ -9,5 +9,7 @@ namespace BrainBoost.Parameter
 
         // 搶答室的題目
         public Race_Question room_question{ get; set; }
+
+
     }
 }

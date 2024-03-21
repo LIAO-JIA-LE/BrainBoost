@@ -25,7 +25,7 @@ namespace BrainBoost.Controllers
         #region 手動新增
         // 新增 是非題題目（手動）
         [HttpPost("[Action]")]
-        public IActionResult Insert_Tfq(InsertQuestion question){
+        public IActionResult TrueOrFalse(InsertQuestion question){
             
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
@@ -61,7 +61,7 @@ namespace BrainBoost.Controllers
 
         // 新增 選擇題題目（手動）
         [HttpPost("[Action]")]
-        public IActionResult Insert_Mcq(InsertQuestion question){
+        public IActionResult MultipleChoice(InsertQuestion question){
             
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
@@ -105,7 +105,7 @@ namespace BrainBoost.Controllers
 
         // 新增 填充題題目（手動）
         [HttpPost("[Action]")]
-        public IActionResult Insert_Fq(InsertQuestion question){
+        public IActionResult ShortAnswer(InsertQuestion question){
             
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
@@ -144,7 +144,7 @@ namespace BrainBoost.Controllers
         
         // 讀取 是非題Excel檔案
         [HttpPost("[Action]")]
-        public IActionResult UploadExcel_Tfq(IFormFile file)
+        public IActionResult Excel_TrueorFalse(IFormFile file)
         {
             // 檔案處理
             DataTable dataTable = QuestionService.FileDataPrecess(file);
@@ -170,6 +170,7 @@ namespace BrainBoost.Controllers
                 try
                 {
                     question.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                    // question.QuestionData.member_id = 1;
                     QuestionService.InsertQuestion(question);
                 }
                 catch (Exception e)
@@ -182,7 +183,7 @@ namespace BrainBoost.Controllers
     
         // 讀取 選擇題Excel檔案
         [HttpPost("[Action]")]
-        public IActionResult UploadExcel_Mcq(IFormFile file)
+        public IActionResult Excel_MultipleChoice(IFormFile file)
         {
             // 檔案處理
             DataTable dataTable = QuestionService.FileDataPrecess(file);
@@ -228,7 +229,7 @@ namespace BrainBoost.Controllers
     
         // 讀取 填充題Excel檔案
         [HttpPost("[Action]")]
-        public IActionResult UploadExcel_Fq(IFormFile file)
+        public IActionResult Excel_ShortAnswer(IFormFile file)
         {
             // 檔案處理
             DataTable dataTable = QuestionService.FileDataPrecess(file);

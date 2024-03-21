@@ -16,6 +16,7 @@ public class MemberService
     }
     #endregion
 
+    #region 登入
     // 獲得權限
     public int GetRole(string member_Account)
     {
@@ -44,7 +45,9 @@ public class MemberService
         else
             return "無此會員資料";
     }
-
+    #endregion
+    
+    #region 註冊
     // 密碼確認
     public bool PasswordCheck(string Data, string Password)
     {
@@ -58,20 +61,6 @@ public class MemberService
         else if(GetDataByEmail(Email)!=null)
             return "電子郵件已被註冊";
         return "";
-    }
-
-    // 用account獲得資料
-    public Member GetDataByAccount(string account){
-        string sql = $@"SELECT * FROM Member WHERE member_account = '{account}' ";
-        using (var conn = new SqlConnection(cnstr))
-        return conn.QueryFirstOrDefault<Member>(sql);
-    }
-
-    // 用mail獲得資料
-    public Member GetDataByEmail(string mail){
-        string sql = $@"SELECT * FROM Member WHERE Member_Email = '{mail}' ";
-        using (var conn = new SqlConnection(cnstr))
-        return conn.QueryFirstOrDefault<Member>(sql);
     }
 
     // 雜湊密碼
@@ -88,6 +77,7 @@ public class MemberService
         }
     }
 
+    // 註冊
     public void Register(Member member)
     {
         string sql = @$"INSERT INTO Member(member_name,member_account,member_password,member_email,member_authcode)
@@ -100,6 +90,7 @@ public class MemberService
         conn.Execute(sql);
     }
 
+    // 郵件驗證
     public bool MailValidate(string Account, string AuthCode)
     {
         Member Data = GetDataByAccount(Account);
@@ -113,4 +104,53 @@ public class MemberService
         }
         else return false;
     }
+    #endregion
+    
+    #region 忘記密碼
+    // 更新驗證碼
+    public void ChangeAuthCode(string NewAuthCode,string Email){
+        string sql = $@" UPDATE Member SET member_authcode = '{NewAuthCode}' WHERE member_email = '{Email}';";
+        using (var conn = new SqlConnection(cnstr))
+        conn.Execute(sql);
+    }
+
+    // 修改權限‵‵‵‵‵‵‵‵‵‵‵‵‵‵‵
+    public void ChangeMemberRole(int id, int Role){
+        string sql = $@" UPDATE Member SET Member_Role = {Role} WHERE Member_Id = {id} ";
+        using (var conn = new SqlConnection(cnstr))
+        conn.Execute(sql);
+    }
+
+    // 清除驗證碼
+    public void ClearAuthCode(string Email){
+        string sql = $@" UPDATE Member SET member_authcode = '{String.Empty}' WHERE member_email = '{Email}';";
+        using (var conn = new SqlConnection(cnstr))
+        conn.Execute(sql);
+    }
+
+    // 更改密碼ByForget
+    public void ChangePasswordByForget(CheckForgetPassword Data){
+        Member member = GetDataByEmail(Data.Email);
+        member.Member_Password = HashPassword(Data.NewPassword);
+        string sql = $@" UPDATE Member SET member_password = '{member.Member_Password}' WHERE member_email = '{Data.Email}';";
+        using (var conn = new SqlConnection(cnstr))
+        conn.Execute(sql);
+    }
+    #endregion
+
+    #region 獲得資料
+    // 用account獲得資料
+    public Member GetDataByAccount(string account){
+        string sql = $@"SELECT * FROM Member WHERE member_account = '{account}' ";
+        using (var conn = new SqlConnection(cnstr))
+        return conn.QueryFirstOrDefault<Member>(sql);
+    }
+
+    // 用mail獲得資料
+    public Member GetDataByEmail(string mail){
+        string sql = $@"SELECT * FROM Member WHERE member_email = '{mail}' ";
+        using (var conn = new SqlConnection(cnstr))
+        return conn.QueryFirstOrDefault<Member>(sql);
+    }
+    #endregion
 }

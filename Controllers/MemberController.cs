@@ -149,5 +149,82 @@ namespace BrainBoost.Controllers
                 return Ok("Admin");
         }
         #endregion
+
+        #region 忘記密碼
+        // 輸入Email後寄驗證信
+        [HttpGet]
+        [Route("[Action]/{Email}")]
+        public IActionResult SendForgetPasswordEmail([FromRoute] string Email)
+        {
+            // 看有沒有Email的資料
+            Member Data = MemberService.GetDataByEmail(Email);
+            // 有就寄驗證信，沒有則回傳「查無用戶」
+            if (Data != null)
+            {
+                Data.Member_AuthCode = MailService.GenerateAuthCode();
+                // 製作AuthCode
+                MemberService.ChangeAuthCode(Data.Member_AuthCode, Email);
+                // 寄驗證信
+                var path = Directory.GetCurrentDirectory() + "/Verificationletter/ForgetPasswordTempMail.html";
+                string TempMail = System.IO.File.ReadAllText(path);
+                string MailBody = MailService.GetMailBody(TempMail, Data.Member_Name, Data.Member_AuthCode);
+                MailService.SendMail(MailBody, Email);
+                string str = "寄信成功，請收信。";
+                return Ok(str);
+            }
+            else
+                return BadRequest("查無用戶");
+        }
+
+        // 檢查驗證碼
+        [HttpPost]
+        [Route("[Action]")]
+        public IActionResult CheckForgetPasswordAuthCode([FromBody] CheckForgetPasswordAuthCode Data)
+        {
+            // 取得此Email的會員資訊
+            Member Member = MemberService.GetDataByEmail(Data.Email);
+            // 判斷驗證碼是否正確
+            if (Member.Member_AuthCode == Data.AuthCode)
+            {
+                MemberService.ChangeMemberRole(Member.Member_Id, 3);
+                int Role = MemberService.GetRole(Member.Member_Account);
+                var jwt = JwtHelpers.GenerateToken(Member.Member_Account, Role);
+                var result = new
+                {
+                    SuccessMessage = "驗證成功",
+                    StatusCode = 200,
+                    Token = jwt
+                };
+                // 回傳成功
+                return Ok(result);
+            }
+            else
+            {
+                // 回傳失敗
+                return BadRequest("驗證碼錯誤");
+            }
+        }
+
+        // 修改密碼
+        [HttpPost]
+        [Route("[Action]")]
+        [Authorize(Roles = "ForgetPassword")]
+        public IActionResult CheckForgetPassword([FromBody] CheckForgetPassword Data)
+        {
+            // 取得此Email的會員資訊
+            if (User.IsInRole("ForgetPassword"))
+            {
+                MemberService.ClearAuthCode(Data.Email);
+                MemberService.ChangePasswordByForget(Data);
+                return Ok("修改密碼成功！請再次登入！");
+            }
+            else
+            {
+                // 用戶未獲得足夠的權限
+                return BadRequest("您無權執行此操作。");
+            }
+
+        }
+        #endregion
     }
 }
