@@ -40,7 +40,7 @@ namespace BrainBoost.Services
         
         #region 修改搶答室（資訊和問題分開）
         // 修改 搶答室資訊（名稱、時間、公開）
-        public void RoomInformation(int id, RaceData raceData){
+        public void RoomInformation(int id, RaceRooms raceData){
             _raceRepository.RoomInformation(id, raceData);
         }
         #endregion

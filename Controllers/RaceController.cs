@@ -54,15 +54,15 @@ namespace BrainBoost.Controllers
 
         // 修改 搶答室資訊
         [HttpPut("[Action]")]
-        public IActionResult RoomInformation([FromQuery]int id, [FromBody]RaceData raceData){
+        public IActionResult RoomInformation([FromQuery]int id, [FromBody]RaceRooms raceData){
             raceService.RoomInformation(id, raceData);
             return Ok();
         }
 
-        // // 新增 搶答室題目
+        // 新增 搶答室題目
         // [HttpPost("[Action]")]
-        // public IActionResult Insert_Question_ByRoom([FromBody]RaceData raceData){
-        //     RaceService.Insert_Question_ByRoom(raceData);
+        // public IActionResult RoomQuestion([FromBody]RaceData raceData){
+        //     RaceService.RoomQuestion(raceData);
         //     return Ok();
         // }
 

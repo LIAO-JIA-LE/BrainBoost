@@ -65,13 +65,12 @@ namespace BrainBoost.Services
         #endregion
 
         #region 修改搶答室資訊
-        public void RoomInformation(int id, RaceData raceData){
-            int Raceroom_id = GetRoomId(raceData);
+        public void RoomInformation(int id, RaceRooms raceData){
             // 新增搶答室資訊
-            string sql = $@"UPDATE RaceRooms SET race_name = '{raceData.room_information.race_name}',
-                            race_date = '{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}' WHERE racerooms_id = '{Raceroom_id}'";
+            string sql = $@"UPDATE RaceRooms SET race_name = @race_name, @race_function = @race_function,
+                            @race_public = @race_public WHERE racerooms_id = '{id}'";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql);
+            conn.Execute(sql, new {race_name = raceData.race_name, race_function = raceData.race_function, race_public = raceData.race_public });
         }
         #endregion
     }
