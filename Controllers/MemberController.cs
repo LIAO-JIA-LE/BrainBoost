@@ -17,11 +17,13 @@ namespace BrainBoost.Controllers
         readonly MailService MailService;
         readonly JwtHelpers JwtHelpers;
         readonly Forpaging Forpaging;
-        public MemberController(MemberService _memberservice,MailService _mailservice, JwtHelpers _jwtHelpers,Forpaging _forpaging){
+        readonly RoleService RoleService;
+        public MemberController(MemberService _memberservice,MailService _mailservice, JwtHelpers _jwtHelpers,Forpaging _forpaging,RoleService _roleservice){
             MemberService = _memberservice;
             MailService = _mailservice;
             JwtHelpers = _jwtHelpers;
             Forpaging = _forpaging;
+            RoleService = _roleservice;
         }
         #endregion
         
@@ -155,7 +157,6 @@ namespace BrainBoost.Controllers
         public Member MemberByAcc([FromQuery]string account){
             return MemberService.GetDataByAccount(account);
         }
-        #endregion
 
         #region 忘記密碼
         // 輸入Email後寄驗證信
@@ -193,7 +194,7 @@ namespace BrainBoost.Controllers
             // 判斷驗證碼是否正確
             if (Member.Member_AuthCode == Data.AuthCode)
             {
-                MemberService.ChangeMemberRole(Member.Member_Id, 3);
+                RoleService.UpdateMemberRole(Member.Member_Id, 4);
                 int Role = MemberService.GetRole(Member.Member_Account);
                 var jwt = JwtHelpers.GenerateToken(Member.Member_Account, Role);
                 var result = new

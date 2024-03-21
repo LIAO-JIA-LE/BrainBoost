@@ -48,7 +48,7 @@ public class MemberService
     }
     #endregion
     
-    #region 註冊
+    // 註冊
     // 密碼確認
     public bool PasswordCheck(string Data, string Password)
     {
@@ -170,6 +170,14 @@ public class MemberService
         using (var conn = new SqlConnection(cnstr))
         conn.Execute(sql);
     }
+    
+    // 清除驗證碼
+    public void ClearAuthCode(string Email){
+        string sql = $@" UPDATE Member SET member_authcode = '{String.Empty}' WHERE member_email = '{Email}';";
+        using (var conn = new SqlConnection(cnstr))
+        conn.Execute(sql);
+    }
+
     // 更改密碼ByForget
     public void ChangePasswordByForget(CheckForgetPassword Data){
         Member member = GetDataByEmail(Data.Email);
@@ -178,6 +186,7 @@ public class MemberService
         using (var conn = new SqlConnection(cnstr))
         conn.Execute(sql);
     }
+    
     // 用mail獲得資料
     public Member GetDataByEmail(string mail){
         string sql = $@"SELECT * FROM Member WHERE member_email = '{mail}' ";
@@ -190,5 +199,5 @@ public class MemberService
         using (var conn = new SqlConnection(cnstr))
         return conn.QueryFirstOrDefault<Member>(sql);
     }
-
+    #endregion
 }
