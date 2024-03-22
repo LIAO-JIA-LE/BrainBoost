@@ -3,6 +3,7 @@ using BrainBoost.Services;
 using BrainBoost.Models;
 using Microsoft.AspNetCore.Authorization;
 using BrainBoost.Parameter;
+using BrainBoost.ViewModels;
 
 namespace BrainBoost.Controllers
 {
@@ -15,10 +16,14 @@ namespace BrainBoost.Controllers
         readonly MemberService MemberService;
         readonly MailService MailService;
         readonly JwtHelpers JwtHelpers;
-        public MemberController(MemberService _MemberService,MailService _MailService, JwtHelpers _jwtHelpers){
-            MemberService = _MemberService;
-            MailService = _MailService;
+        readonly Forpaging Forpaging;
+        readonly RoleService RoleService;
+        public MemberController(MemberService _memberservice,MailService _mailservice, JwtHelpers _jwtHelpers,Forpaging _forpaging,RoleService _roleservice){
+            MemberService = _memberservice;
+            MailService = _mailservice;
             JwtHelpers = _jwtHelpers;
+            Forpaging = _forpaging;
+            RoleService = _roleservice;
         }
         #endregion
         
@@ -134,21 +139,24 @@ namespace BrainBoost.Controllers
             return Ok(User.Identity?.Name);
         }
         
-        // 獲得權限
-        [HttpGet("[Action]")]
-        [Authorize]
-        public IActionResult GetRole(){
-            int Role = MemberService.GetRole(User.Identity?.Name);
-            if(Role == 1)
-                return Ok("Student");
-            else if(Role == 2)
-                return Ok("Teacher");
-            else if(Role == 3)
-                return Ok("Manager");
-            else
-                return Ok("Admin");
-        }
         #endregion
+
+        //取得目前所有使用者
+        // [Authorize(Roles = "Admin")]
+        [HttpGet("[Action]")]
+        public MemberViewModels MemberList([FromQuery]string? Search,[FromQuery]int page = 1){
+            MemberViewModels data = new(){
+                forpaging = new Forpaging(page)
+            };
+            data.member = MemberService.GetAllMemberList(Search,data.forpaging);
+            data.search = Search;
+            return data;
+        }
+        //取得單一使用者(帳號)
+        [HttpGet("[Action]")]
+        public Member MemberByAcc([FromQuery]string account){
+            return MemberService.GetDataByAccount(account);
+        }
 
         #region 忘記密碼
         // 輸入Email後寄驗證信
@@ -186,7 +194,7 @@ namespace BrainBoost.Controllers
             // 判斷驗證碼是否正確
             if (Member.Member_AuthCode == Data.AuthCode)
             {
-                MemberService.ChangeMemberRole(Member.Member_Id, 3);
+                RoleService.UpdateMemberRole(Member.Member_Id, 4);
                 int Role = MemberService.GetRole(Member.Member_Account);
                 var jwt = JwtHelpers.GenerateToken(Member.Member_Account, Role);
                 var result = new

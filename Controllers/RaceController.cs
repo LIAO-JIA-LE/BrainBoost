@@ -54,7 +54,7 @@ namespace BrainBoost.Controllers
 
         // 修改 搶答室資訊
         [HttpPut("[Action]")]
-        public IActionResult RoomInformation([FromQuery]int id, [FromBody]RaceRooms raceData){
+        public IActionResult RoomInformation([FromQuery]int id, [FromBody]RaceData raceData){
             raceService.RoomInformation(id, raceData);
             return Ok();
         }

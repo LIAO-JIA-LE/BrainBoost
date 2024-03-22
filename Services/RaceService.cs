@@ -11,37 +11,37 @@ namespace BrainBoost.Services
     public class RaceService
     {
         #region 呼叫函式
-        private readonly QuestionsDBService _questionService;
-        private readonly RaceRepository _raceRepository;
+        private readonly QuestionsDBService QuestionService;
+        private readonly RaceRepository RaceRepository;
 
-        public RaceService(QuestionsDBService questionService, RaceRepository raceRepository){
-            _questionService = questionService;
-            _raceRepository = raceRepository;
+        public RaceService(QuestionsDBService _questionService, RaceRepository _raceRepository){
+            QuestionService = _questionService;
+            RaceRepository = _raceRepository;
         }
         #endregion
 
         #region 顯示 搶答室資訊
         // 搶答室列表
         public List<RaceRooms> GetRoomList(){
-            return _raceRepository.GetList();
+            return RaceRepository.GetList();
         }
         
         // 搶答室單一（詳細資料）
         public RaceRooms GetRoom(int id){
-            return _raceRepository.GetInformation(id);
+            return RaceRepository.GetInformation(id);
         }
         #endregion
 
         #region 新增搶答室
         public void Room(RaceData raceData){
-            _raceRepository.Room(raceData);
+            RaceRepository.Room(raceData);
         }
         #endregion
         
         #region 修改搶答室（資訊和問題分開）
         // 修改 搶答室資訊（名稱、時間、公開）
         public void RoomInformation(int id, RaceRooms raceData){
-            _raceRepository.RoomInformation(id, raceData);
+            RaceRepository.RoomInformation(id, raceData);
         }
         #endregion
 

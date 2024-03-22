@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using BrainBoost.Models;
 using BrainBoost.Parameter;
+using BrainBoost.ViewModels;
 using Dapper;
 
 namespace BrainBoost.Services;
@@ -47,7 +48,7 @@ public class MemberService
     }
     #endregion
     
-    #region 註冊
+    // 註冊
     // 密碼確認
     public bool PasswordCheck(string Data, string Password)
     {
@@ -77,7 +78,6 @@ public class MemberService
         }
     }
 
-    // 註冊
     public void Register(Member member)
     {
         string sql = @$"INSERT INTO Member(member_name,member_account,member_password,member_email,member_authcode)
@@ -90,7 +90,6 @@ public class MemberService
         conn.Execute(sql);
     }
 
-    // 郵件驗證
     public bool MailValidate(string Account, string AuthCode)
     {
         Member Data = GetDataByAccount(Account);
@@ -104,8 +103,66 @@ public class MemberService
         }
         else return false;
     }
-    #endregion
-    
+
+    //(後台管理者)
+    //取得所有使用者
+    public List<Member> GetAllMemberList(string Search,Forpaging forpaging){
+        List<Member> Data = new();
+        //判斷是否有增加搜尋值
+        if(string.IsNullOrEmpty(Search)){
+            SetMaxPage(forpaging);
+            Data = GetMemberList(forpaging);
+        }
+        else{
+            SetMaxPage(Search,forpaging);
+            Data = GetMemberList(Search,forpaging);
+        }
+        return Data;
+    }
+    //無搜尋值查詢的使用者列表
+    public List<Member> GetMemberList(Forpaging forpaging){
+        List<Member> data = new();
+        string sql = $@"SELECT * FROM (
+                            SELECT ROW_NUMBER() OVER(ORDER BY m.member_id DESC) r_num,m.member_id,m.member_account,m.member_name,m.member_email,mr.role_id FROM Member m 
+                            JOIN Member_Role mr
+                            ON m.member_id = mr.member_id
+                        )a
+                        WHERE a.r_num BETWEEN {(forpaging.NowPage - 1) * forpaging.Item + 1} AND {forpaging.NowPage * forpaging.Item }";
+        using var conn = new SqlConnection(cnstr);
+        data = new List<Member>(conn.Query<Member>(sql));
+        return data;
+    }
+    //有搜尋值查詢的使用者列表
+    public List<Member> GetMemberList(string Search,Forpaging forpaging){
+        List<Member> data = new();
+        string sql = $@"SELECT * FROM (
+                            SELECT ROW_NUMBER() OVER(ORDER BY m.member_id DESC) r_num,m.member_id,m.member_account,m.member_name,mr.role_id FROM Member m 
+                            JOIN Member_Role mr
+                            ON m.member_id = mr.member_id
+                            WHERE m.member_account LIKE '%{Search}%' OR m.member_name LIKE '%{Search}%'
+                        )a
+                        WHERE a.r_num BETWEEN {(forpaging.NowPage - 1) * forpaging.Item + 1} AND {forpaging.NowPage * forpaging.Item }";
+        using var conn = new SqlConnection(cnstr);
+        data = new List<Member>(conn.Query<Member>(sql));
+        return data;
+    }
+    //無搜尋值計算所有使用者並設定頁數
+    public void SetMaxPage(Forpaging forpaging){
+        string sql = $@"SELECT COUNT(*) FROM Member";
+        using var conn = new SqlConnection(cnstr);
+        int row = conn.QueryFirst<int>(sql);
+        forpaging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
+        forpaging.SetRightPage();
+    }
+    //有搜尋值計算所有使用者並設定頁數
+    public void SetMaxPage(string Search,Forpaging forpaging){
+        string sql = $@"SELECT COUNT(*) FROM Member WHERE member_account LIKE '%{Search}%' OR member_name LIKE '%{Search}%'";
+        using var conn = new SqlConnection(cnstr);
+        int row = conn.QueryFirst<int>(sql);
+        forpaging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
+        forpaging.SetRightPage();
+    }
+
     #region 忘記密碼
     // 更新驗證碼
     public void ChangeAuthCode(string NewAuthCode,string Email){
@@ -113,14 +170,7 @@ public class MemberService
         using (var conn = new SqlConnection(cnstr))
         conn.Execute(sql);
     }
-
-    // 修改權限‵‵‵‵‵‵‵‵‵‵‵‵‵‵‵
-    public void ChangeMemberRole(int id, int Role){
-        string sql = $@" UPDATE Member SET Member_Role = {Role} WHERE Member_Id = {id} ";
-        using (var conn = new SqlConnection(cnstr))
-        conn.Execute(sql);
-    }
-
+    
     // 清除驗證碼
     public void ClearAuthCode(string Email){
         string sql = $@" UPDATE Member SET member_authcode = '{String.Empty}' WHERE member_email = '{Email}';";
@@ -136,19 +186,16 @@ public class MemberService
         using (var conn = new SqlConnection(cnstr))
         conn.Execute(sql);
     }
-    #endregion
-
-    #region 獲得資料
-    // 用account獲得資料
-    public Member GetDataByAccount(string account){
-        string sql = $@"SELECT * FROM Member WHERE member_account = '{account}' ";
-        using (var conn = new SqlConnection(cnstr))
-        return conn.QueryFirstOrDefault<Member>(sql);
-    }
-
+    
     // 用mail獲得資料
     public Member GetDataByEmail(string mail){
         string sql = $@"SELECT * FROM Member WHERE member_email = '{mail}' ";
+        using (var conn = new SqlConnection(cnstr))
+        return conn.QueryFirstOrDefault<Member>(sql);
+    }
+    // 用account獲得資料
+    public Member GetDataByAccount(string account){
+        string sql = $@"SELECT * FROM Member WHERE member_account = '{account}' ";
         using (var conn = new SqlConnection(cnstr))
         return conn.QueryFirstOrDefault<Member>(sql);
     }
