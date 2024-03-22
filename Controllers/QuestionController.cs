@@ -2,6 +2,7 @@ using BrainBoost.Parameter;
 using BrainBoost.Services;
 using Microsoft.AspNetCore.Mvc;
 using BrainBoost.Models;
+using BrainBoost.ViewModels;
 using Microsoft.IdentityModel.Tokens;
 
 
@@ -21,8 +22,6 @@ namespace BrainBoost.Controllers
         }
         #endregion
 
-        
-        
         // #region 顯示問題
         // 獲得 單一問題
         // [HttpPost("[Action]")]

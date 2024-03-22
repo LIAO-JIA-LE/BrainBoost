@@ -179,7 +179,7 @@ namespace BrainBoost.Services
 
         // 獲得沒有重複的Tag
         public string NotRepeatQuestionTag(int memberid, string tagname){
-            string sql = $@" SELECT tag_name FROM Tag WHERE member_id = '{memberid}'AND tag_name = '{tagname}' ";
+            string sql = $@" SELECT tag_name FROM Tag WHERE member_id = '{memberid}' AND tag_name = '{tagname}' ";
             using var conn = new SqlConnection(cnstr);
             return conn.QueryFirstOrDefault<string>(sql);
         }
@@ -206,8 +206,8 @@ namespace BrainBoost.Services
             StringBuilder stringBuilder = new StringBuilder();
             // 題目答案
             stringBuilder.Append($@"INSERT INTO Answer(question_id, question_answer, question_parse)
-                            VALUES({question_id},'{questionList.AnswerData.question_answer}',
-                            '{questionList.AnswerData.question_parse}')");
+                                    VALUES({question_id},'{questionList.AnswerData.question_answer}',
+                                    '{questionList.AnswerData.question_parse}')");
                             
             // 題目標籤
             // 看有沒有Tag的資訊
@@ -219,12 +219,14 @@ namespace BrainBoost.Services
                 stringBuilder.Append($@" INSERT INTO Question_Tag (question_id, tag_id) VALUES ('{question_id}', '{tag_id}') ");
             }
             
-            // 是非題
-            if(questionList.QuestionData.type_id == 1)
-            {
-                stringBuilder.Append($@"INSERT INTO ""Option""(question_id, option_content, is_answer)
-                                        VALUES('{question_id}', '{questionList.AnswerData.question_answer}', 1)");
-            }
+            // 是非題 
+            // 只有是跟否因此儲存在Answer的Table
+            // 後續正式搶答邏輯直接與Answer的Table做關聯比對答案
+            // if(questionList.QuestionData.type_id == 1)
+            // {
+            //     stringBuilder.Append($@"INSERT INTO ""Option""(question_id, option_content, is_answer)
+            //                             VALUES('{question_id}', '{questionList.AnswerData.question_answer}', {(questionList.AnswerData.question_answer == "是" ? 1 : 0)})");
+            // }
             
             // 選擇題
             else if(questionList.QuestionData.type_id == 2)
