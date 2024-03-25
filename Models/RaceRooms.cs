@@ -25,5 +25,8 @@ namespace BrainBoost.Models
 
         // 假刪除
         public bool is_delete{get;set;}
+
+        // 限時
+        public int time_limit{get;set;}
     }
 }

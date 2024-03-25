@@ -3,6 +3,7 @@ using BrainBoost.Models;
 using BrainBoost.Parameter;
 using BrainBoost.Services;
 using Microsoft.AspNetCore.Authorization;
+using BrainBoost.ViewModels;
 
 namespace BrainBoost.Controllers
 {
@@ -12,36 +13,37 @@ namespace BrainBoost.Controllers
     public class RaceController : Controller
     {
         #region 呼叫函式
-        readonly RaceService raceService;
-        readonly QuestionsDBService questionService;
+        readonly RaceService RaceService;
+        readonly QuestionsDBService QuestionService;
 
         public RaceController(RaceService _raceService, QuestionsDBService _questionService)
         {
-            raceService = _raceService;
-            questionService = _questionService;
+            RaceService = _raceService;
+            QuestionService = _questionService;
         }
         #endregion
 
-        #region 顯示搶答室含題目
+        // 搶答室資訊
+        #region 顯示搶答室資訊
         // 搶答室列表
         [HttpGet("[Action]")]
         public List<RaceRooms> GetRoomList(){
-            return raceService.GetRoomList();
+            return RaceService.GetRoomList();
         }
         
         // 搶答室單一
         [HttpGet("[Action]")]
         public RaceRooms GetRoom([FromQuery]int id){
-            return raceService.GetRoom(id);
+            return RaceService.GetRoom(id);
         }
         #endregion
         
         #region 新增搶答室
         // 新增搶答室
         [HttpPost("[Action]")]
-        public IActionResult Room([FromBody]RaceData raceData){
+        public IActionResult Room([FromBody]InsertRoom raceData){
             try{
-                raceService.Room(raceData);
+                RaceService.Room(raceData);
             }
             catch(Exception e){
                 return BadRequest(e.ToString());
@@ -51,43 +53,68 @@ namespace BrainBoost.Controllers
         #endregion
 
         #region 修改搶答室
-
         // 修改 搶答室資訊
         [HttpPut("[Action]")]
-        public IActionResult RoomInformation([FromQuery]int id, [FromBody]RaceData raceData){
-            raceService.RoomInformation(id, raceData);
-            return Ok();
+        public IActionResult RoomInformation([FromQuery]int id, [FromBody]RaceInformation raceData){
+            RaceService.RoomInformation(id, raceData);
+            return Ok("修改成功");
+        }
+        #endregion
+
+        #region 刪除搶答室
+        [HttpDelete("[Action]")]
+        public IActionResult Room([FromQuery]int id){
+            RaceService.DeleteRoom(id);
+            return Ok("刪除成功");
+        }
+        #endregion
+
+        // 搶答室題目
+        #region 顯示搶答室題目（只有題目內容）
+        // 搶答室題目列表
+        [HttpGet("[Action]")]
+        public List<RaceQuestion> RoomQuestionList([FromQuery]int id){
+            return RaceService.RoomQuestionList(id);
         }
 
+        // 搶答室題目單一含內容
+        [HttpGet("[Action]")]
+        public List<RaceQuestionAnswer> RoomQuestion([FromQuery]int id, [FromQuery]int question_id){
+            return RaceService.RoomQuestion(id, question_id);
+        }
+        #endregion
+        
+        #region 新增搶答室題目
         // 新增 搶答室題目
-        // [HttpPost("[Action]")]
-        // public IActionResult RoomQuestion([FromBody]RaceData raceData){
-        //     RaceService.RoomQuestion(raceData);
-        //     return Ok();
-        // }
-
-        // // 刪除 搶答室題目
-        // [HttpPost("[Action]/{Id}")]
-        // public IActionResult Delete_Question_ByRoom([FromRoute]int id){
-        //     RaceService.Delete_Question_ByRoom(id);
-        //     return Ok();
-        // }
-        // #endregion
-
-        // #region 刪除搶答室
-        // [HttpDelete("[Action]/{id}")]
-        // public IActionResult DeleteRoom([FromRoute]int id){
-        //     RaceService.Delete_Room(id);
-        //     return Ok();
-        // }
-        // #endregion
-
-        // #region 顯示題目
-        // [HttpGet("[Action]")]
-        // public List<QuestionList> GetQuestionList([FromRoute]int Question_type, [FromRoute]string Search){
-        //     var result = QuestionService.GetQuestionList(Question_type, Search);
-        //     return result;
-        // }
+        [HttpPost("[Action]")]
+        public IActionResult RoomQuestion([FromQuery]int id, [FromBody]List<int> question_id_list){
+            RaceService.RoomQuestion(id, question_id_list);
+            return Ok("新增成功");
+        }
+        #endregion
+        
+        #region 刪除搶答室題目
+        // 刪除 搶答室題目
+        [HttpDelete("[Action]")]
+        public IActionResult RoomQuestion_D([FromQuery]int id, [FromBody]List<int> question_id_list){
+            RaceService.DeleteRoomQuestion(id, question_id_list);
+            return Ok("刪除成功");
+        }
+        #endregion
+    
+        // 題庫（多重篩選）
+        #region 題庫列表
+        [HttpGet("[Action]")]
+        public List<RaceQuestion> QuestionFilterList([FromQuery]int id, [FromQuery]QuestionFiltering? SearchData, [FromQuery]int page = 1){           
+            QuestionFiltering Data = new QuestionFiltering(){
+                subject_id = SearchData.subject_id,
+                tag_id = SearchData.tag_id,
+                question_level = SearchData.question_level,
+                search = SearchData.search,
+                paging = new Forpaging(page)
+            };
+            return RaceService.GetSearchList(Data.paging, Data);
+        }
         #endregion
     }
 }

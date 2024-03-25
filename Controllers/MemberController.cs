@@ -143,15 +143,15 @@ namespace BrainBoost.Controllers
 
         //取得目前所有使用者
         // [Authorize(Roles = "Admin")]
-        [HttpGet("[Action]")]
-        public MemberViewModels MemberList([FromQuery]string? Search,[FromQuery]int page = 1){
-            MemberViewModels data = new(){
-                forpaging = new Forpaging(page)
-            };
-            data.member = MemberService.GetAllMemberList(Search,data.forpaging);
-            data.search = Search;
-            return data;
-        }
+        // [HttpGet("[Action]")]
+        // public MemberViewModels MemberList([FromQuery]string? Search,[FromQuery]int page = 1){
+        //     MemberViewModels data = new(){
+        //         forpaging = new Forpaging(page)
+        //     };
+        //     data.member = MemberService.GetAllMemberList(Search,data.forpaging);
+        //     data.search = Search;
+        //     return data;
+        // }
         //取得單一使用者(帳號)
         [HttpGet("[Action]")]
         public Member MemberByAcc([FromQuery]string account){

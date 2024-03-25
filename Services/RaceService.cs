@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Net.Mail;
 using BrainBoost.Models;
 using BrainBoost.Parameter;
+using BrainBoost.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,51 +34,48 @@ namespace BrainBoost.Services
         #endregion
 
         #region 新增搶答室
-        public void Room(RaceData raceData){
+        public void Room(InsertRoom raceData){
             RaceRepository.Room(raceData);
         }
         #endregion
         
         #region 修改搶答室（資訊和問題分開）
         // 修改 搶答室資訊（名稱、時間、公開）
-        public void RoomInformation(int id, RaceRooms raceData){
+        public void RoomInformation(int id, RaceInformation raceData){
             RaceRepository.RoomInformation(id, raceData);
         }
         #endregion
 
 
-        // // 新增 搶答室題目
-        // public void Insert_Question_ByRoom(RaceData raceData){
-        //     string sql = String.Empty;
-        //     // 新增題目
-        //     for(int i = 0; i < raceData.room_question.question_id.Count; i++){
-        //         sql = $@"INSERT INTO Race_Question(question_id, time_limit)
-        //                         VALUES('{raceData.room_question.question_id[i]}', '{raceData.room_question.time_limit}') ";
-        //     }
-        //     using var conn = new SqlConnection(cnstr);
-        //     conn.Execute(sql);
-        // }
+        // 新增 搶答室題目
+        public void RoomQuestion(int id, List<int> question_id_list){
+            RaceRepository.InsertQuestion(id, question_id_list);
+        }
 
-        // // 取消選取 搶答室題目
-        // public void Delete_Question_ByRoom(int id){
-        //     string sql = $@"DELETE FROM Race_Question WHERE racerooms_id = '{id}' ";
-        //     using var conn = new SqlConnection(cnstr);
-        //     conn.Execute(sql);
-        // }
+        // 取消選取 搶答室題目
+        public void DeleteRoomQuestion(int id, List<int> question_id_list){
+            RaceRepository.DeleteQuestion(id, question_id_list);
+        }
         // #endregion
 
-        // #region 刪除搶答室
-        // public void Delete_Room(int id){
-        //     string sql = $@"DELETE FROM RaceRooms WHERE racerooms_id = '{id}' 
-        //                     DELETE FROM Race_Question WHERE racerooms_id = '{id}'
-        //                     DELETE FROM Race_Rank WHERE racerooms_id = '{id}'
-        //                     DELETE FROM Room_Responses WHERE racerooms_id = '{id}' ";
-        //     using var conn = new SqlConnection(cnstr);
-        //     conn.Execute(sql);
-        // }
-        // #endregion  
+        #region 刪除搶答室
+        public void DeleteRoom(int id){
+            RaceRepository.DeleteRoom(id);
+        }
+        #endregion  
 
-        
+        #region 搶答室題目列表
+        public List<RaceQuestion> RoomQuestionList(int id){
+            return RaceRepository.QuestionList(id);
+        }
+        #endregion
+
+        #region 搶答室題目單一
+        public List<RaceQuestionAnswer> RoomQuestion(int id, int question_id){
+            return RaceRepository.Question(id, question_id);
+        }
+        #endregion
+
         // #region 隨機邀請碼
         // public string GetCode()
         // {
@@ -89,5 +87,20 @@ namespace BrainBoost.Services
         //     return AuthCode;
         // }
         // #endregion
+
+        #region 多重篩選
+        public List<RaceQuestion> GetSearchList(Forpaging paging, QuestionFiltering Search){
+            List<RaceQuestion> DataList = new List<RaceQuestion>();
+            if(Search.subject_id == null && Search.type_id == null && Search.tag_id == null && Search.question_level == null && Search.search == null){
+                RaceRepository.SetMaxPaging(paging);
+                DataList = RaceRepository.GetAllQuestionList(paging);
+            }
+            else{
+                RaceRepository.SetMaxPaging(paging, Search);
+                DataList = RaceRepository.GetAllQuestionList(paging, Search);
+            }
+            return DataList;
+        }
+        #endregion
     }
 }

@@ -169,8 +169,8 @@ namespace BrainBoost.Controllers
 
                 try
                 {
-                    question.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-                    // question.QuestionData.member_id = 1;
+                    // question.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                    question.QuestionData.member_id = 1;
                     QuestionService.InsertQuestion(question);
                 }
                 catch (Exception e)
@@ -216,7 +216,8 @@ namespace BrainBoost.Controllers
 
                 try
                 {
-                    question.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                    // question.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                    question.QuestionData.member_id = 1;
                     QuestionService.InsertQuestion(question);
                 }
                 catch (Exception e)
