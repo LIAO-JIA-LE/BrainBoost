@@ -8,7 +8,7 @@ namespace BrainBoost.Models
         // 題目編號
         public int question_id { get; set; }
 
-        // 提醒編號
+        // 提型編號
         public int type_id { get; set; }
 
         // 科目編號

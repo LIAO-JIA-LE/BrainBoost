@@ -25,7 +25,7 @@ namespace BrainBoost.Controllers
         #region 手動新增
         // 新增 是非題題目（手動）
         [HttpPost("[Action]")]
-        public IActionResult TrueOrFalse(InsertQuestion question){
+        public IActionResult TrueOrFalse([FromBody]TureorFalse question){
             
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
@@ -42,14 +42,14 @@ namespace BrainBoost.Controllers
             
             // 題目答案
             questionList.AnswerData = new Answer(){
-                question_answer = question.answer,
+                question_answer = question.is_answer ? "是" : "否",
                 question_parse = question.parse
             };
 
             try
             {
-                // questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-                questionList.QuestionData.member_id = 1;
+                questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                // questionList.QuestionData.member_id = 1;
                 QuestionService.InsertQuestion(questionList);
             }
             catch (Exception e)
@@ -61,7 +61,7 @@ namespace BrainBoost.Controllers
 
         // 新增 選擇題題目（手動）
         [HttpPost("[Action]")]
-        public IActionResult MultipleChoice(InsertQuestion question){
+        public IActionResult MultipleChoice([FromBody]InsertQuestion question){
             
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
@@ -92,8 +92,8 @@ namespace BrainBoost.Controllers
 
             try
             {
-                // questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-                questionList.QuestionData.member_id = 1;
+                questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                // questionList.QuestionData.member_id = 1;
                 QuestionService.InsertQuestion(questionList);
             }
             catch (Exception e)
@@ -105,7 +105,7 @@ namespace BrainBoost.Controllers
 
         // 新增 填充題題目（手動）
         [HttpPost("[Action]")]
-        public IActionResult ShortAnswer(InsertQuestion question){
+        public IActionResult ShortAnswer([FromBody]InsertQuestion question){
             
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
@@ -128,8 +128,8 @@ namespace BrainBoost.Controllers
             
             try
             {
-                // questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-                questionList.QuestionData.member_id = 1;
+                questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                // questionList.QuestionData.member_id = 1;
                 QuestionService.InsertQuestion(questionList);
             }
             catch (Exception e)

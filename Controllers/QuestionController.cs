@@ -2,6 +2,7 @@ using BrainBoost.Parameter;
 using BrainBoost.Services;
 using Microsoft.AspNetCore.Mvc;
 using BrainBoost.Models;
+using BrainBoost.ViewModels;
 using Microsoft.IdentityModel.Tokens;
 
 
@@ -21,22 +22,22 @@ namespace BrainBoost.Controllers
         }
         #endregion
 
-        
-        
         // #region 顯示問題
         // 獲得 單一問題
-        // [HttpPost("[Action]")]
-        // public IActionResult Get_Question(int page = 1){
-        //     QuestionService.Get();
-        //     return Ok();
+        // [HttpGet("[Action]")]
+        // public Question Question([FromQuery]int question_id){
+        //     return QuestionService.GetQuestionById(question_id);
         // }
 
         // 獲得 單一問題
-        // [HttpPost("[Action]")]
-        // public IActionResult Get_QuestionList(int page = 1){
-            
-        //     return Ok();
-        // }
+        [HttpGet("[Action]")]
+        public List<Question> All_Question([FromQuery]string search,[FromQuery]int type = 0,[FromQuery]int page = 1){
+            QuestionViewModel data = new(){
+                forpaging = new Forpaging(page),
+            };
+            data.question = QuestionService.GetQuestionList(type,search,data.forpaging);
+            return data.question;
+        }
         // #endregion
     }
 }
