@@ -1,8 +1,8 @@
 using BrainBoost.Models;
 
-namespace BrainBoost.Parameter
+namespace BrainBoost.ViewModels
 {
-    public class RaceQuestion
+    public class SimpleQuestion
     {
         // 題目編號
         public int question_id { get; set; }

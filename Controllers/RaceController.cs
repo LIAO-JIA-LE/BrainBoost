@@ -15,11 +15,13 @@ namespace BrainBoost.Controllers
         #region 呼叫函式
         readonly RaceService RaceService;
         readonly QuestionsDBService QuestionService;
+        readonly MemberService MemberService;
 
-        public RaceController(RaceService _raceService, QuestionsDBService _questionService)
+        public RaceController(RaceService _raceService, QuestionsDBService _questionService,MemberService _memberService)
         {
             RaceService = _raceService;
             QuestionService = _questionService;
+            MemberService = _memberService;
         }
         #endregion
 
@@ -73,7 +75,7 @@ namespace BrainBoost.Controllers
         #region 顯示搶答室題目（只有題目內容）
         // 搶答室題目列表
         [HttpGet("[Action]")]
-        public List<RaceQuestion> RoomQuestionList([FromQuery]int id){
+        public List<SimpleQuestion> RoomQuestionList([FromQuery]int id){
             return RaceService.RoomQuestionList(id);
         }
 
@@ -105,15 +107,32 @@ namespace BrainBoost.Controllers
         // 題庫（多重篩選）
         #region 題庫列表
         [HttpGet("[Action]")]
-        public List<RaceQuestion> QuestionFilterList([FromQuery]int id, [FromQuery]QuestionFiltering? SearchData, [FromQuery]int page = 1){           
+        public List<SimpleQuestion> QuestionFilterList([FromQuery]int id, [FromQuery]QuestionFiltering? SearchData, [FromQuery]int page = 1){           
             QuestionFiltering Data = new QuestionFiltering(){
                 subject_id = SearchData.subject_id,
+                member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
                 tag_id = SearchData.tag_id,
                 question_level = SearchData.question_level,
                 search = SearchData.search,
                 paging = new Forpaging(page)
             };
             return RaceService.GetSearchList(Data.paging, Data);
+        }
+        #endregion
+    
+        // 隨機亂碼
+        #region 取得隨機亂碼
+        [HttpGet("[Action]")]
+        public string GetCode([FromQuery]int id){
+            return RaceService.GetCode(id);
+        }
+        #endregion
+
+        #region 刪除隨機亂碼
+        [HttpDelete("[Action]")]
+        public IActionResult Code([FromQuery]int id){
+            RaceService.DeleteCode(id);
+            return Ok("刪除成功");
         }
         #endregion
     }

@@ -8,6 +8,9 @@ namespace BrainBoost.ViewModels
 {
     public class QuestionFiltering
     {
+        //會員編號
+        public int member_id{get;set;}
+        
         // 題型
         public int? type_id{get;set;}
         

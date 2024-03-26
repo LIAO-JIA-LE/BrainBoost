@@ -111,11 +111,11 @@ namespace BrainBoost.Services
         #endregion
 
         #region 搶答室題目列表
-        public List<RaceQuestion> QuestionList(int id){
+        public List<SimpleQuestion> QuestionList(int id){
             string sql = $@"SELECT R.question_id, question_content FROM Race_Question AS R
                             INNER JOIN Question AS Q ON R.question_id = Q.question_id WHERE raceroom_id = {id} AND R.is_delete = 0";
             using (var conn = new SqlConnection(cnstr))
-            return (List<RaceQuestion>)conn.Query<RaceQuestion>(sql);
+            return (List<SimpleQuestion>)conn.Query<SimpleQuestion>(sql);
         }
         #endregion
 
@@ -153,66 +153,109 @@ namespace BrainBoost.Services
         #endregion
 
         #region 設定最大頁數
-        public void SetMaxPaging(Forpaging paging){
+        public void SetMaxPaging(int member_id, Forpaging paging){
             string sql = $@"SELECT
-                                ROW_NUMBER() OVER(ORDER BY(Q.question_id)) number,
+                                ROW_NUMBER() OVER(ORDER BY Q.question_id) AS number,
                                 Q.question_id,
                                 question_content
-                            FROM Question Q, Question_Tag T
-                            WHERE Q.question_id = T.question_id AND number BETWEEN {(paging.NowPage - 1) * paging.Item + 1} AND {paging.NowPage * paging.Item }";
+                            FROM Question Q
+                            INNER JOIN Question_Tag T ON Q.question_id = T.question_id
+                            WHERE member_id = @member_id AND 1=1";
             using var conn = new SqlConnection(cnstr);
-            int row = conn.QueryFirst<int>(sql);
+            int row = conn.QueryFirst<int>(sql, new{member_id = member_id});
             paging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
             paging.SetRightPage();
         }
         public void SetMaxPaging(Forpaging paging, QuestionFiltering Search){
+            StringBuilder stringBuilder = new StringBuilder();
             string sql = $@"SELECT
-                                ROW_NUMBER() OVER(ORDER BY(Q.question_id)) number,
+                                ROW_NUMBER() OVER(ORDER BY Q.question_id) AS number,
                                 Q.question_id,
                                 question_content
-                            FROM Question Q, Question_Tag T
-                            WHERE Q.question_id = T.question_id AND Q.subject_id = {Search.subject_id} AND type_id = {Search.type_id} AND T.tag_id = {Search.tag_id} AND Q.question_level = {Search.question_level} AND Q.question_content = '{Search.search}' AND number BETWEEN {(paging.NowPage - 1) * paging.Item + 1} AND {paging.NowPage * paging.Item }";
+                            FROM Question Q
+                            INNER JOIN Question_Tag T ON Q.question_id = T.question_id
+                            WHERE member_id = @member_id AND 1=1";
+            #region 判斷
+            if(Search.subject_id != null)
+                stringBuilder.Replace("1=1", $"1=1 AND Q.subject_id = @subject_id");
+            if(Search.type_id != null)
+                stringBuilder.Replace("1=1", $"1=1 AND Q.type_id = @type_id");
+            if(Search.tag_id != null)
+                stringBuilder.Replace("1=1", $"1=1 AND T.tag_id = @tag_id");
+            if(Search.question_level != null)
+                stringBuilder.Replace("1=1", $"1=1 AND Q.question_level = @question_level");
+            if(Search.search != null)
+                stringBuilder.Replace("1=1", $"1=1 AND Q.question_content = '@question_content'");
+            #endregion
             using var conn = new SqlConnection(cnstr);
-            int row = conn.QueryFirst<int>(sql);
+            int row = conn.QueryFirst<int>(sql, new{subject_id = Search.subject_id, type_id = Search.type_id, tag_id = Search.tag_id, question_level = Search.question_level, question_content = Search.search, member_id = Search.member_id});
             paging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
             paging.SetRightPage();
         }
         #endregion
 
         #region 顯示題庫List
-        public List<RaceQuestion> GetAllQuestionList(Forpaging paging){
+        public List<SimpleQuestion> GetAllQuestionList(int member_id, Forpaging paging){
             string sql = $@"SELECT
-                                ROW_NUMBER() OVER(ORDER BY(Q.question_id)) number,
-                                Q.question_id,
-                                question_content
-                            FROM Question Q, Question_Tag T
-                            WHERE Q.question_id = T.question_id AND number BETWEEN {(paging.NowPage - 1) * paging.Item + 1} AND {paging.NowPage * paging.Item }";
+                             *
+                            FROM (
+                                SELECT
+                                    ROW_NUMBER() OVER(ORDER BY Q.question_id) AS number,
+                                    Q.question_id,
+                                    question_content
+                                FROM Question Q
+                                INNER JOIN Question_Tag T ON Q.question_id = T.question_id
+                                WHERE member_id = @member_id
+                            ) AS numbered_rows
+                            WHERE number BETWEEN {(paging.NowPage - 1) * paging.Item + 1} AND {paging.NowPage * paging.Item }";
             using (var conn = new SqlConnection(cnstr))
-            return (List<RaceQuestion>)conn.Query<RaceQuestion>(sql);
+            return (List<SimpleQuestion>)conn.Query<SimpleQuestion>(sql, new{member_id = member_id});
         }
-        public List<RaceQuestion> GetAllQuestionList(Forpaging paging, QuestionFiltering Search){
+        public List<SimpleQuestion> GetAllQuestionList(Forpaging paging, QuestionFiltering Search){
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append($@"SELECT
-                                        ROW_NUMBER() OVER(ORDER BY(Q.question_id)) number,
-                                        Q.question_id,
-                                        question_content
-                                    FROM Question Q, Question_Tag T
-                                    WHERE Q.question_id = T.question_id AND number BETWEEN {(paging.NowPage - 1) * paging.Item + 1} AND {paging.NowPage * paging.Item } ");
+                                        *
+                                    FROM (
+                                        SELECT
+                                            ROW_NUMBER() OVER(ORDER BY Q.question_id) AS number,
+                                            Q.question_id,
+                                            question_content
+                                        FROM Question Q
+                                        INNER JOIN Question_Tag T ON Q.question_id = T.question_id
+                                        WHERE member_id = @member_id AND 1=1
+                                    ) AS numbered_rows
+                                    WHERE number BETWEEN {(paging.NowPage - 1) * paging.Item + 1} AND {paging.NowPage * paging.Item }");
             #region 判斷
             if(Search.subject_id != null)
-                stringBuilder.Append($@"AND Q.subject_id = {Search.subject_id} ");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.subject_id = @subject_id");
             if(Search.type_id != null)
-                stringBuilder.Append($@"AND Q.type_id = {Search.type_id} ");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.type_id = @type_id");
             if(Search.tag_id != null)
-                stringBuilder.Append($@"AND T.tag_id = {Search.tag_id} ");
+                stringBuilder.Replace("1=1", $"1=1 AND T.tag_id = @tag_id");
             if(Search.question_level != null)
-                stringBuilder.Append($@"AND Q.question_level = {Search.question_level} ");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.question_level = @question_level");
             if(Search.search != null)
-                stringBuilder.Append($@"AND Q.question_content = '{Search.search}' ");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.question_content = '@question_content'");
             #endregion
 
             using (var conn = new SqlConnection(cnstr))
-            return (List<RaceQuestion>)conn.Query<RaceQuestion>(stringBuilder.ToString());
+            return (List<SimpleQuestion>)conn.Query<SimpleQuestion>(stringBuilder.ToString(),new {member_id = Search.member_id});
+        }
+        #endregion
+
+        #region 儲存隨機亂碼
+        public void Code(int id, string ValidateCode){
+            string sql = $@"UPDATE RaceRoom SET race_code = '@race_code' WHERE raceroom_id = @raceroom_id AND is_delete = 0";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql, new{raceroom_id = id, race_code = ValidateCode});
+        }
+        #endregion
+
+        #region 刪除隨機亂碼
+        public void DeleteCode(int id){
+            string sql = $@"DELETE FROM RaceRoom WHERE raceroom_id = @raceroom_id";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql, new{raceroom_id = id});
         }
         #endregion
     }

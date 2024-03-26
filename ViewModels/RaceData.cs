@@ -1,6 +1,6 @@
 using BrainBoost.Models;
 
-namespace BrainBoost.Parameter
+namespace BrainBoost.ViewModels
 {
     public class RaceData
     {

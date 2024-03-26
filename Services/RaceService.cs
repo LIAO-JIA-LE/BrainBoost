@@ -65,7 +65,7 @@ namespace BrainBoost.Services
         #endregion  
 
         #region 搶答室題目列表
-        public List<RaceQuestion> RoomQuestionList(int id){
+        public List<SimpleQuestion> RoomQuestionList(int id){
             return RaceRepository.QuestionList(id);
         }
         #endregion
@@ -76,30 +76,37 @@ namespace BrainBoost.Services
         }
         #endregion
 
-        // #region 隨機邀請碼
-        // public string GetCode()
-        // {
-        //     string[] Code = {"1","2","3","4","5","6","7","8","9","0"};
-        //     Random rd = new();
-        //     string AuthCode = string.Empty;
-        //     for (int i = 0; i < 6; i++)
-        //         AuthCode += Code[rd.Next(Code.Length)];
-        //     return AuthCode;
-        // }
-        // #endregion
+        #region 隨機邀請碼
+        public string GetCode(int id)
+        {
+            string[] Code = {"1","2","3","4","5","6","7","8","9","0"};
+            Random rd = new();
+            string ValidateCode = string.Empty;
+            for (int i = 0; i < 6; i++)
+                ValidateCode += Code[rd.Next(Code.Length)];
+            RaceRepository.Code(id, ValidateCode);
+            return ValidateCode;
+        }
+        #endregion
 
         #region 多重篩選
-        public List<RaceQuestion> GetSearchList(Forpaging paging, QuestionFiltering Search){
-            List<RaceQuestion> DataList = new List<RaceQuestion>();
+        public List<SimpleQuestion> GetSearchList(Forpaging paging, QuestionFiltering Search){
+            List<SimpleQuestion> DataList = new List<SimpleQuestion>();
             if(Search.subject_id == null && Search.type_id == null && Search.tag_id == null && Search.question_level == null && Search.search == null){
-                RaceRepository.SetMaxPaging(paging);
-                DataList = RaceRepository.GetAllQuestionList(paging);
+                RaceRepository.SetMaxPaging(Search.member_id, paging);
+                DataList = RaceRepository.GetAllQuestionList(Search.member_id, paging);
             }
             else{
                 RaceRepository.SetMaxPaging(paging, Search);
                 DataList = RaceRepository.GetAllQuestionList(paging, Search);
             }
             return DataList;
+        }
+        #endregion
+
+        #region 刪除邀請碼
+        public void DeleteCode(int id){
+            RaceRepository.DeleteCode(id);
         }
         #endregion
     }
