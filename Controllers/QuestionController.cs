@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace BrainBoost.Controllers
 {
-    [Route("[controller]")]
+    [Route("BrainBoost/[controller]")]
     public class QuestionController : Controller
     {
         #region 呼叫函示
