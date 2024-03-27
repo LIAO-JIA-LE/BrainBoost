@@ -4,7 +4,7 @@ namespace BrainBoost.Parameter
 {
     public class TureorFalse
     {
-        
+
         // 題目
         [DisplayName("題目")]
         public string question_content {get;set;}

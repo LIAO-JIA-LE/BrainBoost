@@ -153,6 +153,7 @@ namespace BrainBoost.Controllers
             return data;
         }
         //取得單一使用者(帳號)
+        // 未來可加任課科目&上課科目
         [HttpGet("{account}")]
         public Member MemberByAcc([FromRoute]string account){
             return MemberService.GetDataByAccount(account);
@@ -161,8 +162,8 @@ namespace BrainBoost.Controllers
         #region 忘記密碼
         // 輸入Email後寄驗證信
         [HttpGet]
-        [Route("[Action]/{Email}")]
-        public IActionResult SendForgetPasswordEmail([FromRoute] string Email)
+        [Route("[Action]")]
+        public IActionResult ForgetPasswordEmail([FromQuery] string Email)
         {
             // 看有沒有Email的資料
             Member Data = MemberService.GetDataByEmail(Email);
@@ -187,7 +188,7 @@ namespace BrainBoost.Controllers
         // 檢查驗證碼
         [HttpPost]
         [Route("[Action]")]
-        public IActionResult CheckForgetPasswordAuthCode([FromBody] CheckForgetPasswordAuthCode Data)
+        public IActionResult CheckForgetPasswordCode([FromBody] CheckForgetPasswordAuthCode Data)
         {
             // 取得此Email的會員資訊
             Member Member = MemberService.GetDataByEmail(Data.Email);
@@ -216,7 +217,7 @@ namespace BrainBoost.Controllers
         // 修改密碼
         [HttpPost]
         [Route("[Action]")]
-        [Authorize(Roles = "ForgetPassword")]
+        // [Authorize(Roles = "ForgetPassword")]
         public IActionResult CheckForgetPassword([FromBody] CheckForgetPassword Data)
         {
             // 取得此Email的會員資訊

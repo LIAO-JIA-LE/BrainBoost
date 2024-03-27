@@ -165,8 +165,8 @@ namespace BrainBoost.Services
         // 儲存題目
         public void InsertQuestion(QuestionList questionList)
         {
-            string sql = $@"INSERT INTO Question(type_id, member_id, question_level, question_content, question_picture, create_time)
-                            VALUES('{questionList.QuestionData.type_id}',{questionList.QuestionData.member_id},
+            string sql = $@"INSERT INTO Question(type_id,subject_id, member_id, question_level, question_content, question_picture, create_time)
+                            VALUES('{questionList.QuestionData.type_id}',{questionList.QuestionData.subject_id},{questionList.QuestionData.member_id},
                             '{questionList.QuestionData.question_level}','{questionList.QuestionData.question_content}',
                             '{questionList.QuestionData.question_picture}', '{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}')";
             

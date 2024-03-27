@@ -36,7 +36,8 @@ namespace BrainBoost.Services
 
         #region 新增搶答室
         public void Room(InsertRoom raceData){
-            RaceRepository.Room(raceData);
+            string Code = GetCode();
+            RaceRepository.Room(Code, raceData);
         }
         #endregion
         
@@ -78,14 +79,13 @@ namespace BrainBoost.Services
         #endregion
 
         #region 隨機邀請碼
-        public string GetCode(int id)
+        public string GetCode()
         {
             string[] Code = {"1","2","3","4","5","6","7","8","9","0"};
             Random rd = new();
             string ValidateCode = string.Empty;
             for (int i = 0; i < 6; i++)
                 ValidateCode += Code[rd.Next(Code.Length)];
-            RaceRepository.Code(id, ValidateCode);
             return ValidateCode;
         }
         #endregion

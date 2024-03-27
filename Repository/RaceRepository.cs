@@ -18,13 +18,13 @@ namespace BrainBoost.Services
         #endregion
         
         #region 新增搶答室資訊
-        public void Room(InsertRoom raceData){
+        public void Room(string Code, InsertRoom raceData){
             string currentTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
             // 新增搶答室資訊
-            string sql = $@"INSERT INTO RaceRoom(member_id,race_name, race_date, race_function, time_limit)
-                            VALUES(@member_id,@race_name, @race_date, @race_function, @time_limit) ";
+            string sql = $@"INSERT INTO RaceRoom(member_id,race_name, race_date, race_code, race_function, time_limit)
+                            VALUES(@member_id,@race_name, @race_date, @race_code, @race_function, @time_limit) ";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new {member_id = raceData.member_id,race_name = raceData.race_name, race_date = currentTime, race_function = raceData.race_function, time_limit = raceData.time_limit});
+            conn.Execute(sql, new {member_id = raceData.member_id,race_name = raceData.race_name, race_date = currentTime, race_code = Code, race_function = raceData.race_function, time_limit = raceData.time_limit});
             RoomQuestion(raceData);
         }
         #endregion
@@ -52,7 +52,7 @@ namespace BrainBoost.Services
 
         #region 搶答室列表
         public List<RaceRooms> GetList(){
-            string sql = $@" SELECT	* FROM RaceRoom WHERE is_delete = 0 AND race_public = 1 ORDER BY race_date DESC ";
+            string sql = $@" SELECT	* FROM RaceRoom WHERE is_delete = 0 ORDER BY race_public DESC, race_date DESC ";
             using (var conn = new SqlConnection(cnstr))
             return (List<RaceRooms>)conn.Query<RaceRooms>(sql);
         }
@@ -240,14 +240,6 @@ namespace BrainBoost.Services
 
             using (var conn = new SqlConnection(cnstr))
             return (List<SimpleQuestion>)conn.Query<SimpleQuestion>(stringBuilder.ToString(),new {member_id = Search.member_id});
-        }
-        #endregion
-
-        #region 儲存隨機亂碼
-        public void Code(int id, string ValidateCode){
-            string sql = $@"UPDATE RaceRoom SET race_code = '@race_code' WHERE raceroom_id = @raceroom_id AND is_delete = 0";
-            using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new{raceroom_id = id, race_code = ValidateCode});
         }
         #endregion
 
