@@ -97,8 +97,10 @@ namespace BrainBoost.Controllers
         
         #region 刪除搶答室題目
         // 刪除 搶答室題目
-        [HttpDelete("[Action]")]
-        public IActionResult RoomQuestion_D([FromQuery]int id, [FromBody]List<int> question_id_list){
+        // [HttpDelete("[Action]")]
+        [HttpDelete]
+        [Route("RoomQuestion")]
+        public IActionResult DeleteRoomQuestion([FromQuery]int id, [FromBody]List<int> question_id_list){
             RaceService.DeleteRoomQuestion(id, question_id_list);
             return Ok("刪除成功");
         }
@@ -110,8 +112,8 @@ namespace BrainBoost.Controllers
         public List<SimpleQuestion> QuestionFilterList([FromQuery]QuestionFiltering SearchData, [FromQuery]int page = 1){           
             QuestionFiltering Data = new QuestionFiltering(){
                 subject_id = SearchData.subject_id,
-                // member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
-                member_id = 1,
+                member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
+                // member_id = 1,
                 tag_id = SearchData.tag_id,
                 question_level = SearchData.question_level,
                 search = SearchData.search
