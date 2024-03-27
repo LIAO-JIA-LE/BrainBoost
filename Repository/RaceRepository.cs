@@ -21,10 +21,10 @@ namespace BrainBoost.Services
         public void Room(InsertRoom raceData){
             string currentTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
             // 新增搶答室資訊
-            string sql = $@"INSERT INTO RaceRoom(race_name, race_date, race_function, time_limit)
-                            VALUES(@race_name, @race_date, @race_function, @time_limit) ";
+            string sql = $@"INSERT INTO RaceRoom(member_id,race_name, race_date, race_function, time_limit)
+                            VALUES(@member_id,@race_name, @race_date, @race_function, @time_limit) ";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new {race_name = raceData.race_name, race_date = currentTime, race_function = raceData.race_function, time_limit = raceData.time_limit});
+            conn.Execute(sql, new {member_id = raceData.member_id,race_name = raceData.race_name, race_date = currentTime, race_function = raceData.race_function, time_limit = raceData.time_limit});
             RoomQuestion(raceData);
         }
         #endregion

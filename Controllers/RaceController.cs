@@ -44,6 +44,7 @@ namespace BrainBoost.Controllers
         [HttpPost("[Action]")]
         public IActionResult Room([FromBody]InsertRoom raceData){
             try{
+                raceData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
                 RaceService.Room(raceData);
             }
             catch(Exception e){
@@ -105,18 +106,18 @@ namespace BrainBoost.Controllers
     
         // 題庫（多重篩選）
         #region 題庫列表
-        [HttpGet("[Action]")]
-        public List<SimpleQuestion> QuestionFilterList([FromQuery]int id, [FromQuery]QuestionFiltering? SearchData, [FromQuery]int page = 1){           
+        [HttpPost("[Action]")]
+        public List<SimpleQuestion> QuestionFilterList([FromBody]QuestionFiltering SearchData, [FromQuery]int page = 1){           
             QuestionFiltering Data = new QuestionFiltering(){
                 subject_id = SearchData.subject_id,
                 // member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
                 member_id = 1,
                 tag_id = SearchData.tag_id,
                 question_level = SearchData.question_level,
-                search = SearchData.search,
-                paging = new Forpaging(page)
+                search = SearchData.search
             };
-            return RaceService.GetSearchList(Data.paging, Data);
+            Forpaging paging = new(page);
+            return RaceService.GetSearchList(paging, Data);
         }
         #endregion
     
