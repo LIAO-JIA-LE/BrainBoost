@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using BrainBoost.Models;
 using BrainBoost.Parameter;
 using BrainBoost.Services;
-using Microsoft.AspNetCore.Authorization;
 using BrainBoost.ViewModels;
 
 namespace BrainBoost.Controllers
@@ -110,7 +109,8 @@ namespace BrainBoost.Controllers
         public List<SimpleQuestion> QuestionFilterList([FromQuery]int id, [FromQuery]QuestionFiltering? SearchData, [FromQuery]int page = 1){           
             QuestionFiltering Data = new QuestionFiltering(){
                 subject_id = SearchData.subject_id,
-                member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
+                // member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
+                member_id = 1,
                 tag_id = SearchData.tag_id,
                 question_level = SearchData.question_level,
                 search = SearchData.search,
@@ -120,6 +120,16 @@ namespace BrainBoost.Controllers
         }
         #endregion
     
+        // 篩選列表
+        #region 標籤列表
+        [HttpGet("[Action]")]
+        public List<Tag> TagList([FromQuery]int subject_id){
+            // int member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+            int member_id = 1;
+            return RaceService.TagList(member_id, subject_id);
+        }
+        #endregion
+
         // 隨機亂碼
         #region 取得隨機亂碼
         [HttpGet("[Action]")]
@@ -135,5 +145,7 @@ namespace BrainBoost.Controllers
             return Ok("刪除成功");
         }
         #endregion
+    
+
     }
 }

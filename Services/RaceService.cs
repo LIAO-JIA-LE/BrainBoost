@@ -6,6 +6,7 @@ using BrainBoost.Parameter;
 using BrainBoost.ViewModels;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
+using NPOI.SS.Formula.Functions;
 
 namespace BrainBoost.Services
 {
@@ -107,6 +108,12 @@ namespace BrainBoost.Services
         #region 刪除邀請碼
         public void DeleteCode(int id){
             RaceRepository.DeleteCode(id);
+        }
+        #endregion
+
+        #region 標籤列表
+        public List<Tag> TagList(int member_id, int subject_id){
+            return RaceRepository.TagList(member_id);
         }
         #endregion
     }

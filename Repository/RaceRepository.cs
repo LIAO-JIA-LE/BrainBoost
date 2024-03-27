@@ -258,5 +258,19 @@ namespace BrainBoost.Services
             conn.Execute(sql, new{raceroom_id = id});
         }
         #endregion
+
+        #region 標籤列表
+        public List<Tag> TagList(int member_id){
+            string sql = $@" SELECT
+                                Q.question_id,
+                                Q.question_content
+                            FROM Tag T
+                            INNER JOIN Question Q
+                            ON T.member_id = Q.member_id
+                            WHERE Q.subject_id = 1 AND Q.is_delete = 0";
+            using var conn = new SqlConnection(cnstr);
+            return (List<Tag>)conn.Query<Tag>(sql, new{member_id = member_id});
+        }
+        #endregion
     }
 }
