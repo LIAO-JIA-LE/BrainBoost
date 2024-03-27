@@ -12,5 +12,6 @@ namespace BrainBoost.Parameter
         public bool race_public{get;set;}
         public int time_limit{get;set;}
         public List<int> question_id{get;set;}
+        public int member_id{get;set;}
     }
 }

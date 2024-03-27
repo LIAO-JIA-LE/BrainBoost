@@ -27,6 +27,6 @@ namespace BrainBoost.ViewModels
         public string? search{get;set;}
 
         // 分頁
-        public Forpaging paging{get;set;}
+        // public Forpaging paging{get;set;}
     }
 }
