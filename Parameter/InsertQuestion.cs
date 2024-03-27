@@ -6,6 +6,9 @@ namespace BrainBoost.Parameter
 {
     public class InsertQuestion
     {
+        // 科目
+        public int subject_id{get;set;}
+        
         // 題目
         [DisplayName("題目")]
         public string question_content {get;set;}

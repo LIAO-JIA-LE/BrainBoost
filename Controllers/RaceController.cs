@@ -108,12 +108,11 @@ namespace BrainBoost.Controllers
     
         // 題庫（多重篩選）
         #region 題庫列表
-        [HttpPost("[Action]")]
+        [HttpGet("[Action]")]
         public List<SimpleQuestion> QuestionFilterList([FromBody]QuestionFiltering SearchData, [FromQuery]int page = 1){           
             QuestionFiltering Data = new QuestionFiltering(){
                 subject_id = SearchData.subject_id,
                 member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
-                // member_id = 1,
                 tag_id = SearchData.tag_id,
                 question_level = SearchData.question_level,
                 search = SearchData.search
@@ -134,13 +133,6 @@ namespace BrainBoost.Controllers
         #endregion
 
         // 隨機亂碼
-        #region 取得隨機亂碼
-        [HttpGet("[Action]")]
-        public string GetCode([FromQuery]int id){
-            return RaceService.GetCode(id);
-        }
-        #endregion
-
         #region 刪除隨機亂碼
         [HttpDelete("[Action]")]
         public IActionResult Code([FromQuery]int id){

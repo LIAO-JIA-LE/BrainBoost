@@ -18,13 +18,13 @@ namespace BrainBoost.Services
         #endregion
         
         #region 新增搶答室資訊
-        public void Room(InsertRoom raceData){
+        public void Room(string Code, InsertRoom raceData){
             string currentTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
             // 新增搶答室資訊
-            string sql = $@"INSERT INTO RaceRoom(member_id,race_name, race_date, race_function, time_limit)
-                            VALUES(@member_id,@race_name, @race_date, @race_function, @time_limit) ";
+            string sql = $@"INSERT INTO RaceRoom(member_id,race_name, race_date, race_code, race_function, time_limit)
+                            VALUES(@member_id,@race_name, @race_date, @race_code, @race_function, @time_limit) ";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new {member_id = raceData.member_id,race_name = raceData.race_name, race_date = currentTime, race_function = raceData.race_function, time_limit = raceData.time_limit});
+            conn.Execute(sql, new {member_id = raceData.member_id,race_name = raceData.race_name, race_date = currentTime, race_code = Code, race_function = raceData.race_function, time_limit = raceData.time_limit});
             RoomQuestion(raceData);
         }
         #endregion
@@ -52,7 +52,7 @@ namespace BrainBoost.Services
 
         #region 搶答室列表
         public List<RaceRooms> GetList(){
-            string sql = $@" SELECT	* FROM RaceRoom WHERE is_delete = 0 AND race_public = 1 ORDER BY race_date DESC ";
+            string sql = $@" SELECT	* FROM RaceRoom WHERE is_delete = 0 ORDER BY race_public DESC, race_date DESC ";
             using (var conn = new SqlConnection(cnstr))
             return (List<RaceRooms>)conn.Query<RaceRooms>(sql);
         }
@@ -122,31 +122,31 @@ namespace BrainBoost.Services
         #region 搶答室題目單一
         public List<RaceQuestionAnswer> Question(int id,int question_id){
             string sql = $@"SELECT
-                            A.question_id,
-                            A.question_level,
-                            A.question_content,
-                            A.question_picture,
-                            A.option_content,
-                            A.option_picture,
-                            A.is_delete
-                        FROM Race_Question AS R
-                        INNER JOIN(
-                            SELECT
-                                Q.question_id,
-                                Q.question_level,
-                                Q.question_content,
-                                Q.question_picture,
-                                O.option_content,
-                                O.option_picture,
-                                O.is_answer,
-                                Q.is_delete
-                            FROM Question AS Q
-                            INNER JOIN ""Option"" AS O
-                            ON Q.question_id = O.question_id
-                            WHERE Q.question_id = 2 AND Q.is_delete = 0 AND O.is_delete = 0
-                        )A
-                        ON R.question_id = A.question_id
-                        WHERE raceroom_id = 1 AND R.is_delete = 0 AND A.is_delete = 0";
+                                A.question_id,
+                                A.question_level,
+                                A.question_content,
+                                A.question_picture,
+                                A.option_content,
+                                A.option_picture,
+                                A.is_delete
+                            FROM Race_Question AS R
+                            INNER JOIN(
+                                SELECT
+                                    Q.question_id,
+                                    Q.question_level,
+                                    Q.question_content,
+                                    Q.question_picture,
+                                    O.option_content,
+                                    O.option_picture,
+                                    O.is_answer,
+                                    Q.is_delete
+                                FROM Question AS Q
+                                INNER JOIN ""Option"" AS O
+                                ON Q.question_id = O.question_id
+                                WHERE Q.question_id = 2 AND Q.is_delete = 0 AND O.is_delete = 0
+                            )A
+                            ON R.question_id = A.question_id
+                            WHERE raceroom_id = {id} AND A.question_id = {question_id} AND R.is_delete = 0";
             using (var conn = new SqlConnection(cnstr))
             return (List<RaceQuestionAnswer>)conn.Query<RaceQuestionAnswer>(sql);
         }
@@ -240,14 +240,6 @@ namespace BrainBoost.Services
 
             using (var conn = new SqlConnection(cnstr))
             return (List<SimpleQuestion>)conn.Query<SimpleQuestion>(stringBuilder.ToString(), new{subject_id = Search.subject_id, type_id = Search.type_id, tag_id = Search.tag_id, question_level = Search.question_level, question_content = Search.search, member_id = Search.member_id});
-        }
-        #endregion
-
-        #region 儲存隨機亂碼
-        public void Code(int id, string ValidateCode){
-            string sql = $@"UPDATE RaceRoom SET race_code = '@race_code' WHERE raceroom_id = @raceroom_id AND is_delete = 0";
-            using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new{raceroom_id = id, race_code = ValidateCode});
         }
         #endregion
 
