@@ -122,31 +122,31 @@ namespace BrainBoost.Services
         #region 搶答室題目單一
         public List<RaceQuestionAnswer> Question(int id,int question_id){
             string sql = $@"SELECT
-                            A.question_id,
-                            A.question_level,
-                            A.question_content,
-                            A.question_picture,
-                            A.option_content,
-                            A.option_picture,
-                            A.is_delete
-                        FROM Race_Question AS R
-                        INNER JOIN(
-                            SELECT
-                                Q.question_id,
-                                Q.question_level,
-                                Q.question_content,
-                                Q.question_picture,
-                                O.option_content,
-                                O.option_picture,
-                                O.is_answer,
-                                Q.is_delete
-                            FROM Question AS Q
-                            INNER JOIN ""Option"" AS O
-                            ON Q.question_id = O.question_id
-                            WHERE Q.question_id = 2 AND Q.is_delete = 0 AND O.is_delete = 0
-                        )A
-                        ON R.question_id = A.question_id
-                        WHERE raceroom_id = 1 AND R.is_delete = 0 AND A.is_delete = 0";
+                                A.question_id,
+                                A.question_level,
+                                A.question_content,
+                                A.question_picture,
+                                A.option_content,
+                                A.option_picture,
+                                A.is_delete
+                            FROM Race_Question AS R
+                            INNER JOIN(
+                                SELECT
+                                    Q.question_id,
+                                    Q.question_level,
+                                    Q.question_content,
+                                    Q.question_picture,
+                                    O.option_content,
+                                    O.option_picture,
+                                    O.is_answer,
+                                    Q.is_delete
+                                FROM Question AS Q
+                                INNER JOIN ""Option"" AS O
+                                ON Q.question_id = O.question_id
+                                WHERE Q.question_id = 2 AND Q.is_delete = 0 AND O.is_delete = 0
+                            )A
+                            ON R.question_id = A.question_id
+                            WHERE raceroom_id = {id} AND A.question_id = {question_id} AND R.is_delete = 0";
             using (var conn = new SqlConnection(cnstr))
             return (List<RaceQuestionAnswer>)conn.Query<RaceQuestionAnswer>(sql);
         }

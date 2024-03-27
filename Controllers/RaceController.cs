@@ -108,12 +108,11 @@ namespace BrainBoost.Controllers
     
         // 題庫（多重篩選）
         #region 題庫列表
-        [HttpPost("[Action]")]
-        public List<SimpleQuestion> QuestionFilterList([FromQuery]QuestionFiltering SearchData, [FromQuery]int page = 1){           
+        [HttpGet("[Action]")]
+        public List<SimpleQuestion> QuestionFilterList([FromBody]QuestionFiltering SearchData, [FromQuery]int page = 1){           
             QuestionFiltering Data = new QuestionFiltering(){
                 subject_id = SearchData.subject_id,
                 member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
-                // member_id = 1,
                 tag_id = SearchData.tag_id,
                 question_level = SearchData.question_level,
                 search = SearchData.search
