@@ -239,7 +239,7 @@ namespace BrainBoost.Services
             #endregion
 
             using (var conn = new SqlConnection(cnstr))
-            return (List<SimpleQuestion>)conn.Query<SimpleQuestion>(stringBuilder.ToString(),new {member_id = Search.member_id});
+            return (List<SimpleQuestion>)conn.Query<SimpleQuestion>(stringBuilder.ToString(), new{subject_id = Search.subject_id, type_id = Search.type_id, tag_id = Search.tag_id, question_level = Search.question_level, question_content = Search.search, member_id = Search.member_id});
         }
         #endregion
 
