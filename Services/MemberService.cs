@@ -182,7 +182,10 @@ public class MemberService
     public void ChangePasswordByForget(CheckForgetPassword Data){
         Member member = GetDataByEmail(Data.Email);
         member.Member_Password = HashPassword(Data.NewPassword);
-        string sql = $@" UPDATE Member SET member_password = '{member.Member_Password}' WHERE member_email = '{Data.Email}';";
+        string sql = $@"UPDATE Member SET member_password = '{member.Member_Password}' WHERE member_email = '{Data.Email}';
+                        DECLARE @member_id int;
+                        SELECT @member_id = member_id FROM Member WHERE member_email = '{Data.Email}'
+                        UPDATE Member_Role SET role_id -= 4 WHERE member_id = @member_id";
         using (var conn = new SqlConnection(cnstr))
         conn.Execute(sql);
     }

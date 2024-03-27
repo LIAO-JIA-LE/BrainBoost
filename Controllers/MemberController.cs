@@ -160,9 +160,9 @@ namespace BrainBoost.Controllers
 
         #region 忘記密碼
         // 輸入Email後寄驗證信
-        [HttpGet]
-        [Route("[Action]/{Email}")]
-        public IActionResult SendForgetPasswordEmail([FromRoute] string Email)
+        [HttpPost]
+        [Route("[Action]")]
+        public IActionResult ForgetPassword([FromBody] string Email)
         {
             // 看有沒有Email的資料
             Member Data = MemberService.GetDataByEmail(Email);
@@ -194,7 +194,7 @@ namespace BrainBoost.Controllers
             // 判斷驗證碼是否正確
             if (Member.Member_AuthCode == Data.AuthCode)
             {
-                RoleService.UpdateMemberRole(Member.Member_Id, 4);
+                RoleService.SetMemberRole_ForgetPassword(Member.Member_Id);
                 int Role = MemberService.GetRole(Member.Member_Account);
                 var jwt = JwtHelpers.GenerateToken(Member.Member_Account, Role);
                 var result = new
@@ -217,7 +217,7 @@ namespace BrainBoost.Controllers
         [HttpPost]
         [Route("[Action]")]
         [Authorize(Roles = "ForgetPassword")]
-        public IActionResult CheckForgetPassword([FromBody] CheckForgetPassword Data)
+        public IActionResult ChangePassword([FromBody] CheckForgetPassword Data)
         {
             // 取得此Email的會員資訊
             if (User.IsInRole("ForgetPassword"))

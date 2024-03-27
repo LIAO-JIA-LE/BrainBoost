@@ -42,6 +42,8 @@ public class JwtHelpers
             claims.Add(new Claim(ClaimTypes.Role, "Teacher"));
         else if(Role == 3)
             claims.Add(new Claim(ClaimTypes.Role, "Manager"));
+        else if(Role >= 4)
+            claims.Add(new Claim(ClaimTypes.Role, "ForgetPassword"));
         else
             claims.Add(new Claim(ClaimTypes.Role, "Admin"));
 
