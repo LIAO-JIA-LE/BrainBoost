@@ -155,25 +155,19 @@ namespace BrainBoost.Services
         #region 設定最大頁數
         public void SetMaxPaging(int member_id, Forpaging paging){
             string sql = $@"SELECT
-                                ROW_NUMBER() OVER(ORDER BY Q.question_id) AS number,
-                                Q.question_id,
-                                question_content
+                                COUNT(*)
                             FROM Question Q
-                            INNER JOIN Question_Tag T ON Q.question_id = T.question_id
                             WHERE member_id = @member_id AND 1=1";
             using var conn = new SqlConnection(cnstr);
             int row = conn.QueryFirst<int>(sql, new{member_id = member_id});
-            paging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
+            paging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / paging.Item));
             paging.SetRightPage();
         }
         public void SetMaxPaging(Forpaging paging, QuestionFiltering Search){
             StringBuilder stringBuilder = new StringBuilder();
             string sql = $@"SELECT
-                                ROW_NUMBER() OVER(ORDER BY Q.question_id) AS number,
-                                Q.question_id,
-                                question_content
+                                COUNT(*)
                             FROM Question Q
-                            INNER JOIN Question_Tag T ON Q.question_id = T.question_id
                             WHERE member_id = @member_id AND 1=1";
             #region 判斷
             if(Search.subject_id != null)
@@ -189,7 +183,7 @@ namespace BrainBoost.Services
             #endregion
             using var conn = new SqlConnection(cnstr);
             int row = conn.QueryFirst<int>(sql, new{subject_id = Search.subject_id, type_id = Search.type_id, tag_id = Search.tag_id, question_level = Search.question_level, question_content = Search.search, member_id = Search.member_id});
-            paging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
+            paging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / paging.Item));
             paging.SetRightPage();
         }
         #endregion

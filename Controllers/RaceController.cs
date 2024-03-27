@@ -27,13 +27,15 @@ namespace BrainBoost.Controllers
         // 搶答室資訊
         #region 顯示搶答室資訊
         // 搶答室列表
-        [HttpGet("[Action]")]
+        [HttpGet]
+        [Route("AllRoom")]
         public List<RaceRooms> GetRoomList(){
             return RaceService.GetRoomList();
         }
         
         // 搶答室單一
-        [HttpGet("[Action]")]
+        [HttpGet]
+        [Route("Room")]
         public RaceRooms GetRoom([FromQuery]int id){
             return RaceService.GetRoom(id);
         }
@@ -41,8 +43,9 @@ namespace BrainBoost.Controllers
         
         #region 新增搶答室
         // 新增搶答室
-        [HttpPost("[Action]")]
-        public IActionResult Room([FromBody]InsertRoom raceData){
+        [HttpPost]
+        [Route("Room")]
+        public IActionResult InsertRoom([FromBody]InsertRoom raceData){
             try{
                 raceData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
                 RaceService.Room(raceData);
@@ -56,16 +59,18 @@ namespace BrainBoost.Controllers
 
         #region 修改搶答室
         // 修改 搶答室資訊
-        [HttpPut("[Action]")]
-        public IActionResult RoomInformation([FromQuery]int id, [FromBody]RaceInformation raceData){
+        [HttpPut]
+        [Route("Room")]
+        public IActionResult UpdateRoom([FromQuery]int id, [FromBody]RaceInformation raceData){
             RaceService.RoomInformation(id, raceData);
             return Ok("修改成功");
         }
         #endregion
 
         #region 刪除搶答室
-        [HttpDelete("[Action]")]
-        public IActionResult Room([FromQuery]int id){
+        [HttpDelete]
+        [Route("Room")]
+        public IActionResult DeleteRoom([FromQuery]int id){
             RaceService.DeleteRoom(id);
             return Ok("刪除成功");
         }
@@ -108,7 +113,7 @@ namespace BrainBoost.Controllers
     
         // 題庫（多重篩選）
         #region 題庫列表
-        [HttpGet("[Action]")]
+        [HttpPost("[Action]")]
         public List<SimpleQuestion> QuestionFilterList([FromBody]QuestionFiltering SearchData, [FromQuery]int page = 1){           
             QuestionFiltering Data = new QuestionFiltering(){
                 subject_id = SearchData.subject_id,
