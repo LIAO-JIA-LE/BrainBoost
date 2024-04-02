@@ -14,5 +14,7 @@ namespace BrainBoost.ViewModels
         public string option_content{get;set;}
         public string option_picture{get;set;}
         public bool is_delete{get;set;}
+
+        public bool is_appear{get;set;}
     }
 }

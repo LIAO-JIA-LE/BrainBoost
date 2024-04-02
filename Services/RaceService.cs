@@ -121,5 +121,17 @@ namespace BrainBoost.Services
             return RaceRepository.TagList(member_id);
         }
         #endregion
+
+        #region 隨機出題
+        public RaceQuestionViewModel RandomQuestion(int id){
+            // 獲得題目id跟題型id
+            List<RaceQuestionListType> questionIdList = RaceRepository.GetRaceRoomQuestionType(id);
+
+            // 隨機出題
+            Random rd = new();
+            RaceQuestionViewModel question = RaceRepository.GetRandomQuestion(questionIdList[rd.Next(questionIdList.Count)]);
+            return question;
+        }
+        #endregion
     }
 }

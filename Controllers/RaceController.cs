@@ -194,7 +194,7 @@ namespace BrainBoost.Controllers
 
         // TODO：題庫（多重篩選）
         #region 題庫列表
-        [HttpPost("[Action]")]
+        [HttpGet("[Action]")]
         public List<SimpleQuestion> QuestionFilterList([FromBody]QuestionFiltering SearchData, [FromQuery]int page = 1){           
             QuestionFiltering Data = new QuestionFiltering(){
                 subject_id = SearchData.subject_id,
@@ -224,7 +224,11 @@ namespace BrainBoost.Controllers
 
         // TODO：搶答室開始
         #region 隨機出題
-        
+        // 單一
+        [HttpGet("[Action]")]
+        public RaceQuestionViewModel RandomQuestion([FromQuery]int id){
+            return RaceService.RandomQuestion(id);
+        }
         #endregion
 
         

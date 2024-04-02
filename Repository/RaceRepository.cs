@@ -177,18 +177,18 @@ namespace BrainBoost.Services
                             WHERE member_id = @member_id AND 1=1";
             #region 判斷
             if(Search.subject_id != null)
-                stringBuilder.Replace("1=1", $"1=1 AND Q.subject_id = @subject_id");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.subject_id = {Search.subject_id}");
             if(Search.type_id != null)
-                stringBuilder.Replace("1=1", $"1=1 AND Q.type_id = @type_id");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.type_id = {Search.type_id}");
             if(Search.tag_id != null)
-                stringBuilder.Replace("1=1", $"1=1 AND T.tag_id = @tag_id");
+                stringBuilder.Replace("1=1", $"1=1 AND T.tag_id = {Search.tag_id}");
             if(Search.question_level != null)
-                stringBuilder.Replace("1=1", $"1=1 AND Q.question_level = @question_level");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.question_level = {Search.question_level}");
             if(Search.search != null)
-                stringBuilder.Replace("1=1", $"1=1 AND Q.question_content = '@question_content'");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.question_content LIKE '%{Search.search}%'");
             #endregion
             using var conn = new SqlConnection(cnstr);
-            int row = conn.QueryFirst<int>(sql, new{subject_id = Search.subject_id, type_id = Search.type_id, tag_id = Search.tag_id, question_level = Search.question_level, question_content = Search.search, member_id = Search.member_id});
+            int row = conn.QueryFirst<int>(sql, new{member_id = Search.member_id});
             paging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / paging.Item));
             paging.SetRightPage();
         }
@@ -227,19 +227,19 @@ namespace BrainBoost.Services
                                     WHERE number BETWEEN {(paging.NowPage - 1) * paging.Item + 1} AND {paging.NowPage * paging.Item }");
             #region 判斷
             if(Search.subject_id != null)
-                stringBuilder.Replace("1=1", $"1=1 AND Q.subject_id = @subject_id");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.subject_id = {Search.subject_id} ");
             if(Search.type_id != null)
-                stringBuilder.Replace("1=1", $"1=1 AND Q.type_id = @type_id");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.type_id = {Search.type_id} ");
             if(Search.tag_id != null)
-                stringBuilder.Replace("1=1", $"1=1 AND T.tag_id = @tag_id");
+                stringBuilder.Replace("1=1", $"1=1 AND T.tag_id = {Search.tag_id} ");
             if(Search.question_level != null)
-                stringBuilder.Replace("1=1", $"1=1 AND Q.question_level = @question_level");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.question_level = {Search.question_level} ");
             if(Search.search != null)
-                stringBuilder.Replace("1=1", $"1=1 AND Q.question_content = '@question_content'");
+                stringBuilder.Replace("1=1", $"1=1 AND Q.question_content LIKE '%{Search.search}%' ");
             #endregion
 
             using (var conn = new SqlConnection(cnstr))
-            return (List<SimpleQuestion>)conn.Query<SimpleQuestion>(stringBuilder.ToString(), new{subject_id = Search.subject_id, type_id = Search.type_id, tag_id = Search.tag_id, question_level = Search.question_level, question_content = Search.search, member_id = Search.member_id});
+            return (List<SimpleQuestion>)conn.Query<SimpleQuestion>(stringBuilder.ToString(), new{member_id = Search.member_id});
         }
         #endregion
 
@@ -262,6 +262,57 @@ namespace BrainBoost.Services
                             WHERE Q.subject_id = 1 AND Q.is_delete = 0";
             using var conn = new SqlConnection(cnstr);
             return (List<Tag>)conn.Query<Tag>(sql, new{member_id = member_id});
+        }
+        #endregion
+
+        #region 隨機出題
+        // 取得搶答室題目id題型
+        public List<RaceQuestionListType> GetRaceRoomQuestionType(int id){
+            string sql = $@"SELECT
+                                Q.question_id,
+                                type_id
+                            FROM Question Q
+                            INNER JOIN Race_Question R
+                            ON Q.question_id = R.question_id
+                            WHERE raceroom_id = @raceroom_id AND Q.is_delete = 0 AND R.is_delete = 0 AND is_appear = 0
+                            ORDER BY type_id";
+            using var conn = new SqlConnection(cnstr);
+            return (List<RaceQuestionListType>)conn.Query<RaceQuestionListType>(sql, new{raceroom_id = id});
+        }
+        
+        public RaceQuestionViewModel GetRandomQuestion(RaceQuestionListType Question){
+            Random rd = new();
+            string sql2 = String.Empty;
+            // 顯示題目和答案
+            string sql = $@"SELECT
+                                question_content,
+                                question_picture
+                            FROM Question
+                            WHERE question_id = @question_id AND is_delete = 0";
+            // 選項
+            if(Question.type_id == 2){
+                sql2 = $@"SELECT
+                            O.option_content,
+                            O.option_picture
+                        FROM ""Option"" O
+                        INNER JOIN Question Q
+                        ON O.question_id = Q.question_id
+                        WHERE q.is_delete = 0 AND Q.question_id = @question_id";
+            }
+            using var conn = new SqlConnection(cnstr);
+            // 宣告raceQuestionList
+            RaceQuestionViewModel raceQuestionList = new();
+            
+            // 執行顯示題目和答案
+            raceQuestionList.question = conn.QueryFirstOrDefault<Question>(sql, new { question_id = Question.question_id });
+            
+            // 如果是選擇題的話顯示選項
+            if(!String.IsNullOrEmpty(sql2)){
+                List<Option> options = new List<Option>(conn.Query<Option>(sql2, new { question_id = Question.question_id }));
+                raceQuestionList.options = options.OrderBy(x => rd.Next()).ToList();
+            }
+            return raceQuestionList;
+                
         }
         #endregion
     }
