@@ -263,18 +263,21 @@ namespace BrainBoost.Services
         #region 題目列表（只顯示題目內容，不包含選項）
         // 選擇題
         public List<Question> GetQuestionList(int type, string Search,Forpaging forpaging){
-            string sql = String.Empty;
+            string sql = $@" SELECT * FROM Question WHERE is_delete AND 1=1";
             if(!String.IsNullOrEmpty(Search))
-                sql = $@" SELECT * FROM Question WHERE question_content LIKE '%{Search}%' AND type_id = '{type}' ";
+                sql = sql.Replace("1=1", $@"question_content LIKE '%{Search}%' AND type_id = '{type}' AND 1=1");
             else if(type != 0)
-                sql = $@" SELECT * FROM Question WHERE type_id = '{type}'";
-            else
-                sql = $@" SELECT * FROM Question ";
+                sql = sql.Replace("1=1", $@"type_id = '{type}'");
             using var conn = new SqlConnection(cnstr);
             return new List<Question>(conn.Query<Question>(sql));
         }
         #endregion
 
-        
+        //根據Id獲取題目內容
+        public Question GetQuestionById(int id){
+            string sql = $@" SELECT * FROM Question WHERE question_id = @question_id AND is_delete = 0";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<Question>(sql, new{question_id = id});
+        }
     }
 }

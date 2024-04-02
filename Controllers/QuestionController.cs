@@ -24,10 +24,10 @@ namespace BrainBoost.Controllers
 
         // #region 顯示問題
         // 獲得 單一問題
-        // [HttpGet("[Action]")]
-        // public Question Question([FromQuery]int question_id){
-        //     return QuestionService.GetQuestionById(question_id);
-        // }
+        [HttpGet]
+        public Question Question([FromQuery]int question_id){
+            return QuestionService.GetQuestionById(question_id);
+        }
 
         // 獲得 單一問題
         [HttpGet("[Action]")]
