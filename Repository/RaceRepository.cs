@@ -87,6 +87,12 @@ namespace BrainBoost.Services
             using var conn = new SqlConnection(cnstr);
             conn.Execute(stringBuilder.ToString());
         }
+        public void InsertQuestion(int id, int question_id){
+            string sql = $@"INSERT INTO Race_Question(raceroom_id, question_id)
+                                        VALUES('{id}', '{question_id}') ";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql.ToString());
+        }
         #endregion
 
         #region 刪除搶答室題目

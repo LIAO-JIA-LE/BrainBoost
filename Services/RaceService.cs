@@ -50,8 +50,13 @@ namespace BrainBoost.Services
 
 
         // 新增 搶答室題目
-        public void RoomQuestion(int id, List<int> question_id_list){
+        public void RoomQuestionList(int id, List<int> question_id_list){
             RaceRepository.InsertQuestion(id, question_id_list);
+        }
+
+         // 新增 搶答室題目單一
+        public void RoomQuestion(int id, int question_id){
+            RaceRepository.InsertQuestion(id, question_id);
         }
 
         // 取消選取 搶答室題目
@@ -73,7 +78,7 @@ namespace BrainBoost.Services
         #endregion
 
         #region 搶答室題目單一
-        public List<RaceQuestionAnswer> RoomQuestion(int id, int question_id){
+        public List<RaceQuestionAnswer> GetRoomQuestion(int id, int question_id){
             return RaceRepository.Question(id, question_id);
         }
         #endregion

@@ -24,7 +24,7 @@ namespace BrainBoost.Controllers
         }
         #endregion
 
-        // 搶答室資訊
+        // TODO：搶答室資訊
         #region 顯示搶答室資訊
         // 搶答室列表
         [HttpGet]
@@ -39,8 +39,7 @@ namespace BrainBoost.Controllers
         public RaceRooms GetRoom([FromQuery]int id){
             return RaceService.GetRoom(id);
         }
-        #endregion
-        
+        #endregion   
         #region 新增搶答室
         // 新增搶答室
         [HttpPost]
@@ -56,7 +55,6 @@ namespace BrainBoost.Controllers
             return Ok("新增成功");
         }
         #endregion
-
         #region 修改搶答室
         // 修改 搶答室資訊
         [HttpPut]
@@ -66,7 +64,6 @@ namespace BrainBoost.Controllers
             return Ok("修改成功");
         }
         #endregion
-
         #region 刪除搶答室
         [HttpDelete]
         [Route("Room")]
@@ -76,7 +73,7 @@ namespace BrainBoost.Controllers
         }
         #endregion
 
-        // 搶答室題目
+        // TODO：搶答室題目
         #region 顯示搶答室題目（只有題目內容）
         // 搶答室題目列表
         [HttpGet("[Action]")]
@@ -87,19 +84,17 @@ namespace BrainBoost.Controllers
         // 搶答室題目單一含內容
         [HttpGet("[Action]")]
         public List<RaceQuestionAnswer> RoomQuestion([FromQuery]int id, [FromQuery]int question_id){
-            return RaceService.RoomQuestion(id, question_id);
+            return RaceService.GetRoomQuestion(id, question_id);
         }
-        #endregion
-        
+        #endregion        
         #region 新增搶答室題目
         // 新增 搶答室題目
         [HttpPost("[Action]")]
         public IActionResult RoomQuestion([FromQuery]int id, [FromBody]List<int> question_id_list){
-            RaceService.RoomQuestion(id, question_id_list);
+            RaceService.RoomQuestionList(id, question_id_list);
             return Ok("新增成功");
         }
-        #endregion
-        
+        #endregion        
         #region 刪除搶答室題目
         // 刪除 搶答室題目
         // [HttpDelete("[Action]")]
@@ -109,9 +104,95 @@ namespace BrainBoost.Controllers
             RaceService.DeleteRoomQuestion(id, question_id_list);
             return Ok("刪除成功");
         }
+        #endregion   
+        #region 手動新增題目並加進去題庫（是非題）
+        [HttpPost("[Action]")]
+        public IActionResult TrueOrFalse([FromQuery]int id, [FromQuery]int subject_id, [FromBody]TureorFalse question){
+            
+            // 將題目細節儲存至QuestionList物件
+            QuestionList questionList = new();
+
+            // 題目分類
+            questionList.TagData.tag_name = question.tag;
+
+            // 題目敘述
+            questionList.QuestionData = new Question(){
+                type_id = 1,
+                subject_id = subject_id,
+                question_level = question.question_level,
+                question_content = question.question_content
+            };
+            
+            // 題目答案
+            questionList.AnswerData = new Answer(){
+                question_answer = question.is_answer ? "是" : "否",
+                question_parse = question.parse
+            };
+
+            try
+            {
+                // questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                questionList.QuestionData.member_id = 13;
+                QuestionService.InsertQuestion(questionList);
+                int question_id = QuestionService.GetQuestionId(questionList);
+                RaceService.RoomQuestion(id, question_id);
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"發生錯誤:  {e}");
+            }
+            return Ok("新增成功");
+        }
         #endregion
-    
-        // 題庫（多重篩選）
+        #region 手動新增題目並加進去題庫（選擇題）
+        [HttpPost("[Action]")]
+        public IActionResult MultipleChoice([FromQuery]int id, [FromQuery]int subject_id, [FromBody]InsertQuestion question){
+            
+            // 將題目細節儲存至QuestionList物件
+            QuestionList questionList = new();
+
+            // 題目分類
+            questionList.TagData.tag_name = question.tag;
+
+            // 題目敘述
+            questionList.QuestionData = new Question(){
+                type_id = 2,
+                subject_id = subject_id,
+                question_level = question.question_level,
+                question_content = question.question_content
+            };
+
+            // 題目選項
+            questionList.Options = new List<string>(){
+                question.optionA.ToString(),
+                question.optionB.ToString(),
+                question.optionC.ToString(),
+                question.optionD.ToString(),
+            };
+
+            // 題目答案
+            questionList.AnswerData = new Answer(){
+                question_answer = question.answer,
+                question_parse = question.parse
+            };
+
+            try
+            {
+                questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                // questionList.QuestionData.member_id = 1;
+                QuestionService.InsertQuestion(questionList);
+                int question_id = QuestionService.GetQuestionId(questionList);
+                RaceService.RoomQuestion(id, question_id);
+            }
+            catch (Exception e)
+            {
+                return BadRequest($"發生錯誤:  {e}");
+            }
+            return Ok("新增成功");
+        }
+        #endregion+
+
+        // TODO：題庫（多重篩選）
         #region 題庫列表
         [HttpPost("[Action]")]
         public List<SimpleQuestion> QuestionFilterList([FromBody]QuestionFiltering SearchData, [FromQuery]int page = 1){           
@@ -127,7 +208,7 @@ namespace BrainBoost.Controllers
         }
         #endregion
     
-        // 篩選列表
+        // TODO：篩選下拉式選單
         #region 標籤列表
         [HttpGet("[Action]")]
         public List<Tag> TagList([FromQuery]int subject_id){
@@ -136,6 +217,17 @@ namespace BrainBoost.Controllers
             return RaceService.TagList(member_id, subject_id);
         }
         #endregion
+
+        // TODO：統計難度
+        #region level統整
+        #endregion
+
+        // TODO：搶答室開始
+        #region 隨機出題
+        
+        #endregion
+
+        
 
         // 隨機亂碼
         #region 刪除隨機亂碼
