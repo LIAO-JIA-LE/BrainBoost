@@ -2,10 +2,12 @@ namespace BrainBoost.Models
 {
     public class Subject
     {
-        // 角色權限編號
+        // 科目id
         public int subject_id { get; set; }
 
-        // 角色編號
+        //老師id
+        public int member_id {get;set;}
+        // 科目名稱
         public string subject_name { get; set; }
     }
 }
