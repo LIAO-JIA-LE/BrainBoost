@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BrainBoost.Controllers
 {
-    [Route("[controller]")]
-    public class SubjectController(SubjectService _subjectService,MemberService _memberService) : Controller
+    [Route("BrainBoost/[controller]")]
+    public class SubjectController(SubjectService _subjectService, MemberService _memberService) : Controller
     {
         readonly SubjectService subjectService = _subjectService;
         readonly MemberService memberService = _memberService;
@@ -23,14 +23,17 @@ namespace BrainBoost.Controllers
         [HttpPut]
         [Route("Subjcet")]
         public IActionResult UpdateSubject(){
+
             return Ok();
         }
 
         //新增科目
-        // [HttpPost]
-        // [Route("Subject")]
-        // public IActionResult InsertSubject([FromBody]InsertSubject Data){
-
-        // }
+        [HttpPost]
+        [Route("Subject")]
+        public IActionResult InsertSubject([FromBody]InsertSubject insertData){
+            insertData.teacher_id = memberService.GetDataByAccount(User.Identity.Name).Member_Id;
+            subjectService.InsertSubject(insertData);
+            return Ok();
+        }
     }
 }

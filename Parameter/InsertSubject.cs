@@ -10,8 +10,8 @@ namespace BrainBoost.Parameter
         //科目名稱
         public string subject_name{get;set;}
         //老師帳號
-        public int teacher_account{get;set;}
-        //學生列表
-        public List<int> List_student_account{get;set;}
+        public int teacher_id{get;set;}
+        //學生編號列表
+        public List<int> List_student_id{get;set;}
     }
 }

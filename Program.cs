@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using BrainBoost.Services;
 using System.Text;
+using BrainBoost.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +58,7 @@ builder.Host.ConfigureServices((hostContext,services)=>{
     services.AddScoped<ImportRepository>();
     services.AddScoped<Forpaging>();
     services.AddScoped<RoleService>();
+    services.AddScoped<SubjectService>();
 });
 
 var app = builder.Build();
