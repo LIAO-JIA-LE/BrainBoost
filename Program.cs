@@ -72,6 +72,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+//使用靜態檔案
+app.UseStaticFiles();
+
 //授權宣告
 app.UseAuthentication();
 app.UseAuthorization();
