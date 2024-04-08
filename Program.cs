@@ -59,6 +59,7 @@ builder.Host.ConfigureServices((hostContext,services)=>{
     services.AddScoped<Forpaging>();
     services.AddScoped<RoleService>();
     services.AddScoped<SubjectService>();
+    services.AddScoped<ClassService>();
 });
 
 var app = builder.Build();
@@ -71,6 +72,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+//使用靜態檔案
+app.UseStaticFiles();
 
 //授權宣告
 app.UseAuthentication();

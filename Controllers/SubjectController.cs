@@ -1,6 +1,7 @@
 using BrainBoost.Models;
 using BrainBoost.Parameter;
 using BrainBoost.Services;
+using BrainBoost.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BrainBoost.Controllers
@@ -16,7 +17,7 @@ namespace BrainBoost.Controllers
         #region 科目
         // 查看該老師所有的科目
         [HttpGet]
-        [Route("Subject")]
+        [Route("AllSubject")]
         public List<Subject> GetAllSubject(){
             Member member = MemberService.GetDataByAccount(User.Identity.Name);
             return SubjectService.GetAllSubject(member.Member_Id);
@@ -28,6 +29,26 @@ namespace BrainBoost.Controllers
         public IActionResult UpdateSubjectName([FromBody]InsertSubject updateData){
             updateData.teacher_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
             SubjectService.UpdateSubjectName(updateData);
+            return Ok();
+        }
+        //查詢單個科目
+        [HttpGet]
+        [Route("Subject/{subject_id}")]
+        public SubjectViewModel GetSubject(int subject_id){
+            Member member = MemberService.GetDataByAccount(User.Identity.Name);
+            return SubjectService.GetSubject(member.Member_Id,subject_id);
+        }
+
+        //修改科目  
+        [HttpPut]
+        [Route("Subject/{subject_id}")]
+        public IActionResult UpdateSubject(int subject_id,[FromBody]string subject_name){
+            Subject subject = new(){
+                                    subject_id = subject_id,
+                                    subject_name = subject_name,
+                                    member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id
+                                };
+            SubjectService.UpdateSubject(subject);
             return Ok();
         }
 
@@ -55,6 +76,17 @@ namespace BrainBoost.Controllers
             SubjectService.InsertSubject(insertData);
             return Ok();
         }
+        [HttpDelete]
+        [Route("Subject")]
+        public IActionResult DeleteSubject([FromQuery]int subject_id){
+            Member member = MemberService.GetDataByAccount(User.Identity.Name);
+            if(SubjectService.GetSubject(member.Member_Id,subject_id) != null){
+                SubjectService.DeleteSubject(member.Member_Id,subject_id);
+                return Ok();
+            }
+            else return BadRequest();
+        }
+
         #endregion
     }
 }

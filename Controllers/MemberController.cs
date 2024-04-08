@@ -18,12 +18,14 @@ namespace BrainBoost.Controllers
         readonly JwtHelpers JwtHelpers;
         readonly Forpaging Forpaging;
         readonly RoleService RoleService;
-        public MemberController(MemberService _memberservice,MailService _mailservice, JwtHelpers _jwtHelpers,Forpaging _forpaging,RoleService _roleservice){
+        readonly IWebHostEnvironment evn;
+        public MemberController(IWebHostEnvironment _evn,MemberService _memberservice,MailService _mailservice, JwtHelpers _jwtHelpers,Forpaging _forpaging,RoleService _roleservice){
             MemberService = _memberservice;
             MailService = _mailservice;
             JwtHelpers = _jwtHelpers;
             Forpaging = _forpaging;
             RoleService = _roleservice;
+            evn = _evn;
         }
         #endregion
         
@@ -43,9 +45,11 @@ namespace BrainBoost.Controllers
                     };
                     return BadRequest(result);
                 }
+                var wwwroot = evn.ContentRootPath + @"\wwwroot\images\";
                 Member Member = new()
                 {
                     Member_Name = RegisterData.Member_Name,
+                    Member_Photo = wwwroot + "default.jpg",
                     Member_Account = RegisterData.Member_Account,
                     Member_Email = RegisterData.Member_Email,
                     Member_Password = MemberService.HashPassword(RegisterData.Member_Password),
@@ -116,34 +120,59 @@ namespace BrainBoost.Controllers
         }
         #endregion
 
-        #region 無權限 & 未登入
-        // 無權限
-        [HttpGet("[Action]")]
-        public IActionResult NoAccess()
-        {
-            return BadRequest("沒有權限");
+        //修改個人資料
+        [HttpPut]
+        [Route("Member")]
+        public IActionResult UpdateMemberData(IFormFile img,string name){
+            MemberUpdate member = new()
+            {
+                member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
+                member_name = name
+            };
+            //處理圖片
+            var wwwroot = evn.ContentRootPath + @"\wwwroot\images\";
+            if(img.Length > 0){
+                var imgname = User.Identity.Name + ".jpg";
+                var img_path = wwwroot + imgname;
+                using var stream = System.IO.File.Create(img_path);
+                img.CopyTo(stream);
+                member.member_photo = img_path;
+            }
+            else{
+                member.member_photo = wwwroot + "default.jpg";
+            }
+            MemberService.UpdateMemberData(member);
+            return Ok();
         }
-        
-        // 無登入
-        [HttpGet("[Action]")]
-        public IActionResult NoLogin()
-        {
-            return BadRequest("未登入");
-        }
-        #endregion
 
-        #region 權限
-        // 獲得驗證後名稱
-        [HttpGet("[Action]")]
-        public IActionResult GetName(){
-            return Ok(User.Identity?.Name);
-        }
+        // #region 無權限 & 未登入
+        // // 無權限
+        // [HttpGet("[Action]")]
+        // public IActionResult NoAccess()
+        // {
+        //     return BadRequest("沒有權限");
+        // }
         
-        #endregion
+        // // 無登入
+        // [HttpGet("[Action]")]
+        // public IActionResult NoLogin()
+        // {
+        //     return BadRequest("未登入");
+        // }
+        // #endregion
 
-        #region 後台 會員列表
-        // 取得目前所有使用者
-        // [Authorize(Roles = "Admin")]
+        // #region 權限
+        // // 獲得驗證後名稱
+        // [HttpGet("[Action]")]
+        // public IActionResult GetName(){
+        //     return Ok(User.Identity?.Name);
+        // }
+        
+        // #endregion
+
+        #region 後台管理者
+        //取得目前所有使用者
+        //[Authorize(Roles = "Admin")]
         [HttpGet("[Action]")]
         public MemberViewModels MemberList([FromQuery]string? Search,[FromQuery]int page = 1){
             MemberViewModels data = new(){
@@ -161,6 +190,7 @@ namespace BrainBoost.Controllers
             return MemberService.GetDataByAccount(account);
         }
         #endregion
+
 
         #region 忘記密碼
         // 輸入Email後寄驗證信

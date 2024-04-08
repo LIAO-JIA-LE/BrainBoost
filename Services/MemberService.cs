@@ -80,8 +80,9 @@ public class MemberService
 
     public void Register(Member member)
     {
-        string sql = @$"INSERT INTO Member(member_name,member_account,member_password,member_email,member_authcode)
-                                    VALUES('{member.Member_Name}','{member.Member_Account}','{member.Member_Password}','{member.Member_Email}','{member.Member_AuthCode}')
+        string sql = @$"INSERT INTO Member(member_name,member_photo,member_account,member_password,member_email,member_authcode)
+                                    VALUES('{member.Member_Name}','{member.Member_Photo}','{member.Member_Account}',
+                                           '{member.Member_Password}','{member.Member_Email}','{member.Member_AuthCode}')
                         /*設定暫時的變數*/
                         DECLARE @member_id int = (SELECT m.member_id FROM Member m WHERE m.member_account = '{member.Member_Account}');
                         INSERT INTO Member_Role(member_id,role_id)
@@ -187,7 +188,7 @@ public class MemberService
                         SELECT @member_id = member_id FROM Member WHERE member_email = '{Data.Email}'
                         UPDATE Member_Role SET role_id -= 4 WHERE member_id = @member_id";
         using (var conn = new SqlConnection(cnstr))
-        conn.Execute(sql);
+        conn.Execute(sql,new{member.Member_Id});
     }
     
     // 用mail獲得資料
@@ -212,4 +213,14 @@ public class MemberService
         conn.Execute(sql);
     }
     #endregion
+    //修改個人資料
+    public void UpdateMemberData(MemberUpdate member){
+        string sql = $@"UPDATE Member SET 
+                            member_name = @member_name, 
+                            member_photo = @member_photo
+                        WHERE member_id = @member_id
+                        ";
+        using var conn = new SqlConnection(cnstr);
+        conn.Execute(sql,new{member.member_name,member.member_photo,member.member_id});
+    }
 }

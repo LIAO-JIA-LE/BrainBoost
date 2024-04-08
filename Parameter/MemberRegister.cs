@@ -9,6 +9,8 @@ public class MemberRegister
     [Required(ErrorMessage = "請輸入用戶名稱")]
     public required string Member_Name { get; set; }
 
+    // public IFormFile? Member_Photo {get;set;}
+
     // 會員帳號
     [DisplayName("帳號")]
     [StringLength(20, MinimumLength = 6, ErrorMessage = "帳號長度需介於6-20字元")]
