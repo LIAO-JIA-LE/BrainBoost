@@ -203,4 +203,13 @@ public class MemberService
         return conn.QueryFirstOrDefault<Member>(sql);
     }
     #endregion
+
+    #region 修改密碼
+    public void ChangePassword(int member_id, string pwd){
+        string password = HashPassword(pwd);
+        string sql = $@" UPDATE Member SET member_password = '{password}' WHERE member_id = {member_id} ";
+        using (var conn = new SqlConnection(cnstr))
+        conn.Execute(sql);
+    }
+    #endregion
 }

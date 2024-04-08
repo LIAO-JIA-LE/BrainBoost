@@ -279,12 +279,13 @@ namespace BrainBoost.Services
             using var conn = new SqlConnection(cnstr);
             return (List<RaceQuestionListType>)conn.Query<RaceQuestionListType>(sql, new{raceroom_id = id});
         }
-        
+
         public RaceQuestionViewModel GetRandomQuestion(RaceQuestionListType Question){
             Random rd = new();
             string sql2 = String.Empty;
             // 顯示題目和答案
             string sql = $@"SELECT
+                                question_id,
                                 question_content,
                                 question_picture
                             FROM Question
@@ -292,6 +293,7 @@ namespace BrainBoost.Services
             // 選項
             if(Question.type_id == 2){
                 sql2 = $@"SELECT
+                            O.question_id,
                             O.option_content,
                             O.option_picture
                         FROM ""Option"" O

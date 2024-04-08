@@ -10,13 +10,16 @@ namespace BrainBoost.Controllers
     [Route("BrainBoost/[controller]")]
     public class RoleController : Controller
     {
-        
+        #region 呼叫函式
         readonly MemberService MemberService;
         readonly RoleService RoleService;
         public RoleController(MemberService _memberservice,RoleService _roleservice){
             MemberService = _memberservice;
             RoleService = _roleservice;
         }
+        #endregion
+        
+        #region 後台 修改使用者權限
         //修改使用者權限(後臺管理者)
         [HttpPut("[Action]")]
         public IActionResult UpdateMemberRole([FromBody]UpdateRole data){
@@ -24,7 +27,9 @@ namespace BrainBoost.Controllers
             RoleService.UpdateMemberRole(member.Member_Id,data.role);
             return Ok();
         }
+        #endregion
         
+        #region 設定權限
         // 獲得權限
         [HttpGet("[Action]")]
         [Authorize]
@@ -39,5 +44,6 @@ namespace BrainBoost.Controllers
             else
                 return Ok("Admin");
         }
+        #endregion
     }
 }

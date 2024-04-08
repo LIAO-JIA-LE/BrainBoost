@@ -141,8 +141,9 @@ namespace BrainBoost.Controllers
         
         #endregion
 
-        //取得目前所有使用者
-        //[Authorize(Roles = "Admin")]
+        #region 後台 會員列表
+        // 取得目前所有使用者
+        // [Authorize(Roles = "Admin")]
         [HttpGet("[Action]")]
         public MemberViewModels MemberList([FromQuery]string? Search,[FromQuery]int page = 1){
             MemberViewModels data = new(){
@@ -152,12 +153,14 @@ namespace BrainBoost.Controllers
             data.search = Search;
             return data;
         }
-        //取得單一使用者(帳號)
+
+        // 取得單一使用者(帳號)
         // 未來可加任課科目&上課科目
         [HttpGet("{account}")]
         public Member MemberByAcc([FromRoute]string account){
             return MemberService.GetDataByAccount(account);
         }
+        #endregion
 
         #region 忘記密碼
         // 輸入Email後寄驗證信
@@ -216,7 +219,7 @@ namespace BrainBoost.Controllers
 
         // 修改密碼
         [HttpPost]
-        [Route("[Action]")]
+        [Route("ChangePasswordByForget")]
         [Authorize(Roles = "ForgetPassword")]
         public IActionResult ChangePassword([FromBody] CheckForgetPassword Data)
         {
@@ -233,6 +236,21 @@ namespace BrainBoost.Controllers
                 return BadRequest("您無權執行此操作。");
             }
 
+        }
+        #endregion
+
+        #region 修改密碼
+        [HttpPost]
+        [Route("[Action]")]
+        public IActionResult ChangePassword([FromBody]ChangePassword Data){
+            Member member = MemberService.GetDataByAccount(User.Identity.Name);
+            if(member.Member_Password == MemberService.HashPassword(Data.Password)){
+                MemberService.ChangePassword(member.Member_Id, Data.NewPassword);
+                return Ok("修改成功");
+            }
+            else{
+                return BadRequest("您無權執行此操作。");
+            }
         }
         #endregion
     }

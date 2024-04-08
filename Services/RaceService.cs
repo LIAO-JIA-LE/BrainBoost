@@ -129,6 +129,7 @@ namespace BrainBoost.Services
 
             // 隨機出題
             Random rd = new();
+            // if(questionIdList.type_id == 1)
             RaceQuestionViewModel question = RaceRepository.GetRandomQuestion(questionIdList[rd.Next(questionIdList.Count)]);
             return question;
         }
