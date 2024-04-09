@@ -134,5 +134,11 @@ namespace BrainBoost.Services
             return question;
         }
         #endregion
+
+        #region 統計難度
+        public List<int> Level(int subject_id){
+            return RaceRepository.Level(subject_id);
+        }
+        #endregion
     }
 }

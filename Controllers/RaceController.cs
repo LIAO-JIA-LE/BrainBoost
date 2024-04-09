@@ -213,13 +213,18 @@ namespace BrainBoost.Controllers
         [HttpGet("[Action]")]
         public List<Tag> TagList([FromQuery]int subject_id){
             // int member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-            int member_id = 1;
+            int member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
             return RaceService.TagList(member_id, subject_id);
         }
         #endregion
 
         // TODO：統計難度
         #region level統整
+        [HttpGet("[Action]")]
+        public List<int> LevelStatistics([FromQuery]int subject_id, [FromQuery]int raceroom_id){
+            List<int> LevelQuestion = RaceService.Level(subject_id);
+            return LevelQuestion;
+        }
         #endregion
 
         // TODO：搶答室開始
@@ -230,7 +235,8 @@ namespace BrainBoost.Controllers
             return RaceService.RandomQuestion(id);
         }
         #endregion
-
+        #region 紀錄學生搶答室答案和分數
+        #endregion
         
 
         // 隨機亂碼
