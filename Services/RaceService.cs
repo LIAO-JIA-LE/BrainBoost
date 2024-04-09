@@ -63,8 +63,8 @@ namespace BrainBoost.Services
         }
 
         // 取消選取 搶答室題目
-        public void DeleteRoomQuestion(int id, List<int> question_id_list){
-            RaceRepository.DeleteQuestion(id, question_id_list);
+        public void DeleteRoomQuestion(int raceroom_id, int question_id){
+            RaceRepository.DeleteQuestion(raceroom_id, question_id);
         }
         // #endregion
 

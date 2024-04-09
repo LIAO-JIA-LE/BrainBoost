@@ -100,8 +100,8 @@ namespace BrainBoost.Controllers
         // [HttpDelete("[Action]")]
         [HttpDelete]
         [Route("RoomQuestion")]
-        public IActionResult DeleteRoomQuestion([FromQuery]int id, [FromBody]List<int> question_id_list){
-            RaceService.DeleteRoomQuestion(id, question_id_list);
+        public IActionResult DeleteRoomQuestion([FromQuery]int raceroom_id, [FromBody]int question_id){
+            RaceService.DeleteRoomQuestion(raceroom_id, question_id);
             return Ok("刪除成功");
         }
         #endregion   

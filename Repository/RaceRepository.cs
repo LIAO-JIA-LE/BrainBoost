@@ -104,15 +104,11 @@ namespace BrainBoost.Services
         #endregion
 
         #region 刪除搶答室題目
-        public void DeleteQuestion(int id, List<int> question_id_list){
-            StringBuilder stringBuilder = new StringBuilder();
-            // 刪除題目
-            for(int i = 0; i < question_id_list.Count; i++){
-                stringBuilder.Append($@"UPDATE Race_Question SET is_delete = 1 
-                                        WHERE raceroom_id = {id} AND question_id = {question_id_list[i]}");
-            }
+        public void DeleteQuestion(int raceroom_id, int question_id){
+            string sql = $@"UPDATE Race_Question SET is_delete = 1 
+                            WHERE raceroom_id = @raceroom_id AND question_id = @question_id";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(stringBuilder.ToString());
+            conn.Execute(sql,new{ raceroom_id, question_id});
         }
         #endregion
 
@@ -283,7 +279,7 @@ namespace BrainBoost.Services
                             FROM Question Q
                             INNER JOIN Race_Question R
                             ON Q.question_id = R.question_id
-                            WHERE raceroom_id = @raceroom_id AND is_output = 0
+                            WHERE raceroom_id = @raceroom_id AND is_output = 0 AND q.is_delete = 0
                             ORDER BY type_id";
             using var conn = new SqlConnection(cnstr);
             return (List<RaceQuestionListType>)conn.Query<RaceQuestionListType>(sql, new{raceroom_id = id});
