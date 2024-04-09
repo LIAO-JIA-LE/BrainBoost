@@ -220,11 +220,11 @@ namespace BrainBoost.Controllers
 
         // TODO：統計難度
         #region level統整
-        [HttpGet("[Action]")]
-        public List<int> LevelStatistics([FromQuery]int subject_id, [FromQuery]int raceroom_id){
-            List<int> LevelQuestion = RaceService.Level(subject_id);
-            return LevelQuestion;
-        }
+        // [HttpGet("[Action]")]
+        // public List<int> LevelStatistics([FromQuery]int subject_id, [FromQuery]int raceroom_id){
+        //     List<int> LevelQuestion = RaceService.Level(subject_id);
+        //     return LevelQuestion;
+        // }
         #endregion
 
         // TODO：搶答室開始
