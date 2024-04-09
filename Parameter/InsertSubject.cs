@@ -7,6 +7,7 @@ namespace BrainBoost.Parameter
 {
     public class InsertSubject
     {
+        public int subjecct_id;
         //科目名稱
         public string subject_name{get;set;}
         //老師帳號

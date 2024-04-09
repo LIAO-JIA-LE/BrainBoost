@@ -227,7 +227,8 @@ namespace BrainBoost.Controllers
         // 單一
         [HttpGet("[Action]")]
         public RaceQuestionViewModel RandomQuestion([FromQuery]int id){
-            return RaceService.RandomQuestion(id);
+            RaceQuestionViewModel Data = RaceService.RandomQuestion(id);
+            return Data ?? null;
         }
         #endregion
 

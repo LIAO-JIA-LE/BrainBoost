@@ -84,41 +84,33 @@ namespace BrainBoost.Services
     
         //軟刪除科目
         public void DeleteSubject(int teacher_id,int subject_id){
-            string sql = $@"UPDATE ""Subject"" s
-                            SET s.is_delete = 1
-                            WHERE s.subject_id = @subject_id AND teacher_id = @teacher_id";
+            string sql = $@"UPDATE ""Subject""
+                            SET is_delete = 1
+                            WHERE subject_id = @subject_id AND teacher_id = @teacher_id";
             using var conn = new SqlConnection(cnstr);
             conn.Execute(sql,new{ teacher_id, subject_id});
         }
         public void UpdateSubject(Subject subject){
-            string sql = $@"UPDATE ""Subject"" s
-                            SET s.subject_name = @subject_name
-                            WHERE s.subject_id = @subjecct_id AND s.member_id = @member_id
+            string sql = $@"UPDATE ""Subject""
+                            SET subject_name = @subject_name
+                            WHERE subject_id = @subject_id AND member_id = @member_id
                         ";
             using var conn = new SqlConnection(cnstr);
             conn.Execute(sql,subject);
         }
-
-        // 修改科目
-        public void UpdateSubjectName(InsertSubject insertData){
-            string sql = $@"UPDATE Subject SET subject_name = '@subject_name' WHERE member_id = @member_id";
-            using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql,new {member_id = insertData.teacher_id, subject_name = insertData.subject_name});
-        }
-
         // 新增學生
-        public void InsertStudent(int subject_id, int student_id){
+        public void InsertStudent(SubjectStudent data){
             string sql = $@"INSERT INTO ""Subject_Member""(subject_id,member_id)
                             VALUES(@subject_id, @student_id)";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql,new {subject_id, student_id});
+            conn.Execute(sql,data);
         }
 
         // 刪除學生
-        public void DeleteStudent(int subject_id, int student_id){
+        public void DeleteStudent(SubjectStudent data){
             string sql = $@"DELETE FROM ""Subject_Member"" WHERE subject_id = @subject_id AND member_id = @student_id";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql,new {subject_id, student_id});
+            conn.Execute(sql,data);
         }
         #endregion
     }

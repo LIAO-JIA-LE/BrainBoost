@@ -127,11 +127,18 @@ namespace BrainBoost.Services
             // 獲得題目id跟題型id
             List<RaceQuestionListType> questionIdList = RaceRepository.GetRaceRoomQuestionType(id);
 
-            // 隨機出題
-            Random rd = new();
-            // if(questionIdList.type_id == 1)
-            RaceQuestionViewModel question = RaceRepository.GetRandomQuestion(questionIdList[rd.Next(questionIdList.Count)]);
-            return question;
+            if(questionIdList.Count > 0){
+                // 隨機出題
+                Random rd = new();
+                // if(questionIdList.type_id == 1)
+                RaceQuestionViewModel question = RaceRepository.GetRandomQuestion(questionIdList[rd.Next(questionIdList.Count)]);
+                return question;
+            }
+            else{
+                //已經出完所有題目 重製題目的is_output
+                RaceRepository.ResetRaceRoomQuestion(id);
+                return null;
+            }
         }
         #endregion
     }
