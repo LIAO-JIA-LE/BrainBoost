@@ -7,6 +7,7 @@ namespace BrainBoost.Parameter
 {
     public class RaceQuestionListType
     {
+        public int raceroom_id {get;set;}
         public int question_id{get;set;}
         public int type_id{get;set;}
     }

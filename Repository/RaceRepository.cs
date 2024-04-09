@@ -18,13 +18,13 @@ namespace BrainBoost.Services
         #endregion
         
         #region 新增搶答室資訊
-        public void Room(string Code, InsertRoom raceData){
+        public void InsertRoom(string Code, InsertRoom raceData){
             string currentTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
             // 新增搶答室資訊
             string sql = $@"INSERT INTO RaceRoom(member_id,race_name, race_date, race_code, race_function, time_limit)
                             VALUES(@member_id,@race_name, @race_date, @race_code, @race_function, @time_limit) ";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new {member_id = raceData.member_id,race_name = raceData.race_name, race_date = currentTime, race_code = Code, race_function = raceData.race_function, time_limit = raceData.time_limit});
+            conn.Execute(sql, new {raceData.member_id,raceData.race_name, race_date = currentTime, race_code = Code,raceData.race_function,raceData.time_limit});
             RoomQuestion(raceData);
         }
         #endregion
@@ -66,6 +66,14 @@ namespace BrainBoost.Services
         }
         #endregion
 
+        #region  邀請碼取得搶答室
+        public RaceRooms GetRaceRoomByCode(string race_code){
+            string sql = " SELECT * FROM RaceRoom WHERE race_code = @race_code";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<RaceRooms>(sql,new{race_code});
+        }
+        #endregion
+
         #region 修改搶答室資訊
         public void RoomInformation(int id, RaceInformation raceData){
             // 新增搶答室資訊
@@ -96,15 +104,11 @@ namespace BrainBoost.Services
         #endregion
 
         #region 刪除搶答室題目
-        public void DeleteQuestion(int id, List<int> question_id_list){
-            StringBuilder stringBuilder = new StringBuilder();
-            // 刪除題目
-            for(int i = 0; i < question_id_list.Count; i++){
-                stringBuilder.Append($@"UPDATE Race_Question SET is_delete = 1 
-                                        WHERE raceroom_id = {id} AND question_id = {question_id_list[i]}");
-            }
+        public void DeleteQuestion(int raceroom_id, int question_id){
+            string sql = $@"UPDATE Race_Question SET is_delete = 1 
+                            WHERE raceroom_id = @raceroom_id AND question_id = @question_id";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(stringBuilder.ToString());
+            conn.Execute(sql,new{ raceroom_id, question_id});
         }
         #endregion
 
@@ -269,12 +273,13 @@ namespace BrainBoost.Services
         // 取得搶答室題目id題型
         public List<RaceQuestionListType> GetRaceRoomQuestionType(int id){
             string sql = $@"SELECT
+                                R.raceroom_id,
                                 Q.question_id,
                                 type_id
                             FROM Question Q
                             INNER JOIN Race_Question R
                             ON Q.question_id = R.question_id
-                            WHERE raceroom_id = @raceroom_id AND Q.is_delete = 0 AND R.is_delete = 0 AND is_appear = 0
+                            WHERE raceroom_id = @raceroom_id AND is_output = 0 AND q.is_delete = 0
                             ORDER BY type_id";
             using var conn = new SqlConnection(cnstr);
             return (List<RaceQuestionListType>)conn.Query<RaceQuestionListType>(sql, new{raceroom_id = id});
@@ -283,13 +288,19 @@ namespace BrainBoost.Services
         public RaceQuestionViewModel GetRandomQuestion(RaceQuestionListType Question){
             Random rd = new();
             string sql2 = String.Empty;
-            // 顯示題目和答案
+            // 顯示題目和答案 
+            // 將出過的題目設定已出現
             string sql = $@"SELECT
                                 question_id,
                                 question_content,
                                 question_picture
                             FROM Question
-                            WHERE question_id = @question_id AND is_delete = 0";
+                            WHERE question_id = @question_id AND is_delete = 0
+                            
+                            UPDATE Race_Question
+                            SET is_output = 1
+                            WHERE raceroom_id = @raceroom_id AND question_id = @question_id
+                            ";
             // 選項
             if(Question.type_id == 2){
                 sql2 = $@"SELECT
@@ -306,15 +317,26 @@ namespace BrainBoost.Services
             RaceQuestionViewModel raceQuestionList = new();
             
             // 執行顯示題目和答案
-            raceQuestionList.question = conn.QueryFirstOrDefault<Question>(sql, new { question_id = Question.question_id });
+            raceQuestionList.question = conn.QueryFirstOrDefault<Question>(sql, new {Question.question_id, Question.raceroom_id});
             
             // 如果是選擇題的話顯示選項
             if(!String.IsNullOrEmpty(sql2)){
-                List<Option> options = new List<Option>(conn.Query<Option>(sql2, new { question_id = Question.question_id }));
+                List<Option> options = new List<Option>(conn.Query<Option>(sql2, new {Question.question_id }));
                 raceQuestionList.options = options.OrderBy(x => rd.Next()).ToList();
             }
             return raceQuestionList;
                 
+        }
+
+        //重製RaceQuestion is_output欄位
+        public void ResetRaceRoomQuestion(int raceroom_id){
+            string sql = $@"
+                            UPDATE Race_Question
+                            SET is_output = 0
+                            WHERE raceroom_id = @raceroom_id
+                        ";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql,new{ raceroom_id });
         }
         #endregion
     }

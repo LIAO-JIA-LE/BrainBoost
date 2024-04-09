@@ -35,9 +35,12 @@ namespace BrainBoost.Services
         #endregion
 
         #region 新增搶答室
-        public void Room(InsertRoom raceData){
+        public void InsertRoom(InsertRoom raceData){
             string Code = GetCode();
-            RaceRepository.Room(Code, raceData);
+            while(RaceRepository.GetRaceRoomByCode(Code) != null){
+                Code = GetCode();
+            }
+            RaceRepository.InsertRoom(Code, raceData);
         }
         #endregion
         
@@ -60,8 +63,8 @@ namespace BrainBoost.Services
         }
 
         // 取消選取 搶答室題目
-        public void DeleteRoomQuestion(int id, List<int> question_id_list){
-            RaceRepository.DeleteQuestion(id, question_id_list);
+        public void DeleteRoomQuestion(int raceroom_id, int question_id){
+            RaceRepository.DeleteQuestion(raceroom_id, question_id);
         }
         // #endregion
 
@@ -127,11 +130,18 @@ namespace BrainBoost.Services
             // 獲得題目id跟題型id
             List<RaceQuestionListType> questionIdList = RaceRepository.GetRaceRoomQuestionType(id);
 
-            // 隨機出題
-            Random rd = new();
-            // if(questionIdList.type_id == 1)
-            RaceQuestionViewModel question = RaceRepository.GetRandomQuestion(questionIdList[rd.Next(questionIdList.Count)]);
-            return question;
+            if(questionIdList.Count > 0){
+                // 隨機出題
+                Random rd = new();
+                // if(questionIdList.type_id == 1)
+                RaceQuestionViewModel question = RaceRepository.GetRandomQuestion(questionIdList[rd.Next(questionIdList.Count)]);
+                return question;
+            }
+            else{
+                //已經出完所有題目 重製題目的is_output
+                RaceRepository.ResetRaceRoomQuestion(id);
+                return null;
+            }
         }
         #endregion
 

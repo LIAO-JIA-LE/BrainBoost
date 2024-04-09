@@ -47,7 +47,7 @@ namespace BrainBoost.Controllers
         public IActionResult InsertRoom([FromBody]InsertRoom raceData){
             try{
                 raceData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-                RaceService.Room(raceData);
+                RaceService.InsertRoom(raceData);
             }
             catch(Exception e){
                 return BadRequest(e.ToString());
@@ -100,8 +100,8 @@ namespace BrainBoost.Controllers
         // [HttpDelete("[Action]")]
         [HttpDelete]
         [Route("RoomQuestion")]
-        public IActionResult DeleteRoomQuestion([FromQuery]int id, [FromBody]List<int> question_id_list){
-            RaceService.DeleteRoomQuestion(id, question_id_list);
+        public IActionResult DeleteRoomQuestion([FromQuery]int raceroom_id, [FromBody]int question_id){
+            RaceService.DeleteRoomQuestion(raceroom_id, question_id);
             return Ok("刪除成功");
         }
         #endregion   
@@ -232,7 +232,8 @@ namespace BrainBoost.Controllers
         // 單一
         [HttpGet("[Action]")]
         public RaceQuestionViewModel RandomQuestion([FromQuery]int id){
-            return RaceService.RandomQuestion(id);
+            RaceQuestionViewModel Data = RaceService.RandomQuestion(id);
+            return Data ?? null;
         }
         #endregion
         #region 紀錄學生搶答室答案和分數
@@ -240,13 +241,13 @@ namespace BrainBoost.Controllers
         
 
         // 隨機亂碼
-        #region 刪除隨機亂碼
-        [HttpDelete("[Action]")]
-        public IActionResult Code([FromQuery]int id){
-            RaceService.DeleteCode(id);
-            return Ok("刪除成功");
-        }
-        #endregion
+        // #region 刪除隨機亂碼
+        // [HttpDelete("[Action]")]
+        // public IActionResult Code([FromQuery]int id){
+        //     RaceService.DeleteCode(id);
+        //     return Ok("刪除成功");
+        // }
+        // #endregion
     
 
     }
