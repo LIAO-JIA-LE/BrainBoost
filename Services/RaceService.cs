@@ -35,9 +35,12 @@ namespace BrainBoost.Services
         #endregion
 
         #region 新增搶答室
-        public void Room(InsertRoom raceData){
+        public void InsertRoom(InsertRoom raceData){
             string Code = GetCode();
-            RaceRepository.Room(Code, raceData);
+            while(RaceRepository.GetRaceRoomByCode(Code) != null){
+                Code = GetCode();
+            }
+            RaceRepository.InsertRoom(Code, raceData);
         }
         #endregion
         

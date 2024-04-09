@@ -47,7 +47,7 @@ namespace BrainBoost.Controllers
         public IActionResult InsertRoom([FromBody]InsertRoom raceData){
             try{
                 raceData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-                RaceService.Room(raceData);
+                RaceService.InsertRoom(raceData);
             }
             catch(Exception e){
                 return BadRequest(e.ToString());
@@ -235,13 +235,13 @@ namespace BrainBoost.Controllers
         
 
         // 隨機亂碼
-        #region 刪除隨機亂碼
-        [HttpDelete("[Action]")]
-        public IActionResult Code([FromQuery]int id){
-            RaceService.DeleteCode(id);
-            return Ok("刪除成功");
-        }
-        #endregion
+        // #region 刪除隨機亂碼
+        // [HttpDelete("[Action]")]
+        // public IActionResult Code([FromQuery]int id){
+        //     RaceService.DeleteCode(id);
+        //     return Ok("刪除成功");
+        // }
+        // #endregion
     
 
     }

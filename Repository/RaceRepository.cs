@@ -18,13 +18,13 @@ namespace BrainBoost.Services
         #endregion
         
         #region 新增搶答室資訊
-        public void Room(string Code, InsertRoom raceData){
+        public void InsertRoom(string Code, InsertRoom raceData){
             string currentTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
             // 新增搶答室資訊
             string sql = $@"INSERT INTO RaceRoom(member_id,race_name, race_date, race_code, race_function, time_limit)
                             VALUES(@member_id,@race_name, @race_date, @race_code, @race_function, @time_limit) ";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new {member_id = raceData.member_id,race_name = raceData.race_name, race_date = currentTime, race_code = Code, race_function = raceData.race_function, time_limit = raceData.time_limit});
+            conn.Execute(sql, new {raceData.member_id,raceData.race_name, race_date = currentTime, race_code = Code,raceData.race_function,raceData.time_limit});
             RoomQuestion(raceData);
         }
         #endregion
@@ -63,6 +63,14 @@ namespace BrainBoost.Services
             string sql = $@" SELECT	* FROM RaceRoom WHERE raceroom_id = @raceroom_id AND is_delete = 0 ";
             using var conn = new SqlConnection(cnstr);
             return conn.QueryFirstOrDefault<RaceRooms>(sql, new { raceroom_id = Raceroom_id });
+        }
+        #endregion
+
+        #region  邀請碼取得搶答室
+        public RaceRooms GetRaceRoomByCode(string race_code){
+            string sql = " SELECT * FROM RaceRoom WHERE race_code = @race_code";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<RaceRooms>(sql,new{race_code});
         }
         #endregion
 
