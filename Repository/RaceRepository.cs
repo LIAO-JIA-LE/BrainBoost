@@ -299,8 +299,7 @@ namespace BrainBoost.Services
                             
                             UPDATE Race_Question
                             SET is_output = 1
-                            WHERE raceroom_id = @raceroom_id AND question_id = @question_id
-                            ";
+                            WHERE raceroom_id = @raceroom_id AND question_id = @question_id";
             // 選項
             if(Question.type_id == 2){
                 sql2 = $@"SELECT
@@ -337,6 +336,49 @@ namespace BrainBoost.Services
                         ";
             using var conn = new SqlConnection(cnstr);
             conn.Execute(sql,new{ raceroom_id });
+        }
+        #endregion
+
+        #region Level統計
+        public List<int> Level(int raceroom_id){
+            List<int> QuestionLevel = new List<int>();
+            // 總題數
+            string sql = $@"SELECT
+                                COUNT(R.question_id) Level
+                            FROM Race_Question R
+                            INNER JOIN Question Q
+                            ON R.question_id = Q.question_id
+                            WHERE R.raceroom_id = @raceroom_id";
+            using var conn = new SqlConnection(cnstr);
+            QuestionLevel.Add(conn.QueryFirstOrDefault<int>(sql, new { raceroom_id }));
+            // 防呆
+            if(QuestionLevel[0] == null)
+                QuestionLevel[0] = 0;
+
+            // 其他難度統計
+            string sql2 = String.Empty;
+            for(int i = 1 ; i <= 10 ; i++){
+                sql2 = $@"SELECT
+                                COUNT(R.question_id) Level
+                            FROM Race_Question R
+                            INNER JOIN Question Q
+                            ON R.question_id = Q.question_id
+                            WHERE R.raceroom_id = @raceroom_id AND Q.question_level = @level";
+                QuestionLevel.Add(conn.QueryFirstOrDefault<int>(sql2, new { raceroom_id, level = i }));
+                if(QuestionLevel[i] == null)
+                    QuestionLevel[i] = 0;
+            }
+            return QuestionLevel;
+        }
+        #endregion
+
+        #region 記錄學生搶答室答案
+        public void StudentReseponse(StudentReseponse studentReseponse){
+            // 新增學生回答道資料庫
+            string sql = $@"INSERT INTO Race_Response(raceroom_id, question_id, member_id, race_answer, race_time)
+                            VALUES(@raceroom_id, @question_id, @member_id, @race_answer, @race_time)";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql, new { raceroom_id = studentReseponse.raceroom_id, question_id = studentReseponse.question_id, member_id = studentReseponse.member_id, race_answer = studentReseponse.race_answer, race_time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") });
         }
         #endregion
     }
