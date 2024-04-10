@@ -13,10 +13,16 @@ namespace BrainBoost.Services
         //新增班級
         public void InsertClass(InsertClass Data){
             string sql = $@"
+                            DELARE @ClassID INT
                             INSERT INTO ""Class""(class_name,member_id)
                             VALUES(@class_name,@member_id)
-                            DELARE 
+                            SET @ClassID = SCOPE_IDENTITY()
+
+                            INSERT INTO ""Class_Member""
                         ";
+            foreach(int student_id in Data.List_student_id){
+                // sql += "" + i.
+            }
         }
     }
 }

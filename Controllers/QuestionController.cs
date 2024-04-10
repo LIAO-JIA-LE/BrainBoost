@@ -30,6 +30,7 @@ namespace BrainBoost.Controllers
         }
 
         // 獲得 單一問題
+        //需指定MEmBER_ID
         [HttpGet("[Action]")]
         public List<Question> All_Question([FromQuery]string search,[FromQuery]int type = 0,[FromQuery]int page = 1){
             QuestionViewModel data = new(){

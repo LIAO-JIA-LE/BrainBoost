@@ -34,6 +34,7 @@ namespace BrainBoost.Controllers
         }
         
         // 搶答室單一
+        //增加搶答室的題目
         [HttpGet]
         [Route("Room")]
         public RaceRooms GetRoom([FromQuery]int raceroom_id){
@@ -61,6 +62,7 @@ namespace BrainBoost.Controllers
         [Route("Room")]
         public IActionResult UpdateRoom([FromQuery]int raceroom_id, [FromBody]RaceInformation raceData){
             RaceService.RoomInformation(raceroom_id, raceData);
+            //Show資料
             return Ok("修改成功");
         }
         #endregion
@@ -220,23 +222,16 @@ namespace BrainBoost.Controllers
 
         // TODO：統計難度
         #region level統整
-<<<<<<< HEAD
         [HttpGet("[Action]")]
         public List<int> LevelStatistics([FromQuery]int raceroom_id){
             List<int> LevelQuestion = RaceService.Level(raceroom_id);
             return LevelQuestion;
         }
-=======
-        // [HttpGet("[Action]")]
-        // public List<int> LevelStatistics([FromQuery]int subject_id, [FromQuery]int raceroom_id){
-        //     List<int> LevelQuestion = RaceService.Level(subject_id);
-        //     return LevelQuestion;
-        // }
->>>>>>> 103a205e3e096e983f7d339ef6dd69cbfab7c116
         #endregion
 
         // TODO：搶答室開始
         #region 隨機出題
+        //計算完成基在重製is_output
         // 單一
         [HttpGet("[Action]")]
         public RaceQuestionViewModel RandomQuestion([FromQuery]int id){
@@ -245,6 +240,7 @@ namespace BrainBoost.Controllers
         }
         #endregion
         #region 紀錄學生搶答室答案和分數
+        [HttpPost("[Action]")]
         public IActionResult StudentReseponse([FromBody]StudentReseponse studentReseponse){
             studentReseponse.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
             RaceService.StudentReseponse(studentReseponse);
@@ -261,7 +257,5 @@ namespace BrainBoost.Controllers
         //     return Ok("刪除成功");
         // }
         // #endregion
-    
-
     }
 }

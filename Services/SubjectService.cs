@@ -27,7 +27,7 @@ namespace BrainBoost.Services
             string sql = $@"DECLARE @SubjectID INT
                             INSERT INTO ""Subject""(member_id,subject_name)
                             VALUES(@member_id,@subject_name)
-                            SET @SubjectID = SCOPE_IDENTITY();";
+                            SET @SubjectID = SCOPE_IDENTITY();"; //自動擷取剛剛新增資料的id
             foreach(int student_id in insertData.List_student_id){
                 sql += $@"INSERT INTO ""Subject_Member""(subject_id,member_id)
                             VALUES(@SubjectID,{student_id})";

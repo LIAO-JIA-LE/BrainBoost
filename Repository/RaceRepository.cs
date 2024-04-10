@@ -43,8 +43,8 @@ namespace BrainBoost.Services
             int Raceroom_id = GetRoomId(raceData);
             StringBuilder stringBuilder = new StringBuilder();
             for (int i = 0; i < raceData.question_id.Count; i++)
-                stringBuilder.AppendLine($@"INSERT INTO Race_Question (raceroom_id, question_id, is_delete) 
-                                            VALUES({Raceroom_id}, {raceData.question_id[i]}, 0) ");
+                stringBuilder.AppendLine($@"INSERT INTO Race_Question (raceroom_id, question_id) 
+                                            VALUES({Raceroom_id}, {raceData.question_id[i]}) ");
             using var conn = new SqlConnection(cnstr);
             conn.Execute(stringBuilder.ToString());
         }
