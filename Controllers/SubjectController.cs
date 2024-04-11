@@ -32,10 +32,23 @@ namespace BrainBoost.Controllers
 
         // 新增科目
         [HttpPost]
-        public IActionResult InsertSubject([FromBody]InsertSubject insertData){
+        public JsonResult InsertSubject([FromBody]InsertSubject insertData){
             insertData.teacher_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-            SubjectService.InsertSubject(insertData);
-            return Ok();
+            Response result;
+            try{
+                SubjectService.InsertSubject(insertData);
+                result = new(){
+                    status_code = 200,
+                    message = "新增成功"
+                };
+            }
+            catch (Exception e){
+                result = new(){
+                    status_code = 500,
+                    message = e.Message
+                };
+            }
+            return Json(result);
         }
 
         //修改科目名稱

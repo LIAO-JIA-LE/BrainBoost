@@ -263,12 +263,13 @@ namespace BrainBoost.Services
         #region 題目列表（只顯示題目內容，不包含選項）
         // 選擇題
         public List<Question> GetQuestionList(int type, string Search,Forpaging forpaging){
-            string sql = $@" SELECT * FROM Question WHERE is_delete AND 1=1";
+            string sql = $@" SELECT * FROM Question WHERE is_delete=0 AND 1=1";
             if(!String.IsNullOrEmpty(Search))
                 sql = sql.Replace("1=1", $@"question_content LIKE '%{Search}%' AND type_id = '{type}' AND 1=1");
             else if(type != 0)
-                sql = sql.Replace("1=1", $@"type_id = '{type}'");
+                sql = sql.Replace("1=1", $@"AND type_id = '{type}'");
             using var conn = new SqlConnection(cnstr);
+            //指定時間格式
             return new List<Question>(conn.Query<Question>(sql));
         }
         #endregion

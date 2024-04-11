@@ -9,6 +9,6 @@ namespace BrainBoost.Parameter
     {
         public string class_name {get;set;}
         public int teacher_id {get;set;}
-        public List<int> List_class_id {get;set;}
+        public List<int> List_student_id {get;set;}
     }
 }
