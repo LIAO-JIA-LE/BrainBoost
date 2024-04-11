@@ -18,16 +18,44 @@ namespace BrainBoost.Controllers
         // 查看該老師所有的科目
         [HttpGet]
         [Route("AllSubject")]
-        public List<Subject> GetAllSubject(){
-            Member member = MemberService.GetDataByAccount(User.Identity.Name);
-            return SubjectService.GetAllSubject(member.Member_Id);
+        public JsonResult GetAllSubject(){
+            Response result;
+            try{
+                Member member = MemberService.GetDataByAccount(User.Identity.Name);
+                result = new(){
+                    status_code = 200,
+                    data = SubjectService.GetAllSubject(member.Member_Id)
+                };
+            }
+            catch (Exception ex) {
+                result = new(){
+                    status_code = 400,
+                    message = ex.Message
+                };
+            }
+            return new(result);
         }
         //查詢單個科目
         [HttpGet]
         [Route("Subject")]
-        public SubjectViewModel GetSubject(int subject_id){
-            Member member = MemberService.GetDataByAccount(User.Identity.Name);
-            return SubjectService.GetSubject(member.Member_Id,subject_id);
+        public JsonResult GetSubject(int subject_id){
+            Response result;
+            try
+            {
+                Member member = MemberService.GetDataByAccount(User.Identity.Name);
+                result = new(){
+                    status_code = 200,
+                    data = SubjectService.GetSubject(member.Member_Id,subject_id)
+                };
+            }
+            catch (Exception ex)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = ex.Message
+                };
+            }
+            return new(result);
         }
 
         // 新增科目
@@ -45,34 +73,68 @@ namespace BrainBoost.Controllers
             }
             catch (Exception e){
                 result = new(){
-                    status_code = 500,
+                    status_code = 400,
                     message = e.Message
                 };
             }
-            return Json(result);
+            return new(result);
         }
 
         //修改科目名稱
         [HttpPut]
-        public IActionResult UpdateSubject([FromQuery]int subject_id,[FromBody]string subject_name){
-            Subject subject = new(){
+        public JsonResult UpdateSubject([FromQuery]int subject_id,[FromBody]string subject_name){
+            Response result;
+            try
+            {
+                Subject subject = new(){
                                     subject_id = subject_id,
                                     subject_name = subject_name,
                                     member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id
                                 };
-            SubjectService.UpdateSubject(subject);
-            return Ok();
+                SubjectService.UpdateSubject(subject);
+                result = new(){
+                    status_code = 200,
+                    message = "修改成功",
+                    data = SubjectService.GetSubject(subject.member_id,subject.subject_id)
+                };
+            }
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
 
         //刪除科目
         [HttpDelete]
-        public IActionResult DeleteSubject([FromQuery]int subject_id){
-            Member member = MemberService.GetDataByAccount(User.Identity.Name);
-            if(SubjectService.GetSubject(member.Member_Id,subject_id) != null){
-                SubjectService.DeleteSubject(member.Member_Id,subject_id);
-                return Ok();
+        public JsonResult DeleteSubject([FromQuery]int subject_id){
+            Response result;
+            try
+            {
+                Member member = MemberService.GetDataByAccount(User.Identity.Name);
+                if(SubjectService.GetSubject(member.Member_Id,subject_id) != null){
+                    SubjectService.DeleteSubject(member.Member_Id,subject_id);
+                    result = new(){
+                        status_code = 200,
+                        message = "刪除成功"
+                    };
+                }
+                else result = new(){
+                        status_code = 400,
+                        message = "無此資料"
+                    };
             }
-            else return BadRequest();
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
 
         #endregion
@@ -81,25 +143,55 @@ namespace BrainBoost.Controllers
         // 新增學生
         [HttpPost]
         [Route("Student")]
-        public IActionResult InsertStudent([FromQuery]int subject_id,[FromQuery]int student_id){
-            SubjectStudent data = new(){
-                subjecct_id = subject_id,
-                student_id = student_id
-            };
-            SubjectService.InsertStudent(data);
-            return Ok();
+        public JsonResult InsertStudent([FromQuery]int subject_id,[FromQuery]int student_id){
+            Response result;
+            try
+            {
+                SubjectStudent data = new(){
+                    subjecct_id = subject_id,
+                    student_id = student_id
+                };
+                SubjectService.InsertStudent(data);
+                result = new(){
+                    status_code = 200,
+                    message = "新增成功"
+                };
+            }
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
 
         // 刪除學生
         [HttpDelete]
         [Route("Student")]
-        public IActionResult DeleteStudent([FromQuery]int subject_id,[FromQuery]int student_id){
-            SubjectStudent data = new(){
-                subjecct_id = subject_id,
-                student_id = student_id
-            };
-            SubjectService.DeleteStudent(data);
-            return Ok();
+        public JsonResult DeleteStudent([FromQuery]int subject_id,[FromQuery]int student_id){
+            Response result;
+            try
+            {
+                SubjectStudent data = new(){
+                    subjecct_id = subject_id,
+                    student_id = student_id
+                };
+                SubjectService.DeleteStudent(data);
+                result = new(){
+                    status_code = 200,
+                    message = "刪除成功"
+                };
+            }
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
         #endregion
     }
