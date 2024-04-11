@@ -1,9 +1,11 @@
 using System.Data.SqlClient;
+using System.Net.Http.Headers;
 using System.Text;
 using BrainBoost.Models;
 using BrainBoost.Parameter;
 using BrainBoost.ViewModels;
 using Dapper;
+using NPOI.SS.Formula.Functions;
 
 namespace BrainBoost.Services
 {
@@ -75,22 +77,22 @@ namespace BrainBoost.Services
         #endregion
 
         #region 修改搶答室資訊
-        public void RoomInformation(int id, RaceInformation raceData){
+        public void RoomInformation(RaceInformation raceData){
             // 新增搶答室資訊
             string sql = $@"UPDATE RaceRoom SET race_name = @race_name, race_function = @race_function,
-                            time_limit = @time_limit WHERE raceroom_id = {id} ";
+                            time_limit = @time_limit WHERE raceroom_id = @raceroom_id ";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new {race_name = raceData.race_name, race_function = raceData.race_function , time_limit = raceData.time_limit});
+            conn.Execute(sql, new {race_name = raceData.race_name, race_function = raceData.race_function , time_limit = raceData.time_limit, raceroom_id = raceData.raceroom_id});
         }
         #endregion
 
         #region 新增搶答室題目
-        public void InsertQuestion(int id, List<int> question_id_list){
+        public void InsertQuestion(RoomQuestionList roomQuestionList){
             StringBuilder stringBuilder = new StringBuilder();
             // 新增題目
-            for(int i = 0; i < question_id_list.Count; i++){
+            for(int i = 0; i < roomQuestionList.question_id_list.Count; i++){
                 stringBuilder.Append($@"INSERT INTO Race_Question(raceroom_id, question_id)
-                                        VALUES('{id}', '{question_id_list[i]}') ");
+                                        VALUES('{roomQuestionList.raceroom_id}', '{roomQuestionList.question_id_list[i]}') ");
             }
             using var conn = new SqlConnection(cnstr);
             conn.Execute(stringBuilder.ToString());
@@ -104,11 +106,11 @@ namespace BrainBoost.Services
         #endregion
 
         #region 刪除搶答室題目
-        public void DeleteQuestion(int raceroom_id, int question_id){
+        public void DeleteQuestion(RaceroomQuestion raceroomQuestion){
             string sql = $@"UPDATE Race_Question SET is_delete = 1 
                             WHERE raceroom_id = @raceroom_id AND question_id = @question_id";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql,new{ raceroom_id, question_id});
+            conn.Execute(sql,new{ raceroomQuestion.raceroom_id, raceroomQuestion.question_id});
         }
         #endregion
 
@@ -130,7 +132,7 @@ namespace BrainBoost.Services
         #endregion
 
         #region 搶答室題目單一
-        public List<RaceQuestionAnswer> Question(int id,int question_id){
+        public List<RaceQuestionAnswer> Question(RaceroomQuestion raceroomQuestion){
             string sql = $@"SELECT
                                 A.question_id,
                                 A.question_level,
@@ -156,7 +158,7 @@ namespace BrainBoost.Services
                                 WHERE Q.question_id = 2 AND Q.is_delete = 0 AND O.is_delete = 0
                             )A
                             ON R.question_id = A.question_id
-                            WHERE raceroom_id = {id} AND A.question_id = {question_id} AND R.is_delete = 0";
+                            WHERE raceroom_id = {raceroomQuestion.raceroom_id} AND A.question_id = {raceroomQuestion.question_id} AND R.is_delete = 0";
             using (var conn = new SqlConnection(cnstr))
             return (List<RaceQuestionAnswer>)conn.Query<RaceQuestionAnswer>(sql);
         }
@@ -379,6 +381,53 @@ namespace BrainBoost.Services
                             VALUES(@raceroom_id, @question_id, @member_id, @race_answer, @race_time)";
             using var conn = new SqlConnection(cnstr);
             conn.Execute(sql, new { raceroom_id = studentReseponse.raceroom_id, question_id = studentReseponse.question_id, member_id = studentReseponse.member_id, race_answer = studentReseponse.race_answer, race_time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") });
+        }
+        #endregion
+
+        // #region 獲得race_response_id
+        // public int GetRaceReseponseId(StudentReseponse studentReseponse){
+        //     string sql = $@"SELECT
+        //                         race_response_id
+        //                     FROM Race_Response
+        //                     WHERE raceroom_id = @raceroom_id AND question_id = @question_id AND member_id = @member_id";
+        //     using var conn = new SqlConnection(cnstr);
+        //     return conn.QueryFirstOrDefault<int>(sql, new {raceroom_id = studentReseponse.raceroom_id, question_id = studentReseponse.question_id, member_id = studentReseponse.member_id});
+        // }
+        // #endregion
+
+        #region 確定答案
+        public string QuestionAnswer(StudentReseponse studentReseponse){
+            // 正確答案
+            string sql = $@"SELECT
+                                question_answer
+                            FROM Answer
+                            WHERE question_id = @question_id AND is_delete = 0 ";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<string>(sql, new{ question_id = studentReseponse.question_id });
+        }
+        #endregion
+
+        #region 學生答案
+        public string StudentAnswer(StudentReseponse studentReseponse){
+            // 學生答案
+            string sql = $@"SELECT
+                                race_answer
+                            FROM Race_Response
+                            WHERE raceroom_id = @raceroom_id AND question_id = @question_id AND member_id = @member_id ";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<string>(sql, new{ raceroom_id = studentReseponse.raceroom_id, question_id = studentReseponse.question_id, member_id = studentReseponse.member_id });
+        }
+        #endregion
+
+        #region 確定答案
+        public void CheckAnswer(StudentReseponse studentReseponse){
+            bool check = false;
+            if(QuestionAnswer(studentReseponse) == StudentAnswer(studentReseponse))
+                check = true;
+            string sql = $@"UPDATE Race_Reseponse
+                        SET check_answer = @check_answer WHERE raceroom_id = @raceroom_id AND question_id = @question_id AND member_id = @member_id ";
+            using var conn = new SqlConnection(cnstr);
+            conn.QueryFirstOrDefault<string>(sql, new{ check_answer = check , raceroom_id = studentReseponse.raceroom_id, question_id = studentReseponse.question_id, member_id = studentReseponse.member_id });
         }
         #endregion
     }

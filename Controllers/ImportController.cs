@@ -62,7 +62,7 @@ namespace BrainBoost.Controllers
 
         // 新增 選擇題題目（手動）
         [HttpPost("[Action]")]
-        public IActionResult MultipleChoice([FromQuery]int subject_id, [FromBody]InsertQuestion question){
+        public IActionResult MultipleChoice([FromQuery]int subject_id, [FromBody]MultipleChoice question){
             
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();

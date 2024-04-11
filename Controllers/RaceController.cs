@@ -59,15 +59,15 @@ namespace BrainBoost.Controllers
         // 修改 搶答室資訊
         [HttpPut]
         [Route("Room")]
-        public IActionResult UpdateRoom([FromQuery]int raceroom_id, [FromBody]RaceInformation raceData){
-            RaceService.RoomInformation(raceroom_id, raceData);
+        public IActionResult UpdateRoom([FromBody]RaceInformation raceData){
+            RaceService.RoomInformation(raceData);
             return Ok("修改成功");
         }
         #endregion
         #region 刪除搶答室
         [HttpDelete]
         [Route("Room")]
-        public IActionResult DeleteRoom([FromQuery]int raceroom_id){
+        public IActionResult DeleteRoom([FromBody]int raceroom_id){
             RaceService.DeleteRoom(raceroom_id);
             return Ok("刪除成功");
         }
@@ -83,15 +83,15 @@ namespace BrainBoost.Controllers
 
         // 搶答室題目單一含內容
         [HttpGet("[Action]")]
-        public List<RaceQuestionAnswer> RoomQuestion([FromQuery]int raceroom_id, [FromQuery]int question_id){
-            return RaceService.GetRoomQuestion(raceroom_id, question_id);
+        public List<RaceQuestionAnswer> RoomQuestion([FromQuery]RaceroomQuestion raceroomQuestion){
+            return RaceService.GetRoomQuestion(raceroomQuestion);
         }
         #endregion        
         #region 新增搶答室題目
         // 新增 搶答室題目
         [HttpPost("[Action]")]
-        public IActionResult RoomQuestion([FromQuery]int raceroom_id, [FromBody]List<int> question_id_list){
-            RaceService.RoomQuestionList(raceroom_id, question_id_list);
+        public IActionResult RoomQuestion([FromBody]RoomQuestionList roomQuestionList){
+            RaceService.RoomQuestionList(roomQuestionList);
             return Ok("新增成功");
         }
         #endregion        
@@ -100,33 +100,33 @@ namespace BrainBoost.Controllers
         // [HttpDelete("[Action]")]
         [HttpDelete]
         [Route("RoomQuestion")]
-        public IActionResult DeleteRoomQuestion([FromQuery]int raceroom_id, [FromBody]int question_id){
-            RaceService.DeleteRoomQuestion(raceroom_id, question_id);
+        public IActionResult DeleteRoomQuestion([FromBody]RaceroomQuestion raceroomQuestion){
+            RaceService.DeleteRoomQuestion(raceroomQuestion);
             return Ok("刪除成功");
         }
         #endregion   
         #region 手動新增題目並加進去題庫（是非題）
         [HttpPost("[Action]")]
-        public IActionResult TrueOrFalse([FromQuery]int raceroom_id, [FromQuery]int subject_id, [FromBody]TureorFalse question){
+        public IActionResult TrueOrFalse([FromBody]RaceroomTrueOrFalse question){
             
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
 
             // 題目分類
-            questionList.TagData.tag_name = question.tag;
+            questionList.TagData.tag_name = question.TureorFalse.tag;
 
             // 題目敘述
             questionList.QuestionData = new Question(){
                 type_id = 1,
-                subject_id = subject_id,
-                question_level = question.question_level,
-                question_content = question.question_content
+                subject_id = question.subject_id,
+                question_level = question.TureorFalse.question_level,
+                question_content = question.TureorFalse.question_content
             };
             
             // 題目答案
             questionList.AnswerData = new Answer(){
-                question_answer = question.is_answer ? "是" : "否",
-                question_parse = question.parse
+                question_answer = question.TureorFalse.is_answer ? "是" : "否",
+                question_parse = question.TureorFalse.parse
             };
 
             try
@@ -135,7 +135,7 @@ namespace BrainBoost.Controllers
                 // questionList.QuestionData.member_id = 13;
                 QuestionService.InsertQuestion(questionList);
                 int question_id = QuestionService.GetQuestionId(questionList);
-                RaceService.RoomQuestion(raceroom_id, question_id);
+                RaceService.RoomQuestion(question.raceroom_id, question_id);
             }
             catch (Exception e)
             {
@@ -146,34 +146,34 @@ namespace BrainBoost.Controllers
         #endregion
         #region 手動新增題目並加進去題庫（選擇題）
         [HttpPost("[Action]")]
-        public IActionResult MultipleChoice([FromQuery]int raceroom_id, [FromQuery]int subject_id, [FromBody]InsertQuestion question){
+        public IActionResult MultipleChoice([FromBody]RaceroomMultipleChoice question){
             
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
 
             // 題目分類
-            questionList.TagData.tag_name = question.tag;
+            questionList.TagData.tag_name = question.multipleChoice.tag;
 
             // 題目敘述
             questionList.QuestionData = new Question(){
                 type_id = 2,
-                subject_id = subject_id,
-                question_level = question.question_level,
-                question_content = question.question_content
+                subject_id = question.subject_id,
+                question_level = question.multipleChoice.question_level,
+                question_content = question.multipleChoice.question_content
             };
 
             // 題目選項
             questionList.Options = new List<string>(){
-                question.optionA.ToString(),
-                question.optionB.ToString(),
-                question.optionC.ToString(),
-                question.optionD.ToString(),
+                question.multipleChoice.optionA.ToString(),
+                question.multipleChoice.optionB.ToString(),
+                question.multipleChoice.optionC.ToString(),
+                question.multipleChoice.optionD.ToString(),
             };
 
             // 題目答案
             questionList.AnswerData = new Answer(){
-                question_answer = question.answer,
-                question_parse = question.parse
+                question_answer = question.multipleChoice.answer,
+                question_parse = question.multipleChoice.parse
             };
 
             try
@@ -182,7 +182,7 @@ namespace BrainBoost.Controllers
                 // questionList.QuestionData.member_id = 1;
                 QuestionService.InsertQuestion(questionList);
                 int question_id = QuestionService.GetQuestionId(questionList);
-                RaceService.RoomQuestion(raceroom_id, question_id);
+                RaceService.RoomQuestion(question.raceroom_id, question_id);
             }
             catch (Exception e)
             {
@@ -195,7 +195,7 @@ namespace BrainBoost.Controllers
         // TODO：題庫（多重篩選）
         #region 題庫列表
         [HttpGet("[Action]")]
-        public List<SimpleQuestion> QuestionFilterList([FromBody]QuestionFiltering SearchData, [FromQuery]int page = 1){           
+        public List<SimpleQuestion> QuestionFilterList([FromQuery]QuestionFiltering SearchData, [FromQuery]int page = 1){           
             QuestionFiltering Data = new QuestionFiltering(){
                 subject_id = SearchData.subject_id,
                 member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
@@ -220,34 +220,33 @@ namespace BrainBoost.Controllers
 
         // TODO：統計難度
         #region level統整
-<<<<<<< HEAD
         [HttpGet("[Action]")]
         public List<int> LevelStatistics([FromQuery]int raceroom_id){
             List<int> LevelQuestion = RaceService.Level(raceroom_id);
             return LevelQuestion;
         }
-=======
-        // [HttpGet("[Action]")]
-        // public List<int> LevelStatistics([FromQuery]int subject_id, [FromQuery]int raceroom_id){
-        //     List<int> LevelQuestion = RaceService.Level(subject_id);
-        //     return LevelQuestion;
-        // }
->>>>>>> 103a205e3e096e983f7d339ef6dd69cbfab7c116
         #endregion
 
         // TODO：搶答室開始
         #region 隨機出題
         // 單一
         [HttpGet("[Action]")]
-        public RaceQuestionViewModel RandomQuestion([FromQuery]int id){
-            RaceQuestionViewModel Data = RaceService.RandomQuestion(id);
+        public RaceQuestionViewModel RandomQuestion([FromQuery]int raceroom_id){
+            RaceQuestionViewModel Data = RaceService.RandomQuestion(raceroom_id);
             return Data ?? null;
         }
         #endregion
+
         #region 紀錄學生搶答室答案和分數
+        [HttpPost]
+        [Route("[Action]")]
         public IActionResult StudentReseponse([FromBody]StudentReseponse studentReseponse){
+            // 取得member_id
             studentReseponse.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+            // 新增學生答案
             RaceService.StudentReseponse(studentReseponse);
+            // 確定答案
+            RaceService.CheckAnswer(studentReseponse);
             return Ok();
         }
         #endregion

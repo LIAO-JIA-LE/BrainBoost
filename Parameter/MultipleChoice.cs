@@ -4,7 +4,7 @@ using BrainBoost.Models;
 
 namespace BrainBoost.Parameter
 {
-    public class InsertQuestion
+    public class MultipleChoice
     {
         // 科目
         public int subject_id{get;set;}

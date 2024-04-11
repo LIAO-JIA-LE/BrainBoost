@@ -46,15 +46,15 @@ namespace BrainBoost.Services
         
         #region 修改搶答室（資訊和問題分開）
         // 修改 搶答室資訊（名稱、時間、公開）
-        public void RoomInformation(int id, RaceInformation raceData){
-            RaceRepository.RoomInformation(id, raceData);
+        public void RoomInformation(RaceInformation raceData){
+            RaceRepository.RoomInformation(raceData);
         }
         #endregion
 
 
         // 新增 搶答室題目
-        public void RoomQuestionList(int id, List<int> question_id_list){
-            RaceRepository.InsertQuestion(id, question_id_list);
+        public void RoomQuestionList(RoomQuestionList roomQuestionList){
+            RaceRepository.InsertQuestion(roomQuestionList);
         }
 
          // 新增 搶答室題目單一
@@ -63,8 +63,8 @@ namespace BrainBoost.Services
         }
 
         // 取消選取 搶答室題目
-        public void DeleteRoomQuestion(int raceroom_id, int question_id){
-            RaceRepository.DeleteQuestion(raceroom_id, question_id);
+        public void DeleteRoomQuestion(RaceroomQuestion raceroomQuestion){
+            RaceRepository.DeleteQuestion(raceroomQuestion);
         }
         // #endregion
 
@@ -81,8 +81,8 @@ namespace BrainBoost.Services
         #endregion
 
         #region 搶答室題目單一
-        public List<RaceQuestionAnswer> GetRoomQuestion(int id, int question_id){
-            return RaceRepository.Question(id, question_id);
+        public List<RaceQuestionAnswer> GetRoomQuestion(RaceroomQuestion raceroomQuestion){
+            return RaceRepository.Question(raceroomQuestion);
         }
         #endregion
 
@@ -146,7 +146,6 @@ namespace BrainBoost.Services
         #endregion
 
         #region 統計難度
-<<<<<<< HEAD
         public List<int> Level(int raceroom_id){
             return RaceRepository.Level(raceroom_id);
         }
@@ -156,11 +155,12 @@ namespace BrainBoost.Services
         public void StudentReseponse(StudentReseponse studentReseponse){
             RaceRepository.StudentReseponse(studentReseponse);
         }
-=======
-        // public List<int> Level(int subject_id){
-        //     return RaceRepository.Level(subject_id);
-        // }
->>>>>>> 103a205e3e096e983f7d339ef6dd69cbfab7c116
+        #endregion
+
+        #region 確認學生答案
+        public void CheckAnswer(StudentReseponse studentReseponse){
+            RaceRepository.CheckAnswer(studentReseponse);
+        }
         #endregion
     }
 }
