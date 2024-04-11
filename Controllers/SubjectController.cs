@@ -36,10 +36,11 @@ namespace BrainBoost.Controllers
             insertData.teacher_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
             Response result;
             try{
-                SubjectService.InsertSubject(insertData);
+                
                 result = new(){
                     status_code = 200,
-                    message = "新增成功"
+                    message = "新增成功",
+                    data = SubjectService.InsertSubject(insertData)
                 };
             }
             catch (Exception e){

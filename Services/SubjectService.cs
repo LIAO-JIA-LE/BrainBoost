@@ -23,7 +23,7 @@ namespace BrainBoost.Services
             return new List<Subject>(conn.Query<Subject>(sql,new {member_id = member_id}));
         }
         //新增科目
-        public void InsertSubject(InsertSubject insertData){
+        public Subject InsertSubject(InsertSubject insertData){
             string sql = $@"DECLARE @SubjectID INT
                             INSERT INTO ""Subject""(member_id,subject_name)
                             VALUES(@member_id,@subject_name)
@@ -32,8 +32,11 @@ namespace BrainBoost.Services
                 sql += $@"INSERT INTO ""Subject_Member""(subject_id,member_id)
                             VALUES(@SubjectID,{student_id})";
             }
+            sql += $@"SELECT * FROM ""Subject""
+                      WHERE subject_id = @SubjectID
+                    ";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql,new {member_id = insertData.teacher_id, insertData.subject_name});
+            return conn.QueryFirst<Subject>(sql,new {member_id = insertData.teacher_id, insertData.subject_name});
         }
 
         //查詢科目詳細資料
