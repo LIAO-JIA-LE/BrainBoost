@@ -33,17 +33,16 @@ namespace BrainBoost.Controllers
         #region 註冊
         // 註冊 
         [HttpPost("[Action]")]
-        public IActionResult Register([FromBody]MemberRegister RegisterData)
+        public JsonResult Register([FromBody]MemberRegister RegisterData)
         {
             if (ModelState.IsValid)
             {
                 var validatestr = MemberService.RegisterCheck(RegisterData.Member_Account,RegisterData.Member_Email);
                 if (!string.IsNullOrEmpty(validatestr)){
-                    var result = new {
-                        ErrorMessage = validatestr,
-                        StatusCode = 400
-                    };
-                    return BadRequest(result);
+                    return new (new Response(){
+                        status_code = 400,
+                        message = validatestr
+                    });
                 }
                 var wwwroot = evn.ContentRootPath + @"\wwwroot\images\";
                 Member Member = new()
@@ -76,19 +75,33 @@ namespace BrainBoost.Controllers
                 string str = "寄信成功，請收信。";
                 
                 MemberService.Register(Member);
-                return Ok(str);
+                return new(new Response(){
+                    status_code = 200,
+                    message = str
+                });
             }
-            return BadRequest();
+            return new(new Response(){
+                            status_code = 400,
+                            message = "請完整輸入資料"
+                        });
         }
         
         // 郵件驗證
         [HttpGet("[Action]")]
-        public IActionResult MailValidate(string Account,string AuthCode)
+        public JsonResult MailValidate(string Account,string AuthCode)
         {
             if (MemberService.MailValidate(Account, AuthCode))
-                return Ok("已驗證成功");
+                return new(new Response(){
+                    message = "已驗證成功",
+                    status_code = 200,
+                    data = User.Identity.Name
+                });
             else
-                return BadRequest("請重新確認或重新註冊");
+                return new(new Response(){
+                    message = "請重新確認或重新註冊",
+                    status_code = 400,
+                    data = User.Identity.Name
+                });
         }
     
         #endregion
@@ -96,26 +109,26 @@ namespace BrainBoost.Controllers
         #region 登入
         // 登入
         [HttpPost("[Action]")]
-        public IActionResult Login(MemberLogin Member)
+        public JsonResult Login(MemberLogin Member)
         {
             string ValidateStr = MemberService.LoginCheck(Member.Member_Account, Member.Member_Password);
             if (!string.IsNullOrWhiteSpace(ValidateStr)){
-                var result = new {
-                    ErrorMessage = ValidateStr,
-                    StatusCode = 400
+                Response result = new(){
+                    message = ValidateStr,
+                    status_code = 400
                 };
-                return BadRequest(result);
+                return new(result);
             }
             else
             {
                 int Role = MemberService.GetRole(Member.Member_Account);
                 var jwt = JwtHelpers.GenerateToken(Member.Member_Account,Role);
-                var result = new { 
-                    SuccessMessage = "登入成功",
-                    StatusCode = 200,
-                    Token = jwt 
+                Response result = new(){ 
+                    message = "登入成功",
+                    status_code = 200,
+                    data = jwt 
                 };
-                return Ok(result);
+                return new(result);
             }
         }
         #endregion
@@ -123,26 +136,40 @@ namespace BrainBoost.Controllers
         //修改個人資料
         [HttpPut]
         [Route("Member")]
-        public IActionResult UpdateMemberData(IFormFile img,string name){
-            MemberUpdate member = new()
-            {
-                member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
-                member_name = name
-            };
-            //處理圖片
-            var wwwroot = evn.ContentRootPath + @"\wwwroot\images\";
-            if(img.Length > 0){
-                var imgname = User.Identity.Name + ".jpg";
-                var img_path = wwwroot + imgname;
-                using var stream = System.IO.File.Create(img_path);
-                img.CopyTo(stream);
-                member.member_photo = img_path;
+        public JsonResult UpdateMemberData(IFormFile img,string name){
+            try{
+                    MemberUpdate member = new()
+                {
+                    member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
+                    member_name = name
+                };
+                //處理圖片
+                var wwwroot = evn.ContentRootPath + @"\wwwroot\images\";
+                if(img.Length > 0){
+                    var imgname = User.Identity.Name + ".jpg";
+                    var img_path = wwwroot + imgname;
+                    using var stream = System.IO.File.Create(img_path);
+                    img.CopyTo(stream);
+                    member.member_photo = img_path;
+                }
+                else{
+                    member.member_photo = wwwroot + "default.jpg";
+                }
+                MemberService.UpdateMemberData(member);
+                Response result = new(){
+                    status_code = 200,
+                    message = "修改成功",
+                    data = MemberService.GetDataByAccount(User.Identity.Name)
+                };
+                return new(result);
             }
-            else{
-                member.member_photo = wwwroot + "default.jpg";
+            catch(Exception ex){
+                Response result = new(){
+                    status_code = 400,
+                    message = ex.Message
+                };
+                return new(result);
             }
-            MemberService.UpdateMemberData(member);
-            return Ok();
         }
 
         // #region 無權限 & 未登入
@@ -174,20 +201,27 @@ namespace BrainBoost.Controllers
         //取得目前所有使用者
         //[Authorize(Roles = "Admin")]
         [HttpGet("[Action]")]
-        public MemberViewModels MemberList([FromQuery]string? Search,[FromQuery]int page = 1){
+        public JsonResult MemberList([FromQuery]string? Search,[FromQuery]int page = 1){
             MemberViewModels data = new(){
                 forpaging = new Forpaging(page)
             };
             data.member = MemberService.GetAllMemberList(Search,data.forpaging);
             data.search = Search;
-            return data;
+            return new(new Response(){
+                status_code = 200,
+                message = "讀取成功",
+                data = data
+            });
         }
 
         // 取得單一使用者(帳號)
         // 未來可加任課科目&上課科目
         [HttpGet("{account}")]
-        public Member MemberByAcc([FromRoute]string account){
-            return MemberService.GetDataByAccount(account);
+        public JsonResult MemberByAcc([FromRoute]string account){
+            return new(new Response(){
+                status_code = 200,
+                data = MemberService.GetDataByAccount(account)
+            });
         }
         #endregion
 
@@ -196,7 +230,7 @@ namespace BrainBoost.Controllers
         // 輸入Email後寄驗證信
         [HttpPost]
         [Route("[Action]")]
-        public IActionResult ForgetPassword([FromBody] string Email)
+        public JsonResult ForgetPassword([FromBody] string Email)
         {
             // 看有沒有Email的資料
             Member Data = MemberService.GetDataByEmail(Email);
@@ -212,16 +246,22 @@ namespace BrainBoost.Controllers
                 string MailBody = MailService.GetMailBody(TempMail, Data.Member_Name, Data.Member_AuthCode);
                 MailService.SendMail(MailBody, Email);
                 string str = "寄信成功，請收信。";
-                return Ok(str);
+                return new(new Response(){
+                    status_code = 200,
+                    message = str
+                });
             }
             else
-                return BadRequest("查無用戶");
+                return new(new Response(){
+                    status_code = 400,
+                    message = "查無此戶"
+                });
         }
 
         // 檢查驗證碼
         [HttpPost]
         [Route("[Action]")]
-        public IActionResult CheckForgetPasswordCode([FromBody] CheckForgetPasswordAuthCode Data)
+        public JsonResult CheckForgetPasswordCode([FromBody] CheckForgetPasswordAuthCode Data)
         {
             // 取得此Email的會員資訊
             Member Member = MemberService.GetDataByEmail(Data.Email);
@@ -231,19 +271,23 @@ namespace BrainBoost.Controllers
                 RoleService.SetMemberRole_ForgetPassword(Member.Member_Id);
                 int Role = MemberService.GetRole(Member.Member_Account);
                 var jwt = JwtHelpers.GenerateToken(Member.Member_Account, Role);
-                var result = new
+                Response result = new()
                 {
-                    SuccessMessage = "驗證成功",
-                    StatusCode = 200,
-                    Token = jwt
+                    message = "驗證成功",
+                    status_code = 200,
+                    data = jwt
                 };
                 // 回傳成功
-                return Ok(result);
+                return new(result);
             }
             else
             {
                 // 回傳失敗
-                return BadRequest("驗證碼錯誤");
+                return new(new Response()
+                {
+                    message = "驗證碼錯誤",
+                    status_code = 400
+                });
             }
         }
 
@@ -251,19 +295,25 @@ namespace BrainBoost.Controllers
         [HttpPost]
         [Route("ChangePasswordByForget")]
         [Authorize(Roles = "ForgetPassword")]
-        public IActionResult ChangePassword([FromBody] CheckForgetPassword Data)
+        public JsonResult ChangePassword([FromBody] CheckForgetPassword Data)
         {
             // 取得此Email的會員資訊
             if (User.IsInRole("ForgetPassword"))
             {
                 MemberService.ClearAuthCode(Data.Email);
                 MemberService.ChangePasswordByForget(Data);
-                return Ok("修改密碼成功！請再次登入！");
+                return new(new Response(){
+                    status_code = 200,
+                    message = "修改密碼成功！請再次登入！"
+                });
             }
             else
             {
                 // 用戶未獲得足夠的權限
-                return BadRequest("您無權執行此操作。");
+                return new(new Response(){
+                    status_code = 400,
+                    message = "您無權執行此操作。"
+                });
             }
 
         }
@@ -272,14 +322,21 @@ namespace BrainBoost.Controllers
         #region 修改密碼
         [HttpPost]
         [Route("[Action]")]
-        public IActionResult ChangePassword([FromBody]ChangePassword Data){
+        public JsonResult ChangePassword([FromBody]ChangePassword Data){
             Member member = MemberService.GetDataByAccount(User.Identity.Name);
             if(member.Member_Password == MemberService.HashPassword(Data.Password)){
                 MemberService.ChangePassword(member.Member_Id, Data.NewPassword);
-                return Ok("修改成功");
+                return new(new Response(){
+                    status_code = 200,
+                    message = "修改成功"
+                });
             }
             else{
-                return BadRequest("您無權執行此操作。");
+                // 用戶未獲得足夠的權限
+                return new(new Response(){
+                    status_code = 400,
+                    message = "您無權執行此操作。"
+                });
             }
         }
         #endregion
