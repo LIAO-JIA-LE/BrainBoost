@@ -9,7 +9,7 @@ namespace BrainBoost.ViewModels
     public class QuestionFiltering
     {
         //會員編號
-        public int member_id{get;set;}
+        public int member_id;
         
         // 題型
         public int? type_id{get;set;}
@@ -26,6 +26,7 @@ namespace BrainBoost.ViewModels
         // 搜尋
         public string? search{get;set;}
 
+        public int page{get;set;} = 1;
         // 分頁
         // public Forpaging paging{get;set;}
     }

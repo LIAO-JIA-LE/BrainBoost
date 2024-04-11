@@ -196,8 +196,8 @@ namespace BrainBoost.Controllers
 
         // TODO：題庫（多重篩選）
         #region 題庫列表
-        [HttpGet("[Action]")]
-        public List<SimpleQuestion> QuestionFilterList([FromBody]QuestionFiltering SearchData, [FromQuery]int page = 1){           
+        [HttpPost("[Action]")]
+        public List<SimpleQuestion> QuestionFilterList([FromBody]QuestionFiltering SearchData){           
             QuestionFiltering Data = new QuestionFiltering(){
                 subject_id = SearchData.subject_id,
                 member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
@@ -205,7 +205,7 @@ namespace BrainBoost.Controllers
                 question_level = SearchData.question_level,
                 search = SearchData.search
             };
-            Forpaging paging = new(page);
+            Forpaging paging = new(SearchData.page);
             return RaceService.GetSearchList(paging, Data);
         }
         #endregion
