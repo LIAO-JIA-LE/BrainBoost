@@ -20,7 +20,7 @@ namespace BrainBoost.Services
         public List<Subject> GetAllSubject(int member_id){
             string sql = $@"SELECT * FROM ""Subject"" WHERE member_id = @member_id";
             using var conn = new SqlConnection(cnstr);
-            return new List<Subject>(conn.Query<Subject>(sql,new {member_id = member_id}));
+            return new List<Subject>(conn.Query<Subject>(sql,new {member_id}));
         }
         //新增科目
         public Subject InsertSubject(InsertSubject insertData){

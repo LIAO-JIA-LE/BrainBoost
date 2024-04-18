@@ -8,7 +8,8 @@ namespace BrainBoost.Parameter
     public class MemberUpdate
     {
         public string member_name { get; set; }
-        public string member_photo { get; set; }
+        public IFormFile file{ get; set; }
+        public string member_photo ;
         public int member_id ;
     }
 }

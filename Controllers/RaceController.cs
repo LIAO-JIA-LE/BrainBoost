@@ -29,47 +29,118 @@ namespace BrainBoost.Controllers
         // 搶答室列表
         [HttpGet]
         [Route("AllRoom")]
-        public List<RaceRooms> GetRoomList(){
-            return RaceService.GetRoomList();
+        public JsonResult GetRoomList(){
+            Response result;
+            try
+            {
+                result = new(){
+                    status_code = 200,
+                    message = "讀取成功",
+                    data = RaceService.GetRoomList()
+                };
+            }
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
         
         // 搶答室單一
         [HttpGet]
         [Route("Room")]
-        public RaceRooms GetRoom([FromQuery]int raceroom_id){
-            return RaceService.GetRoom(raceroom_id);
+        public JsonResult GetRoom([FromQuery]int raceroom_id){
+            Response result;
+            try
+            {
+                result = new(){
+                    status_code = 200,
+                    message = "讀取成功",
+                    data = RaceService.GetRoom(raceroom_id)
+                };
+            }
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
         #endregion   
         #region 新增搶答室
         // 新增搶答室
         [HttpPost]
         [Route("Room")]
-        public IActionResult InsertRoom([FromBody]InsertRoom raceData){
+        public JsonResult InsertRoom([FromBody]InsertRoom raceData){
+            Response result ;
             try{
                 raceData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
                 RaceService.InsertRoom(raceData);
+                result = new(){
+                    status_code = 200,
+                    message = "新增成功",
+                };
             }
-            catch(Exception e){
-                return BadRequest(e.ToString());
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
             }
-            return Ok("新增成功");
+            return new(result);
         }
         #endregion
         #region 修改搶答室
         // 修改 搶答室資訊
         [HttpPut]
         [Route("Room")]
-        public IActionResult UpdateRoom([FromBody]RaceInformation raceData){
-            RaceService.RoomInformation(raceData);
-            return Ok("修改成功");
+        public JsonResult UpdateRoom([FromBody]RaceInformation raceData){
+            Response result;
+            try
+            {
+                RaceService.RoomInformation(raceData);
+                result = new(){
+                    status_code = 200,
+                    message = "修改成功"
+                };
+            }
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
         #endregion
         #region 刪除搶答室
         [HttpDelete]
         [Route("Room")]
-        public IActionResult DeleteRoom([FromBody]int raceroom_id){
-            RaceService.DeleteRoom(raceroom_id);
-            return Ok("刪除成功");
+        public JsonResult DeleteRoom([FromBody]int raceroom_id){
+            Response result;
+            try
+            {
+                RaceService.DeleteRoom(raceroom_id);
+                result = new(){
+                    status_code = 200,
+                    message = "刪除成功"
+                };
+            }
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
         #endregion
 
@@ -77,22 +148,68 @@ namespace BrainBoost.Controllers
         #region 顯示搶答室題目（只有題目內容）
         // 搶答室題目列表
         [HttpGet("[Action]")]
-        public List<SimpleQuestion> RoomQuestionList([FromQuery]int raceroom_id){
-            return RaceService.RoomQuestionList(raceroom_id);
+        public JsonResult RoomQuestionList([FromQuery]int raceroom_id){
+            Response result;
+            try
+            {
+                result = new(){
+                    status_code = 200,
+                    message = "讀取成功",
+                    data = RaceService.RoomQuestionList(raceroom_id)
+                };
+            }
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
 
         // 搶答室題目單一含內容
         [HttpGet("[Action]")]
-        public List<RaceQuestionAnswer> RoomQuestion([FromQuery]RaceroomQuestion raceroomQuestion){
-            return RaceService.GetRoomQuestion(raceroomQuestion);
+        public JsonResult RoomQuestion([FromQuery]RaceroomQuestion raceroomQuestion){
+            Response result;
+            try
+            {
+                result = new(){
+                    status_code = 200,
+                    message = "讀取成功",
+                    data = RaceService.GetRoomQuestion(raceroomQuestion)
+                };
+            }
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
         #endregion        
         #region 新增搶答室題目
         // 新增 搶答室題目
         [HttpPost("[Action]")]
-        public IActionResult RoomQuestion([FromBody]RoomQuestionList roomQuestionList){
-            RaceService.RoomQuestionList(roomQuestionList);
-            return Ok("新增成功");
+        public JsonResult RoomQuestion([FromBody]RoomQuestionList roomQuestionList){
+            Response result ;
+            try{
+                RaceService.RoomQuestionList(roomQuestionList);
+                result = new(){
+                    status_code = 200,
+                    message = "新增成功",
+                };
+            }
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
         #endregion        
         #region 刪除搶答室題目
@@ -100,18 +217,33 @@ namespace BrainBoost.Controllers
         // [HttpDelete("[Action]")]
         [HttpDelete]
         [Route("RoomQuestion")]
-        public IActionResult DeleteRoomQuestion([FromBody]RaceroomQuestion raceroomQuestion){
-            RaceService.DeleteRoomQuestion(raceroomQuestion);
-            return Ok("刪除成功");
+        public JsonResult DeleteRoomQuestion([FromBody]RaceroomQuestion raceroomQuestion){
+            Response result;
+            try
+            {
+                RaceService.DeleteRoomQuestion(raceroomQuestion);
+                result = new(){
+                    status_code = 200,
+                    message = "刪除成功"
+                };
+            }
+            catch (Exception e)
+            {
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
+            }
+            return new(result);
         }
         #endregion   
         #region 手動新增題目並加進去題庫（是非題）
         [HttpPost("[Action]")]
-        public IActionResult TrueOrFalse([FromBody]RaceroomTrueOrFalse question){
-            
+        public JsonResult TrueOrFalse([FromBody]RaceroomTrueOrFalse question){
             // 將題目細節儲存至QuestionList物件
             QuestionList questionList = new();
-
+            // 回應物件
+            Response result; 
             // 題目分類
             questionList.TagData.tag_name = question.TureorFalse.tag;
 
@@ -136,12 +268,19 @@ namespace BrainBoost.Controllers
                 QuestionService.InsertQuestion(questionList);
                 int question_id = QuestionService.GetQuestionId(questionList);
                 RaceService.RoomQuestion(question.raceroom_id, question_id);
+                result = new(){
+                    status_code = 200,
+                    message = "新增成功"
+                };
             }
             catch (Exception e)
             {
-                return BadRequest($"發生錯誤:  {e}");
+                result = new(){
+                    status_code = 400,
+                    message = e.Message
+                };
             }
-            return Ok("新增成功");
+            return new(result);
         }
         #endregion
         #region 手動新增題目並加進去題庫（選擇題）

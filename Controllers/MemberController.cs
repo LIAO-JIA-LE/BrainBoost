@@ -135,21 +135,21 @@ namespace BrainBoost.Controllers
 
         //修改個人資料
         [HttpPut]
-        [Route("Member")]
-        public JsonResult UpdateMemberData(IFormFile img,string name){
+        [Route("")]
+        public JsonResult UpdateMemberData(MemberUpdate data){
             try{
                     MemberUpdate member = new()
                 {
                     member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
-                    member_name = name
+                    member_name = data.member_name
                 };
                 //處理圖片
                 var wwwroot = evn.ContentRootPath + @"\wwwroot\images\";
-                if(img.Length > 0){
+                if(data.file.Length > 0){
                     var imgname = User.Identity.Name + ".jpg";
                     var img_path = wwwroot + imgname;
                     using var stream = System.IO.File.Create(img_path);
-                    img.CopyTo(stream);
+                    data.file.CopyTo(stream);
                     member.member_photo = img_path;
                 }
                 else{
