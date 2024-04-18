@@ -74,16 +74,20 @@ namespace BrainBoost.Controllers
         #endregion   
         #region 新增搶答室
         // 新增搶答室
+        // 解題方式(race_function)預設為0(0:最後一次顯示,1:逐題解析)
+        // 是否公開(race_public)預設為0(0:不公開,1:公開)
+        // 時間限制(time_limit)預設為30秒
         [HttpPost]
         [Route("Room")]
         public JsonResult InsertRoom([FromBody]InsertRoom raceData){
             Response result ;
             try{
                 raceData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-                RaceService.InsertRoom(raceData);
+                int raceroom_id = RaceService.InsertRoom(raceData);
                 result = new(){
                     status_code = 200,
                     message = "新增成功",
+                    data = RaceService.GetRoom(raceroom_id)
                 };
             }
             catch (Exception e)

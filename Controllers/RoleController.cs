@@ -30,7 +30,8 @@ namespace BrainBoost.Controllers
                 RoleService.UpdateMemberRole(member.Member_Id,data.role);
                 result = new(){
                     status_code = 200,
-                    message = "修改成功"
+                    message = "修改成功",
+                    data = MemberService.GetDataByAccount(data.account)
                 };
             }
             catch (Exception e)
