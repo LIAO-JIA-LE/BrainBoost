@@ -1,5 +1,6 @@
 using System;
 using System.Data.SqlClient;
+using System.Drawing.Text;
 using System.Net.Mail;
 using BrainBoost.Models;
 using BrainBoost.Parameter;
@@ -152,14 +153,17 @@ namespace BrainBoost.Services
         #endregion
 
         #region 紀錄學生搶答室回答
-        public void StudentReseponse(StudentReseponse studentReseponse){
-            RaceRepository.StudentReseponse(studentReseponse);
+        public void StudentResponse(StudentResponse studentResponse){
+            RaceRepository.StudentResponse(studentResponse);
         }
         #endregion
 
         #region 確認學生答案
-        public void CheckAnswer(StudentReseponse studentReseponse){
-            RaceRepository.CheckAnswer(studentReseponse);
+        public void CheckAnswer(StudentResponse studentResponse){
+            
+            int second = RaceRepository.RaceRoomTimer(studentResponse.raceroom_id);
+            
+            RaceRepository.CheckAnswer(studentResponse);
         }
         #endregion
     }

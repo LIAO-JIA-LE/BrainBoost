@@ -240,14 +240,33 @@ namespace BrainBoost.Controllers
         #region 紀錄學生搶答室答案和分數
         [HttpPost]
         [Route("[Action]")]
-        public IActionResult StudentReseponse([FromBody]StudentReseponse studentReseponse){
-            // 取得member_id
-            studentReseponse.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-            // 新增學生答案
-            RaceService.StudentReseponse(studentReseponse);
-            // 確定答案
-            RaceService.CheckAnswer(studentReseponse);
-            return Ok();
+        public JsonResult StudentResponse([FromBody]StudentResponse studentResponse){
+            
+            Response result = new();
+            
+            try{
+                // 取得member_id
+                studentResponse.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                // 新增學生答案
+                RaceService.StudentResponse(studentResponse);
+                // 確定答案
+                RaceService.CheckAnswer(studentResponse);
+                // // 紀錄分數
+                // RaceService.RecordScore(studentResponse);
+
+                result = new(){
+                    status_code = 200,
+                    message = "匯入成功",
+                    data = studentResponse
+                };
+            }
+            catch(Exception e){
+                result = new(){
+                    status_code = 500,
+                    message = e.Message.ToString()
+                };
+            }
+            return new(result);
         }
         #endregion
         

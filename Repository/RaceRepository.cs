@@ -375,59 +375,70 @@ namespace BrainBoost.Services
         #endregion
 
         #region 記錄學生搶答室答案
-        public void StudentReseponse(StudentReseponse studentReseponse){
+        public void StudentResponse(StudentResponse studentResponse){
             // 新增學生回答道資料庫
             string sql = $@"INSERT INTO Race_Response(raceroom_id, question_id, member_id, race_answer, race_time)
                             VALUES(@raceroom_id, @question_id, @member_id, @race_answer, @race_time)";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new { raceroom_id = studentReseponse.raceroom_id, question_id = studentReseponse.question_id, member_id = studentReseponse.member_id, race_answer = studentReseponse.race_answer, race_time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") });
+            conn.Execute(sql, new { raceroom_id = studentResponse.raceroom_id, question_id = studentResponse.question_id, member_id = studentResponse.member_id, race_answer = studentResponse.race_answer, race_time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") });
         }
         #endregion
 
         // #region 獲得race_response_id
-        // public int GetRaceReseponseId(StudentReseponse studentReseponse){
+        // public int GetRaceReseponseId(StudentResponse studentResponse){
         //     string sql = $@"SELECT
         //                         race_response_id
         //                     FROM Race_Response
         //                     WHERE raceroom_id = @raceroom_id AND question_id = @question_id AND member_id = @member_id";
         //     using var conn = new SqlConnection(cnstr);
-        //     return conn.QueryFirstOrDefault<int>(sql, new {raceroom_id = studentReseponse.raceroom_id, question_id = studentReseponse.question_id, member_id = studentReseponse.member_id});
+        //     return conn.QueryFirstOrDefault<int>(sql, new {raceroom_id = studentResponse.raceroom_id, question_id = studentResponse.question_id, member_id = studentResponse.member_id});
         // }
         // #endregion
 
         #region 確定答案
-        public string QuestionAnswer(StudentReseponse studentReseponse){
+        public string QuestionAnswer(StudentResponse studentResponse){
             // 正確答案
             string sql = $@"SELECT
                                 question_answer
                             FROM Answer
                             WHERE question_id = @question_id AND is_delete = 0 ";
             using var conn = new SqlConnection(cnstr);
-            return conn.QueryFirstOrDefault<string>(sql, new{ question_id = studentReseponse.question_id });
+            return conn.QueryFirstOrDefault<string>(sql, new{ question_id = studentResponse.question_id });
         }
         #endregion
 
         #region 學生答案
-        public string StudentAnswer(StudentReseponse studentReseponse){
+        public string StudentAnswer(StudentResponse studentResponse){
             // 學生答案
             string sql = $@"SELECT
                                 race_answer
                             FROM Race_Response
                             WHERE raceroom_id = @raceroom_id AND question_id = @question_id AND member_id = @member_id ";
             using var conn = new SqlConnection(cnstr);
-            return conn.QueryFirstOrDefault<string>(sql, new{ raceroom_id = studentReseponse.raceroom_id, question_id = studentReseponse.question_id, member_id = studentReseponse.member_id });
+            return conn.QueryFirstOrDefault<string>(sql, new{ raceroom_id = studentResponse.raceroom_id, question_id = studentResponse.question_id, member_id = studentResponse.member_id });
         }
         #endregion
 
         #region 確定答案
-        public void CheckAnswer(StudentReseponse studentReseponse){
+        public void CheckAnswer(StudentResponse studentResponse){
             bool check = false;
-            if(QuestionAnswer(studentReseponse) == StudentAnswer(studentReseponse))
+            if(QuestionAnswer(studentResponse) == StudentAnswer(studentResponse))
                 check = true;
             string sql = $@"UPDATE Race_Reseponse
                         SET check_answer = @check_answer WHERE raceroom_id = @raceroom_id AND question_id = @question_id AND member_id = @member_id ";
             using var conn = new SqlConnection(cnstr);
-            conn.QueryFirstOrDefault<string>(sql, new{ check_answer = check , raceroom_id = studentReseponse.raceroom_id, question_id = studentReseponse.question_id, member_id = studentReseponse.member_id });
+            conn.Execute(sql, new{ check_answer = check , raceroom_id = studentResponse.raceroom_id, question_id = studentResponse.question_id, member_id = studentResponse.member_id });
+        }
+        #endregion
+
+        #region 獲得計時時間
+        public int RaceRoomTimer(int raceroom_id){
+            string sql = $@"SELECT
+                                time_limit
+                            FORM RaceRoom
+                            WHERE raceroom_id = @raceroom_id ";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault(sql, raceroom_id);
         }
         #endregion
     }
