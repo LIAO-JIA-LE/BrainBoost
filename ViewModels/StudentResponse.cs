@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace BrainBoost.ViewModels
 {
-    public class StudentReseponse
+    public class StudentResponse
     {
         // 搶答室編號
         public int raceroom_id{get;set;}
