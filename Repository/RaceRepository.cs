@@ -20,14 +20,21 @@ namespace BrainBoost.Services
         #endregion
         
         #region 新增搶答室資訊
-        public void InsertRoom(string Code, InsertRoom raceData){
+        public int InsertRoom(string Code, InsertRoom raceData){
             string currentTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
             // 新增搶答室資訊
-            string sql = $@"INSERT INTO RaceRoom(member_id,race_name, race_date, race_code, race_function, time_limit)
-                            VALUES(@member_id,@race_name, @race_date, @race_code, @race_function, @time_limit) ";
+            string sql = $@"INSERT INTO RaceRoom(member_id,race_name, race_date, race_code, race_function, race_public, time_limit)
+                            VALUES(@member_id,@race_name, @race_date, @race_code, @race_function, @race_public, @time_limit)
+                            
+                            DECLARE @raceroom_id int;
+                            SET @raceroom_id = SCOPE_IDENTITY(); /*自動擷取剛剛新增資料的id*/
+
+                            SELECT * FROM RaceRoom WHERE raceroom_id = @raceroom_id
+                            ";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new {raceData.member_id,raceData.race_name, race_date = currentTime, race_code = Code,raceData.race_function,raceData.time_limit});
+            RaceRooms data = conn.QueryFirstOrDefault<RaceRooms>(sql, new {raceData.member_id,raceData.race_name, race_date = currentTime, race_code = Code,raceData.race_function,raceData.race_public,raceData.time_limit});
             RoomQuestion(raceData);
+            return data.raceroom_id;
         }
         #endregion
 

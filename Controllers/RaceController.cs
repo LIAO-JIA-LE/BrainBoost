@@ -91,6 +91,9 @@ namespace BrainBoost.Controllers
         #endregion   
         #region 新增搶答室
         // 新增搶答室
+        // 解題方式(race_function)預設為0(0:最後一次顯示,1:逐題解析)
+        // 是否公開(race_public)預設為0(0:不公開,1:公開)
+        // 時間限制(time_limit)預設為30秒
         [HttpPost]
         [Route("Room")]
         public IActionResult InsertRoom([FromBody]InsertRoom raceData){

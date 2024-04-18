@@ -199,7 +199,14 @@ public class MemberService
     }
     // 用account獲得資料
     public Member GetDataByAccount(string account){
-        string sql = $@"SELECT * FROM Member WHERE member_account = '{account}' ";
+        string sql = $@"SELECT 
+                            m.*,
+                            mr.role_id
+                        FROM Member m
+                        JOIN Member_Role mr
+                        ON m.member_id = mr.member_id
+                        WHERE member_account = '{account}'
+                        ";
         using (var conn = new SqlConnection(cnstr))
         return conn.QueryFirstOrDefault<Member>(sql);
     }
