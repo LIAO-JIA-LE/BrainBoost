@@ -22,7 +22,7 @@ namespace BrainBoost.Controllers
         #region 後台 修改使用者權限
         //修改使用者權限(後臺管理者)
         [HttpPut("[Action]")]
-        public JsonResult UpdateMemberRole([FromBody]UpdateRole data){
+        public IActionResult UpdateMemberRole([FromBody]UpdateRole data){
             Response result;
             try
             {
@@ -40,7 +40,7 @@ namespace BrainBoost.Controllers
                     message = e.Message
                 };
             }
-            return new(result);
+            return Ok(result);
         }
         #endregion
         

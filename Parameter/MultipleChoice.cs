@@ -6,8 +6,6 @@ namespace BrainBoost.Parameter
 {
     public class MultipleChoice
     {
-        // 科目
-        public int subject_id{get;set;}
         
         // 題目
         [DisplayName("題目")]
@@ -18,8 +16,8 @@ namespace BrainBoost.Parameter
         public int question_level {get;set;}
 
         // 圖片
-        [DisplayName("圖片")]
-        public IFormFile? photo{get;set;}
+        // [DisplayName("圖片")]
+        // public IFormFile? photo{get;set;}
 
         // 選項A
         [DisplayName("選項A")]

@@ -51,13 +51,20 @@ namespace BrainBoost.Controllers
             {
                 questionList.QuestionData.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
                 // questionList.QuestionData.member_id = 1;
-                QuestionService.InsertQuestion(questionList);
+                questionList.QuestionData.question_id =  QuestionService.InsertQuestion(questionList);
             }
             catch (Exception e)
             {
-                return BadRequest($"發生錯誤:  {e}");
+                return BadRequest(new Response(){
+                        status_code = Response.StatusCode,
+                        message = $"發生錯誤:  {e}"
+                    });
             }
-            return Ok("新增成功");
+            return Ok(new Response(){
+                status_code = Response.StatusCode,
+                message = "新增是非題成功",
+                data = QuestionService.GetQuestionById(questionList.QuestionData.question_id)
+            });
         }
 
         // 新增 選擇題題目（手動）
@@ -100,9 +107,15 @@ namespace BrainBoost.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest($"發生錯誤:  {e}");
+                return BadRequest(new Response(){
+                        status_code = Response.StatusCode,
+                        message = $"發生錯誤:  {e}"
+                    });
             }
-            return Ok("新增成功");
+            return Ok(new Response(){
+                status_code = Response.StatusCode,
+                message = "匯入選擇題成功"
+            });
         }
 
         // 新增 填充題題目（手動）
@@ -180,10 +193,16 @@ namespace BrainBoost.Controllers
                 }
                 catch (Exception e)
                 {
-                    return BadRequest($"發生錯誤:  {e}");
+                    return BadRequest(new Response(){
+                        status_code = Response.StatusCode,
+                        message = $"發生錯誤:  {e}"
+                    });
                 }
             }
-            return Ok("匯入成功");    
+            return Ok(new Response(){
+                status_code = Response.StatusCode,
+                message = "匯入是非題成功"
+            }); 
         }
     
         // 讀取 選擇題Excel檔案
@@ -228,10 +247,16 @@ namespace BrainBoost.Controllers
                 }
                 catch (Exception e)
                 {
-                    return BadRequest($"發生錯誤:  {e}");
+                    return BadRequest(new Response(){
+                        status_code = Response.StatusCode,
+                        message = $"發生錯誤:  {e}"
+                    });
                 }
             }
-            return Ok("匯入成功");    
+            return Ok(new Response(){
+                status_code = Response.StatusCode,
+                message = "匯入選擇題成功"
+            });    
         }
     
         // 讀取 填充題Excel檔案

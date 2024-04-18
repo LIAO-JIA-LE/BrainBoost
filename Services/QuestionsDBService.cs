@@ -163,18 +163,23 @@ namespace BrainBoost.Services
 
         #region 匯入題目、選項和答案
         // 儲存題目
-        public void InsertQuestion(QuestionList questionList)
+        public int InsertQuestion(QuestionList questionList)
         {
             string sql = $@"INSERT INTO Question(type_id,subject_id, member_id, question_level, question_content, question_picture, create_time)
                             VALUES('{questionList.QuestionData.type_id}',{questionList.QuestionData.subject_id},{questionList.QuestionData.member_id},
                             '{questionList.QuestionData.question_level}','{questionList.QuestionData.question_content}',
-                            '{questionList.QuestionData.question_picture}', '{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}')";
+                            '{questionList.QuestionData.question_picture}', '{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}')
+                            
+                            DECLARE @question_id int;
+                            SET @question_id = SCOPE_IDENTITY();
+                            SELECT @question_id
+                            ";
             
             // 先執行當前題目內容
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql);
-
+            int question_id = conn.QueryFirst<int>(sql);
             InsertOption(questionList);
+            return question_id;
         }
 
         // 獲得沒有重複的Tag

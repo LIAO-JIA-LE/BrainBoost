@@ -7,11 +7,11 @@ namespace BrainBoost.Parameter
 {
     public class InsertRoom
     {
+        public int member_id{get;set;}
         public string race_name{get;set;}
         public bool race_function{get;set;}
         public bool race_public{get;set;}
         public int time_limit{get;set;}
         public List<int> question_id{get;set;}
-        public int member_id{get;set;}
     }
 }

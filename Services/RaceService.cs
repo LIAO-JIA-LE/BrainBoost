@@ -1,13 +1,6 @@
-using System;
-using System.Data.SqlClient;
-using System.Drawing.Text;
-using System.Net.Mail;
 using BrainBoost.Models;
 using BrainBoost.Parameter;
 using BrainBoost.ViewModels;
-using Dapper;
-using Microsoft.AspNetCore.Mvc;
-using NPOI.SS.Formula.Functions;
 
 namespace BrainBoost.Services
 {
@@ -47,20 +40,20 @@ namespace BrainBoost.Services
         
         #region 修改搶答室（資訊和問題分開）
         // 修改 搶答室資訊（名稱、時間、公開）
-        public void RoomInformation(RaceInformation raceData){
-            RaceRepository.RoomInformation(raceData);
+        public void RoomInformation(int raceroom_id, RaceInformation raceData){
+            RaceRepository.RoomInformation(raceroom_id, raceData);
         }
         #endregion
 
 
         // 新增 搶答室題目
-        public void RoomQuestionList(RoomQuestionList roomQuestionList){
-            RaceRepository.InsertQuestion(roomQuestionList);
+        public void RoomQuestionList(int raceroom_id, RoomQuestionList roomQuestionList){
+            RaceRepository.InsertQuestion(raceroom_id, roomQuestionList);
         }
 
          // 新增 搶答室題目單一
-        public void RoomQuestion(int id, int question_id){
-            RaceRepository.InsertQuestion(id, question_id);
+        public void RoomQuestion(int raceroom_id, int question_id){
+            RaceRepository.InsertQuestion(raceroom_id, question_id);
         }
 
         // 取消選取 搶答室題目
@@ -82,8 +75,8 @@ namespace BrainBoost.Services
         #endregion
 
         #region 搶答室題目單一
-        public List<RaceQuestionAnswer> GetRoomQuestion(RaceroomQuestion raceroomQuestion){
-            return RaceRepository.Question(raceroomQuestion);
+        public List<RaceQuestionAnswer> GetRoomQuestion(int raceroom_id, int question_id){
+            return RaceRepository.Question(raceroom_id, question_id);
         }
         #endregion
 
@@ -120,11 +113,11 @@ namespace BrainBoost.Services
         }
         #endregion
 
-        #region 標籤列表
-        public List<Tag> TagList(int member_id, int subject_id){
-            return RaceRepository.TagList(member_id);
-        }
-        #endregion
+        // #region 標籤列表
+        // public List<Tag> TagList(int member_id){
+        //     return RaceRepository.TagList(member_id, subject_id);
+        // }
+        // #endregion
 
         #region 隨機出題
         public RaceQuestionViewModel RandomQuestion(int id){
@@ -153,17 +146,17 @@ namespace BrainBoost.Services
         #endregion
 
         #region 紀錄學生搶答室回答
-        public void StudentResponse(StudentResponse studentResponse){
-            RaceRepository.StudentResponse(studentResponse);
+        public void StudentResponse(int raceroom_id, int question_id, StudentResponse studentResponse){
+            RaceRepository.StudentResponse(raceroom_id, question_id, studentResponse);
         }
         #endregion
 
         #region 確認學生答案
-        public void CheckAnswer(StudentResponse studentResponse){
+        public void CheckAnswer(int raceroom_id, int question_id, StudentResponse studentResponse){
             
-            int second = RaceRepository.RaceRoomTimer(studentResponse.raceroom_id);
+            int second = RaceRepository.RaceRoomTimer(raceroom_id);
             
-            RaceRepository.CheckAnswer(studentResponse);
+            RaceRepository.CheckAnswer(raceroom_id, question_id, studentResponse);
         }
         #endregion
     }

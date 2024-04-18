@@ -18,7 +18,7 @@ namespace BrainBoost.Controllers
         // 查看該老師所有的科目
         [HttpGet]
         [Route("AllSubject")]
-        public JsonResult GetAllSubject(){
+        public IActionResult GetAllSubject(){
             Response result;
             try{
                 Member member = MemberService.GetDataByAccount(User.Identity.Name);
@@ -33,12 +33,12 @@ namespace BrainBoost.Controllers
                     message = ex.Message
                 };
             }
-            return new(result);
+            return Ok(result);
         }
         //查詢單個科目
         [HttpGet]
         [Route("Subject")]
-        public JsonResult GetSubject(int subject_id){
+        public IActionResult GetSubject(int subject_id){
             Response result;
             try
             {
@@ -55,12 +55,12 @@ namespace BrainBoost.Controllers
                     message = ex.Message
                 };
             }
-            return new(result);
+            return Ok(result);
         }
 
         // 新增科目
         [HttpPost]
-        public JsonResult InsertSubject([FromBody]InsertSubject insertData){
+        public IActionResult InsertSubject([FromBody]InsertSubject insertData){
             insertData.teacher_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
             Response result;
             try{
@@ -77,12 +77,12 @@ namespace BrainBoost.Controllers
                     message = e.Message
                 };
             }
-            return new(result);
+            return Ok(result);
         }
 
         //修改科目名稱
         [HttpPut]
-        public JsonResult UpdateSubject([FromQuery]int subject_id,[FromBody]string subject_name){
+        public IActionResult UpdateSubject([FromQuery]int subject_id,[FromBody]string subject_name){
             Response result;
             try
             {
@@ -105,12 +105,12 @@ namespace BrainBoost.Controllers
                     message = e.Message
                 };
             }
-            return new(result);
+            return Ok(result);
         }
 
         //刪除科目
         [HttpDelete]
-        public JsonResult DeleteSubject([FromQuery]int subject_id){
+        public IActionResult DeleteSubject([FromQuery]int subject_id){
             Response result;
             try
             {
@@ -123,7 +123,7 @@ namespace BrainBoost.Controllers
                     };
                 }
                 else result = new(){
-                        status_code = 400,
+                        status_code = 204,
                         message = "無此資料"
                     };
             }
@@ -134,7 +134,7 @@ namespace BrainBoost.Controllers
                     message = e.Message
                 };
             }
-            return new(result);
+            return Ok(result);
         }
 
         #endregion
@@ -143,12 +143,12 @@ namespace BrainBoost.Controllers
         // 新增學生
         [HttpPost]
         [Route("Student")]
-        public JsonResult InsertStudent([FromQuery]int subject_id,[FromQuery]int student_id){
+        public IActionResult InsertStudent([FromQuery]int subject_id,[FromQuery]int student_id){
             Response result;
             try
             {
                 SubjectStudent data = new(){
-                    subjecct_id = subject_id,
+                    subject_id = subject_id,
                     student_id = student_id
                 };
                 SubjectService.InsertStudent(data);
@@ -164,18 +164,18 @@ namespace BrainBoost.Controllers
                     message = e.Message
                 };
             }
-            return new(result);
+            return Ok(result);
         }
 
         // 刪除學生
         [HttpDelete]
         [Route("Student")]
-        public JsonResult DeleteStudent([FromQuery]int subject_id,[FromQuery]int student_id){
+        public IActionResult DeleteStudent([FromQuery]int subject_id,[FromQuery]int student_id){
             Response result;
             try
             {
                 SubjectStudent data = new(){
-                    subjecct_id = subject_id,
+                    subject_id = subject_id,
                     student_id = student_id
                 };
                 SubjectService.DeleteStudent(data);
@@ -191,7 +191,7 @@ namespace BrainBoost.Controllers
                     message = e.Message
                 };
             }
-            return new(result);
+            return Ok(result);
         }
         #endregion
     }

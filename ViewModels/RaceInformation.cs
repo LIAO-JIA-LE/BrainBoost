@@ -4,8 +4,6 @@ namespace BrainBoost.ViewModels
 {
     public class RaceInformation
     {
-        // 搶答室編號
-        public int raceroom_id{get;set;}
 
         // 搶答室名稱
         public string race_name { get; set; }
