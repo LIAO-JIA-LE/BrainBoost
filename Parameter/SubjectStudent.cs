@@ -8,6 +8,6 @@ namespace BrainBoost.Parameter
     public class SubjectStudent
     {
         public int subject_id {get;set;}
-        public int student_id {get;set;}
+        public int member_id {get;set;}
     }
 }

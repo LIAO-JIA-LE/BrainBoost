@@ -149,7 +149,7 @@ namespace BrainBoost.Controllers
             {
                 SubjectStudent data = new(){
                     subject_id = subject_id,
-                    student_id = student_id
+                    member_id = student_id
                 };
                 SubjectService.InsertStudent(data);
                 result = new(){
@@ -176,7 +176,7 @@ namespace BrainBoost.Controllers
             {
                 SubjectStudent data = new(){
                     subject_id = subject_id,
-                    student_id = student_id
+                    member_id = student_id
                 };
                 SubjectService.DeleteStudent(data);
                 result = new(){

@@ -14,6 +14,7 @@ namespace BrainBoost.Controllers
     {
         private readonly ClassService classService = _classService;
         private readonly MemberService memberService = _memberService;
+        #region 班級
         //新增班級
         [HttpPost]
         [Route("")]
@@ -96,5 +97,45 @@ namespace BrainBoost.Controllers
                 });
             }    
         }
+        #endregion
+        #region 班級學生
+        [HttpPost]
+        [Route("Student")]
+        public IActionResult InsertStudent(ClassStudent insertData){
+            try
+            {
+                classService.InsertStudent(insertData);
+                return Ok(new Response(){
+                    status_code = 200,
+                    message = "新增成功",
+                });
+            }
+            catch (System.Exception e)
+            {
+                return BadRequest(new Response(){
+                    status_code = 400,
+                    message = e.Message
+                });
+            }
+        }
+        [HttpDelete]
+        [Route("Student")]
+        public IActionResult DeleteStudent(ClassStudent deleteData){try
+            {
+                classService.DeleteStudent(deleteData);
+                return Ok(new Response(){
+                    status_code = 200,
+                    message = "刪除成功",
+                });
+            }
+            catch (System.Exception e)
+            {
+                return BadRequest(new Response(){
+                    status_code = 400,
+                    message = e.Message
+                });
+            }
+        }
+        #endregion
     }
 }

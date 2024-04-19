@@ -76,5 +76,18 @@ namespace BrainBoost.Services
             using var conn = new SqlConnection(cnstr);
             conn.Execute(sql,updateData);
         }
+        //班級新增學生
+        public void InsertStudent(ClassStudent insertData){
+            string sql = $@"INSERT INTO Class_Member(class_id,member_id)
+                            VALUES(@class_id,@member_id)";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql,insertData);
+        }
+        //班級刪除學生
+        public void DeleteStudent(ClassStudent deleteData){
+            string sql = $@"DELETE Class_Member WHERE class_id = @class_id AND member_id = @member_id";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql,deleteData);
+        }
     }
 }
