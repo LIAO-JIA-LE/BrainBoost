@@ -4,8 +4,8 @@ namespace BrainBoost.ViewModels
 {
     public class ClassViewModel
     {
-        public Class @class {get;set;} = new();
+        public Class @class {get;set;} = new Class();
 
-        public Class_Member class_member {get;set;} = new();
+        public List<Class_Member> class_member {get;set;} = [];
     }
 }

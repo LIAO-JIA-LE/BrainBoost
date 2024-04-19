@@ -13,6 +13,6 @@ namespace BrainBoost.Models
         //班級編號
         public int class_id {get;set;}
         //學生編號
-        public List<int> member_id = new();
+        public int member_id = new();
     }
 }

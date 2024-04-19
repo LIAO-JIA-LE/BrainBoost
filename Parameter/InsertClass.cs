@@ -8,7 +8,7 @@ namespace BrainBoost.Parameter
     public class InsertClass
     {
         public string class_name {get;set;}
-        public int teacher_id {get;set;}
+        public int teacher_id;
         public List<int> List_student_id {get;set;}
     }
 }
