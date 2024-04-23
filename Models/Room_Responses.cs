@@ -21,6 +21,6 @@ namespace BrainBoost.Models
         public bool check_correct { get; set; }
 
         // 回答時間
-        public DateTime race_time { get; set; }
+        public float race_time { get; set; }
     }
 }

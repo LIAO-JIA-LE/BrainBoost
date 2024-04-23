@@ -478,15 +478,12 @@ namespace BrainBoost.Controllers
         #region 紀錄學生搶答室答案和分數
         [HttpPost]
         [Route("[Action]")]
-        public IActionResult StudentResponse([FromQuery]int raceroom_id,[FromBody]StudentResponse studentResponse){
-            
-            Response result = new();
-            
+        public IActionResult StudentResponse([FromBody]StudentResponse studentResponse){
             try{
                 // 取得member_id
                 studentResponse.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
                 // 取得搶答室限時
-                studentResponse.time_limit = RaceService.GetTimeLimitByRId(raceroom_id);
+                studentResponse.time_limit = RaceService.GetTimeLimitByRId(studentResponse.raceroom_id);
                 // 取得此題目的答案
                 string Answer = QuestionService.GetQuestionAnswerByQId(studentResponse.question_id);
                 // 取得此題目的難度

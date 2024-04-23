@@ -146,7 +146,7 @@ namespace BrainBoost.Services
         #endregion
 
         #region 取得限時
-        public int GetTimeLimitByRId(int raceroom_id){
+        public float GetTimeLimitByRId(int raceroom_id){
             return RaceRepository.TimeLimit(raceroom_id);
         }
         #endregion
@@ -157,7 +157,7 @@ namespace BrainBoost.Services
             float limit = 0;
             if(studentResponse.time_limit > studentResponse.time_response){
                 if(studentResponse.race_answer.Equals(question_answer)){
-                    limit = studentResponse.time_limit - (studentResponse.time_limit - studentResponse.time_response);
+                    limit = studentResponse.time_limit - studentResponse.time_response;
                     RaceRepository.SaveResponse(level, limit, studentResponse, true);
                 }
                 else{

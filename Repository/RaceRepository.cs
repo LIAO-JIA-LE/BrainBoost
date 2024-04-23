@@ -390,34 +390,23 @@ namespace BrainBoost.Services
         #endregion
 
         #region 取得限時時間
-        public int TimeLimit(int raceroom_id){
+        public float TimeLimit(int raceroom_id){
             string sql = $@"SELECT
                                 time_limit
                             FROM RaceRoom
-                            WHERE raceroom_id = 1";
+                            WHERE raceroom_id = @raceroom_id";
             using var conn = new SqlConnection(cnstr);
-            return conn.QueryFirstOrDefault(sql, raceroom_id);
-        }
-        #endregion
-
-        #region 獲得計時時間
-        public int RaceRoomTimer(int raceroom_id){
-            string sql = $@"SELECT
-                                time_limit
-                            FORM RaceRoom
-                            WHERE raceroom_id = @raceroom_id ";
-            using var conn = new SqlConnection(cnstr);
-            return conn.QueryFirstOrDefault(sql, raceroom_id);
+            return conn.QueryFirstOrDefault<float>(sql, new{ raceroom_id });
         }
         #endregion
 
         #region 儲存回應
         public void SaveResponse(int level, float limit, StudentResponse studentResponse, bool check_correct){
             float score = limit * level;
-            string sql = $@"INSERT INTO Race_Response(question_id, member_id, race_answer, race_score, check_correct, race_time)
-                            VALUES(@question_id, @member_id, @race_answer, @race_score, @check_correct, @race_time )";
+            string sql = $@"INSERT INTO Race_Response(raceroom_id, question_id, member_id, race_answer, race_score, check_correct, race_time)
+                            VALUES(@raceroom_id, @question_id, @member_id, @race_answer, @race_score, @check_correct, @race_time )";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new{question_id = studentResponse.question_id, member_id = studentResponse.question_id, race_score = score, check_correct = check_correct, race_time = limit});
+            conn.Execute(sql, new{raceroom_id = studentResponse.raceroom_id, question_id = studentResponse.question_id, member_id = studentResponse.member_id, race_answer = studentResponse.race_answer, race_score = score, check_correct = check_correct, race_time = studentResponse.time_response});
         }
         #endregion
     }
