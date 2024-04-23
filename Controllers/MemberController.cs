@@ -80,7 +80,7 @@ namespace BrainBoost.Controllers
                     message = str
                 });
             }
-            return Ok(new Response(){
+            return BadRequest(new Response(){
                             status_code = 400,
                             message = "請完整輸入資料"
                         });
@@ -138,8 +138,13 @@ namespace BrainBoost.Controllers
         [Route("")]
         public IActionResult UpdateMemberData(MemberUpdate data){
             try{
-                    MemberUpdate member = new()
-                {
+                if(User.Identity.Name == null){
+                    return BadRequest(new Response(){
+                        status_code = 400,
+                        message = "請先登入"
+                    });
+                }
+                MemberUpdate member = new(){
                     member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id,
                     member_name = data.member_name
                 };
@@ -155,11 +160,13 @@ namespace BrainBoost.Controllers
                 else{
                     member.member_photo = wwwroot + "default.jpg";
                 }
+                var memberdata = MemberService.GetDataByAccount(User.Identity.Name);
+                memberdata.Member_Password = string.Empty;
                 MemberService.UpdateMemberData(member);
                 Response result = new(){
                     status_code = 200,
                     message = "修改成功",
-                    data = MemberService.GetDataByAccount(User.Identity.Name)
+                    data = memberdata
                 };
                 return Ok(result);
             }
@@ -200,7 +207,8 @@ namespace BrainBoost.Controllers
         #region 後台管理者
         //取得目前所有使用者
         //[Authorize(Roles = "Admin")]
-        [HttpGet("[Action]")]
+        [HttpGet]
+        [Route("AllMember")]
         public IActionResult MemberList([FromQuery]string? Search,[FromQuery]int page = 1){
             MemberViewModels data = new(){
                 forpaging = new Forpaging(page)
@@ -216,8 +224,8 @@ namespace BrainBoost.Controllers
 
         // 取得單一使用者(帳號)
         // 未來可加任課科目&上課科目
-        [HttpGet("{account}")]
-        public IActionResult MemberByAcc([FromRoute]string account){
+        [HttpGet]
+        public IActionResult MemberByAcc([FromQuery]string account){
             return Ok(new Response(){
                 status_code = 200,
                 data = MemberService.GetDataByAccount(account)

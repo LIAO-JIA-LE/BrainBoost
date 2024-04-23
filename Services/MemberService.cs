@@ -86,7 +86,7 @@ public class MemberService
                         /*設定暫時的變數*/
                         DECLARE @member_id int = (SELECT m.member_id FROM Member m WHERE m.member_account = '{member.Member_Account}');
                         INSERT INTO Member_Role(member_id,role_id)
-                                    VALUES(@member_id,0)";
+                                    VALUES(@member_id,1)";
         using var conn = new SqlConnection(cnstr);
         conn.Execute(sql);
     }
@@ -152,7 +152,7 @@ public class MemberService
         string sql = $@"SELECT COUNT(*) FROM Member";
         using var conn = new SqlConnection(cnstr);
         int row = conn.QueryFirst<int>(sql);
-        forpaging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
+        forpaging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / forpaging.Item));
         forpaging.SetRightPage();
     }
     //有搜尋值計算所有使用者並設定頁數
@@ -160,7 +160,7 @@ public class MemberService
         string sql = $@"SELECT COUNT(*) FROM Member WHERE member_account LIKE '%{Search}%' OR member_name LIKE '%{Search}%'";
         using var conn = new SqlConnection(cnstr);
         int row = conn.QueryFirst<int>(sql);
-        forpaging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / 10));
+        forpaging.MaxPage = Convert.ToInt32(Math.Ceiling(Convert.ToDouble(row) / forpaging.Item));
         forpaging.SetRightPage();
     }
 

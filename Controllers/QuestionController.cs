@@ -30,14 +30,25 @@ namespace BrainBoost.Controllers
         }
 
         // 獲得 單一問題
-        //需指定MEmBER_ID
-        [HttpGet("[Action]")]
-        public List<Question> All_Question([FromQuery]string search,[FromQuery]int type = 0,[FromQuery]int page = 1){
+        [HttpGet]
+        [Route("AllQuestion")]
+        public IActionResult All_Question([FromQuery]string search,[FromQuery]int type = 0,[FromQuery]int page = 1){
             QuestionViewModel data = new(){
                 forpaging = new Forpaging(page),
             };
-            data.question = QuestionService.GetQuestionList(type,search,data.forpaging);
-            return data.question;
+            int member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+            data.question = QuestionService.GetQuestionList(member_id,type,search,data.forpaging);
+            if(data.question.Count==0){
+                return Ok(new Response(){
+                    status_code = 204,
+                    message = "無資料，請新增題目"
+                });
+            }
+            return Ok(new Response(){
+                status_code = 200,
+                message = "讀取成功",
+                data = data
+            });
         }
         // #endregion
     }
