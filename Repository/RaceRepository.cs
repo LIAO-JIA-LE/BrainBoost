@@ -266,11 +266,21 @@ namespace BrainBoost.Services
 
         #region 標籤列表
         public List<Tag> TagList(int member_id, int subject_id){
-            string sql = $@" SELECT
-                                tag_id,
-                                tag_name
-                            FROM Tag
-                            WHERE member_id = @member_id";
+            string sql = $@"SELECT 
+                                qqt.tag_id,
+                                qqt.member_id,
+                                t.tag_name
+                            FROM Tag t
+                            JOIN(
+                                SELECT 
+                                    qt.tag_id,
+                                    q.member_id
+                                FROM ""Question"" q
+                                JOIN ""Question_Tag"" qt
+                                ON q.member_id = 1 AND q.question_id = qt.question_id AND q.subject_id = @subject_id
+                            )qqt
+                            ON t.member_id = @member_id AND t.tag_id = qqt.tag_id 
+                            GROUP BY qqt.tag_id, t.tag_name, qqt.member_id";
             using var conn = new SqlConnection(cnstr);
             return (List<Tag>)conn.Query<Tag>(sql, new{member_id, subject_id});
         }
@@ -379,60 +389,14 @@ namespace BrainBoost.Services
         }
         #endregion
 
-        #region 記錄學生搶答室答案
-        public void StudentResponse(int raceroom_id, int question_id, StudentResponse studentResponse){
-            // 新增學生回答道資料庫
-            string sql = $@"INSERT INTO Race_Response(raceroom_id, question_id, member_id, race_answer, race_time)
-                            VALUES(@raceroom_id, @question_id, @member_id, @race_answer, @race_time)";
-            using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new { raceroom_id = raceroom_id, question_id = question_id, member_id = studentResponse.member_id, race_answer = studentResponse.race_answer, race_time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") });
-        }
-        #endregion
-
-        // #region 獲得race_response_id
-        // public int GetRaceReseponseId(StudentResponse studentResponse){
-        //     string sql = $@"SELECT
-        //                         race_response_id
-        //                     FROM Race_Response
-        //                     WHERE raceroom_id = @raceroom_id AND question_id = @question_id AND member_id = @member_id";
-        //     using var conn = new SqlConnection(cnstr);
-        //     return conn.QueryFirstOrDefault<int>(sql, new {raceroom_id = studentResponse.raceroom_id, question_id = studentResponse.question_id, member_id = studentResponse.member_id});
-        // }
-        // #endregion
-
-        #region 確定答案
-        public string QuestionAnswer(int question_id, StudentResponse studentResponse){
-            // 正確答案
+        #region 取得限時時間
+        public int TimeLimit(int raceroom_id){
             string sql = $@"SELECT
-                                question_answer
-                            FROM Answer
-                            WHERE question_id = @question_id AND is_delete = 0 ";
+                                time_limit
+                            FROM RaceRoom
+                            WHERE raceroom_id = 1";
             using var conn = new SqlConnection(cnstr);
-            return conn.QueryFirstOrDefault<string>(sql, new{ question_id = question_id });
-        }
-        #endregion
-
-        #region 學生答案
-        public string StudentAnswer(int raceroom_id, int question_id, StudentResponse studentResponse){
-            // 學生答案
-            string sql = $@"SELECT
-                                race_answer
-                            FROM Race_Response
-                            WHERE raceroom_id = @raceroom_id AND question_id = @question_id AND member_id = @member_id ";
-            using var conn = new SqlConnection(cnstr);
-            return conn.QueryFirstOrDefault<string>(sql, new{ raceroom_id, question_id, member_id = studentResponse.member_id });
-        }
-        #endregion
-
-        #region 確定答案
-        public void CheckAnswer(int raceroom_id, int question_id, StudentResponse studentResponse){
-            bool check = false;
-            if(QuestionAnswer(question_id, studentResponse) == StudentAnswer(raceroom_id, question_id, studentResponse))
-                check = true;
-            string sql = $@"UPDATE Race_Reseponse
-                        SET check_answer = @check_answer WHERE raceroom_id = @raceroom_id AND question_id = @question_id AND member_id = @member_id ";
-            using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new{ check_answer = check , raceroom_id, question_id, member_id = studentResponse.member_id });
+            return conn.QueryFirstOrDefault(sql, raceroom_id);
         }
         #endregion
 
@@ -444,6 +408,16 @@ namespace BrainBoost.Services
                             WHERE raceroom_id = @raceroom_id ";
             using var conn = new SqlConnection(cnstr);
             return conn.QueryFirstOrDefault(sql, raceroom_id);
+        }
+        #endregion
+
+        #region 儲存回應
+        public void SaveResponse(int level, float limit, StudentResponse studentResponse, bool check_correct){
+            float score = limit * level;
+            string sql = $@"INSERT INTO Race_Response(question_id, member_id, race_answer, race_score, check_correct, race_time)
+                            VALUES(@question_id, @member_id, @race_answer, @race_score, @check_correct, @race_time )";
+            using var conn = new SqlConnection(cnstr);
+            conn.Execute(sql, new{question_id = studentResponse.question_id, member_id = studentResponse.question_id, race_score = score, check_correct = check_correct, race_time = limit});
         }
         #endregion
     }

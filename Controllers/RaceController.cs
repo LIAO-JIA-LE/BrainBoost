@@ -409,26 +409,26 @@ namespace BrainBoost.Controllers
         #endregion
     
         // TODO：篩選下拉式選單
-        // #region 標籤列表
-        // [HttpGet("[Action]")]
-        // public IActionResult TagList([FromQuery]int subject_id){
-        //     try{
-        //         int member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-        //         return Ok(new ResponseViewModel<List<Tag>>{
-        //             status_code = 200,
-        //             message = "顯示成功",
-        //             data = RaceService.TagList(member_id, subject_id)
-        //         });
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         return BadRequest(new ResponseViewModel{
-        //                 status_code = 400,
-        //                 message = e.Message
-        //             });
-        //     }
-        // }
-        // #endregion
+        #region 標籤列表
+        [HttpGet("[Action]")]
+        public IActionResult TagList([FromQuery]int subject_id){
+            try{
+                int member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                return Ok(new ResponseViewModel<List<Tag>>{
+                    status_code = 200,
+                    message = "顯示成功",
+                    data = RaceService.TagList(member_id, subject_id)
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ResponseViewModel{
+                        status_code = 400,
+                        message = e.Message
+                    });
+            }
+        }
+        #endregion
 
         // TODO：統計難度
         #region level統整
@@ -478,19 +478,21 @@ namespace BrainBoost.Controllers
         #region 紀錄學生搶答室答案和分數
         [HttpPost]
         [Route("[Action]")]
-        public IActionResult StudentResponse([FromQuery]int raceroom_id, [FromQuery]int question_id, [FromBody]StudentResponse studentResponse){
+        public IActionResult StudentResponse([FromQuery]int raceroom_id,[FromBody]StudentResponse studentResponse){
             
             Response result = new();
             
             try{
                 // 取得member_id
                 studentResponse.member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
-                // 新增學生答案
-                RaceService.StudentResponse(raceroom_id, question_id, studentResponse);
-                // 確定答案
-                RaceService.CheckAnswer(raceroom_id, question_id, studentResponse);
-                // // 紀錄分數
-                // RaceService.RecordScore(studentResponse);
+                // 取得搶答室限時
+                studentResponse.time_limit = RaceService.GetTimeLimitByRId(raceroom_id);
+                // 取得此題目的答案
+                string Answer = QuestionService.GetQuestionAnswerByQId(studentResponse.question_id);
+                // 取得此題目的難度
+                int Level = QuestionService.GetQuestionLevel(studentResponse.question_id);
+                // 計分
+                RaceService.StorageTimers(Level, Answer, studentResponse);
 
                 return Ok(new ResponseViewModel<StudentResponse>{
                     status_code = 200,
