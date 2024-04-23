@@ -7,6 +7,7 @@ using BrainBoost.Models;
 using BrainBoost.Parameter;
 using BrainBoost.ViewModels;
 using Dapper;
+using NPOI.SS.Formula.Functions;
 
 namespace BrainBoost.Services
 {
@@ -33,12 +34,16 @@ namespace BrainBoost.Services
         //查詢班級資訊
         public ClassViewModel GetClassViewModel(int class_id){
             string class_sql = $@"
-                                    SELECT
-                                        c.*
+                                    SELECT 
+                                        c.class_id,
+                                        c.class_name,
+                                        c.member_id,
+                                        COUNT(c.class_id) ""count""
                                     FROM Class c
                                     JOIN Class_Member cm
                                     ON c.class_id = cm.class_id
-                                    WHERE c.class_id = @class_id
+                                    WHERE c.is_delete = 0 AND c.class_id = @class_id
+                                    GROUP BY c.class_id,c.class_name,c.member_id
                                 ";
             string class_member_sql = $@"
                                             SELECT
@@ -48,18 +53,47 @@ namespace BrainBoost.Services
                                             ON c.class_id = cm.class_id
                                             WHERE c.class_id = @class_id
                                         ";
+            string member_sql = $@"
+                                    SELECT
+                                        m.member_id,
+                                        m.member_name,
+                                        m.member_photo,
+                                        m.member_account,
+                                        m.member_email
+                                    FROM Member m
+                                    JOIN Class_Member cm
+                                    ON m.member_id = cm.member_id
+                                    WHERE cm.class_id =  @class_id
+                                ";
             ClassViewModel data = new();
             using var conn = new SqlConnection(cnstr);
             data.@class = conn.QueryFirst<Class>(class_sql,new{class_id});
-            data.class_member = new List<Class_Member>(conn.Query<Class_Member>(class_member_sql,new{class_id}));
+            //班級學生
+            var class_Members = conn.Query<Class_Member>(class_member_sql,new{class_id}).AsList();
+            data.@class.count = class_Members.Count;
+            //學生詳細資料
+            var members = conn.Query<Member>(member_sql,new{class_id}).AsList();
+            //合併
+            var students = class_Members.Zip(members,(classMember, member) => new Student(member, classMember)).ToList();
+            data.students = students;
             return data;
         }
 
         //取得班級列表
         public List<Class> GetClassList(){
-            string sql = $@"SELECT * FROM Class";
+            string sql = $@"SELECT 
+                                c.class_id,
+                                c.class_name,
+                                c.member_id,
+                                COUNT(c.class_id) ""count""
+                            FROM Class c
+                            JOIN Class_Member cm
+                            ON c.class_id = cm.class_id
+                            WHERE c.is_delete = 0
+                            GROUP BY c.class_id,c.class_name,c.member_id";
             using var conn = new SqlConnection(cnstr);
-            return new List<Class>(conn.Query<Class>(sql));
+            List<Class> data = new(conn.Query<Class>(sql));
+            return data;
         }
         //刪除班級
         public void DeleteClass(DeleteClass deleteData){

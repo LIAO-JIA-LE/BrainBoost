@@ -40,15 +40,26 @@ namespace BrainBoost.Controllers
         //取得班級列表
         [HttpGet]
         [Route("")]
-        public IActionResult GetClassList(){
+        public IActionResult GetClassList([FromQuery]int class_id){
             try
             {
-                List<Class> Class_List = classService.GetClassList();
-                return Ok(new Response(){
-                    status_code = 200,
-                    message = "讀取成功",
-                    data = Class_List
-                });
+                // 取得班級詳細學生
+                if(class_id>0){
+                    return Ok(new Response(){
+                        status_code = 200,
+                        message = @"讀取成功,班級詳細資訊",
+                        data = classService.GetClassViewModel(class_id)
+                    });
+                }
+                // 取得所有班級
+                else{
+                    List<Class> Class_List = classService.GetClassList();
+                    return Ok(new Response(){
+                        status_code = 200,
+                        message = @"讀取成功,所有班級",
+                        data = Class_List
+                    });
+                }
             }
             catch (System.Exception e)
             {
@@ -58,6 +69,7 @@ namespace BrainBoost.Controllers
                 });
             }
         }
+        //刪除班級
         [HttpDelete]
         [Route("")]
         public IActionResult DeleteClass(DeleteClass deleteData){
@@ -77,6 +89,7 @@ namespace BrainBoost.Controllers
                 });
             }
         }
+        //修改班級資訊
         [HttpPut]
         [Route("")]
         public IActionResult UpdateClass(UpdateClass updateData){

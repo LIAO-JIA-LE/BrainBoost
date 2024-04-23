@@ -14,5 +14,7 @@ namespace BrainBoost.Models
         public string class_name {get;set;}
         //導師編號
         public int member_id {get;set;}
+        //班級人數
+        public int count {get;set;}
     }
 }
