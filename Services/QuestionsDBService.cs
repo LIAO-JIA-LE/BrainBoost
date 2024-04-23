@@ -285,5 +285,27 @@ namespace BrainBoost.Services
             using var conn = new SqlConnection(cnstr);
             return conn.QueryFirstOrDefault<Question>(sql, new{question_id = id});
         }
+
+        #region 取得題目答案
+        public string GetQuestionAnswerByQId(int question_id){
+            string sql = $@"SELECT
+                                question_answer
+                            FROM Answer
+                            WHERE question_id = @question_id AND is_delete = 0 ";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<string>(sql, new{question_id});
+        }
+        #endregion
+
+        #region 獲得Level
+        public int GetQuestionLevel(int question_id){
+            string sql = $@"SELECT
+                                question_level
+                            FROM Question
+                            WHERE question_id = @question_id";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<int>(sql, new{question_id});
+        }
+        #endregion
     }
 }

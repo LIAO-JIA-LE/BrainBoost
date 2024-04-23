@@ -113,11 +113,11 @@ namespace BrainBoost.Services
         }
         #endregion
 
-        // #region 標籤列表
-        // public List<Tag> TagList(int member_id){
-        //     return RaceRepository.TagList(member_id, subject_id);
-        // }
-        // #endregion
+        #region 標籤列表
+        public List<Tag> TagList(int member_id, int subject_id){
+            return RaceRepository.TagList(member_id, subject_id);
+        }
+        #endregion
 
         #region 隨機出題
         public RaceQuestionViewModel RandomQuestion(int id){
@@ -145,18 +145,28 @@ namespace BrainBoost.Services
         }
         #endregion
 
-        #region 紀錄學生搶答室回答
-        public void StudentResponse(int raceroom_id, int question_id, StudentResponse studentResponse){
-            RaceRepository.StudentResponse(raceroom_id, question_id, studentResponse);
+        #region 取得限時
+        public int GetTimeLimitByRId(int raceroom_id){
+            return RaceRepository.TimeLimit(raceroom_id);
         }
         #endregion
 
-        #region 確認學生答案
-        public void CheckAnswer(int raceroom_id, int question_id, StudentResponse studentResponse){
-            
-            int second = RaceRepository.RaceRoomTimer(raceroom_id);
-            
-            RaceRepository.CheckAnswer(raceroom_id, question_id, studentResponse);
+        #region 計時&答案
+        public void StorageTimers(int level, string question_answer, StudentResponse studentResponse)
+        {
+            float limit = 0;
+            if(studentResponse.time_limit > studentResponse.time_response){
+                if(studentResponse.race_answer.Equals(question_answer)){
+                    limit = studentResponse.time_limit - (studentResponse.time_limit - studentResponse.time_response);
+                    RaceRepository.SaveResponse(level, limit, studentResponse, true);
+                }
+                else{
+                    RaceRepository.SaveResponse(level, limit, studentResponse, false);
+                }
+            }
+            else{
+                RaceRepository.SaveResponse(level, limit, studentResponse, false);
+            }  
         }
         #endregion
     }
