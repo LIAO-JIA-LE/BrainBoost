@@ -84,7 +84,8 @@ public class MemberService
                                     VALUES('{member.Member_Name}','{member.Member_Photo}','{member.Member_Account}',
                                            '{member.Member_Password}','{member.Member_Email}','{member.Member_AuthCode}')
                         /*設定暫時的變數*/
-                        DECLARE @member_id int = (SELECT m.member_id FROM Member m WHERE m.member_account = '{member.Member_Account}');
+                        DECLARE @member_id int;
+                        SET @member_id = (SELECT m.member_id FROM Member m WHERE m.member_account = '{member.Member_Account}');
                         INSERT INTO Member_Role(member_id,role_id)
                                     VALUES(@member_id,1)";
         using var conn = new SqlConnection(cnstr);

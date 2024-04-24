@@ -31,7 +31,7 @@ namespace BrainBoost.Services
             return TempMail;
         }
         
-        // 寄郵件
+        // 寄註冊郵件
         public void SendMail(string MailBody, string ToMail)
         {
             SmtpClient smtp = new("smtp.gmail.com")
@@ -41,6 +41,21 @@ namespace BrainBoost.Services
                 EnableSsl = true
             };
             MailMessage mail = new(g_Email, ToMail, "BrainBoost註冊會員驗證信", MailBody)
+            {
+                IsBodyHtml = true
+            };
+            smtp.Send(mail);
+        }
+        // 寄註冊郵件
+        public void SendForgetMail(string MailBody, string ToMail)
+        {
+            SmtpClient smtp = new("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new System.Net.NetworkCredential(g_Account, g_Password),
+                EnableSsl = true
+            };
+            MailMessage mail = new(g_Email, ToMail, "BrainBoost忘記密碼驗證信", MailBody)
             {
                 IsBodyHtml = true
             };
