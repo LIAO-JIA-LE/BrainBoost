@@ -114,7 +114,8 @@ namespace BrainBoost.Controllers
             }
             return Ok(new Response(){
                 status_code = Response.StatusCode,
-                message = "匯入選擇題成功"
+                message = "匯入選擇題成功",
+                data = QuestionService.GetQuestionById(questionList.QuestionData.question_id)
             });
         }
 

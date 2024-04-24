@@ -27,21 +27,37 @@ namespace BrainBoost.Controllers
             try
             {
                 Member member = MemberService.GetDataByAccount(data.account);
+                if(member == null){
+                    return BadRequest(new Response(){
+                        status_code = 400,
+                        message = "無此用戶"
+                    });
+                }
                 RoleService.UpdateMemberRole(member.Member_Id,data.role);
                 result = new(){
                     status_code = 200,
-                    message = "修改成功",
+                    message = "權限已成功修改為 ",
                     data = MemberService.GetDataByAccount(data.account)
                 };
+                int Role = MemberService.GetRole(member.Member_Account);
+                if(Role == 1)
+                    result.message += "Student";
+                else if(Role == 2)
+                    result.message += "Teacher";
+                else if(Role == 3)
+                    result.message += "Manager";
+                else
+                    result.message += "Admin";
+                return Ok(result);
             }
             catch (Exception e)
             {
-                result = new(){
+                return BadRequest(new Response(){
                     status_code = 400,
                     message = e.Message
-                };
+                });
+                
             }
-            return Ok(result);
         }
         #endregion
         

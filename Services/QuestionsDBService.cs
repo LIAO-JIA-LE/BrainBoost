@@ -177,7 +177,8 @@ namespace BrainBoost.Services
             
             // 先執行當前題目內容
             using var conn = new SqlConnection(cnstr);
-            int question_id = conn.QueryFirst<int>(sql);
+            int question_id = conn.QueryFirstOrDefault<int>(sql);
+            questionList.QuestionData.question_id = question_id;
             InsertOption(questionList);
             return question_id;
         }
@@ -207,7 +208,7 @@ namespace BrainBoost.Services
         // 儲存選項
         public void InsertOption(QuestionList questionList)
         {
-            int question_id = GetQuestionId(questionList);
+            int question_id = questionList.QuestionData.question_id;
             StringBuilder stringBuilder = new StringBuilder();
             // 題目答案
             stringBuilder.Append($@"INSERT INTO Answer(question_id, question_answer, question_parse)
@@ -267,15 +268,15 @@ namespace BrainBoost.Services
 
         #region 題目列表（只顯示題目內容，不包含選項）
         // 選擇題
-        public List<Question> GetQuestionList(int type, string Search,Forpaging forpaging){
-            string sql = $@" SELECT * FROM Question WHERE is_delete=0 AND 1=1";
+        public List<Question> GetQuestionList(int member_id,int type, string Search,Forpaging forpaging){
+            string sql = $@" SELECT * FROM Question WHERE is_delete=0 AND member_id = @member_id AND 1=1";
             if(!String.IsNullOrEmpty(Search))
                 sql = sql.Replace("1=1", $@"question_content LIKE '%{Search}%' AND type_id = '{type}' AND 1=1");
             else if(type != 0)
                 sql = sql.Replace("1=1", $@"AND type_id = '{type}'");
             using var conn = new SqlConnection(cnstr);
             //指定時間格式
-            return new List<Question>(conn.Query<Question>(sql));
+            return new List<Question>(conn.Query<Question>(sql,new{member_id}));
         }
         #endregion
 
