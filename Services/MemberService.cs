@@ -220,14 +220,16 @@ public class MemberService
         conn.Execute(sql);
     }
     #endregion
+
+    #region 修改個人資訊
     //修改個人資料
     public void UpdateMemberData(MemberUpdate member){
         string sql = $@"UPDATE Member SET 
                             member_name = @member_name, 
                             member_photo = @member_photo
-                        WHERE member_id = @member_id
-                        ";
+                        WHERE member_id = @member_id";
         using var conn = new SqlConnection(cnstr);
         conn.Execute(sql,new{member.member_name,member.member_photo,member.member_id});
     }
+    #endregion
 }

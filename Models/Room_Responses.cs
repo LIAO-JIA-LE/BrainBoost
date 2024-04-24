@@ -15,7 +15,7 @@ namespace BrainBoost.Models
         public int member_id { get; set; }
 
         // 會員答案
-        public string race_answer { get; set; }
+        public string? race_answer { get; set; }
 
         // 確認答案
         public bool check_correct { get; set; }

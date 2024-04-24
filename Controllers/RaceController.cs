@@ -4,6 +4,7 @@ using BrainBoost.Parameter;
 using BrainBoost.Services;
 using BrainBoost.ViewModels;
 using NPOI.SS.Formula.Functions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BrainBoost.Controllers
 {
@@ -33,12 +34,12 @@ namespace BrainBoost.Controllers
         public IActionResult GetRoomList(){
             try
             {
-                var Response = RaceService.GetRoomList();
+                int member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                var Response = RaceService.GetRoomList(member_id);
                 if(Response == null){
                     return Ok(new ResponseViewModel{
                         status_code = 200,
-                        message = "查無資料",
-                        data = null
+                        message = "查無資料"
                     });
                 }
                 else{
@@ -64,7 +65,8 @@ namespace BrainBoost.Controllers
         public IActionResult GetRoom([FromQuery]int raceroom_id){
             try
             {
-                var Response = RaceService.GetRoom(raceroom_id);
+                int member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                var Response = RaceService.GetRoom(raceroom_id, member_id);
                 if(Response == null){
                     return Ok(new ResponseViewModel{
                         status_code = 200,
@@ -131,8 +133,9 @@ namespace BrainBoost.Controllers
         public IActionResult UpdateRoom([FromQuery]int raceroom_id, [FromBody]RaceInformation raceData){
             try
             {
+                int member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
                 RaceService.RoomInformation(raceroom_id, raceData);
-                var Response = RaceService.GetRoom(raceroom_id);
+                var Response = RaceService.GetRoom(raceroom_id, member_id);
                 return Ok(new ResponseViewModel<RaceRooms>{
                     status_code = 200,
                     message = "讀取成功",
@@ -154,7 +157,8 @@ namespace BrainBoost.Controllers
         public IActionResult DeleteRoom([FromQuery]int raceroom_id){
             try
             {
-                RaceService.DeleteRoom(raceroom_id);
+                int member_id = MemberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                RaceService.DeleteRoom(raceroom_id, member_id);
                 return Ok(new ResponseViewModel<int>{
                     status_code = 200,
                     message = "刪除成功",
@@ -506,7 +510,64 @@ namespace BrainBoost.Controllers
             }
         }
         #endregion
-        
+        #region 統整學生作答答案
+        [HttpGet]
+        [Route("[Action]")]
+        public IActionResult StaticReseponse([FromQuery]int raceroom_id, [FromQuery]int question_id){
+            try{
+                // 獲得選項
+                List<string> option_content = QuestionService.GetOptionByQId(question_id);
+                var Response = RaceService.GetStudentReseponse(raceroom_id, question_id, option_content);
+                if(Response != null){
+                    return Ok(new ResponseViewModel<object>{
+                        status_code = 200,
+                        message = "顯示成功",
+                        data = Response
+                    });
+                }
+                else{
+                    return Ok(new ResponseViewModel<object>{
+                        status_code = 200,
+                        message = "尚無資料"
+                    });
+                }
+            }
+            catch(Exception e){
+                return BadRequest(new ResponseViewModel{
+                        status_code = 400,
+                        message = e.Message
+                    });
+            }
+        }
+        #endregion
+        #region 記分板
+        [HttpGet]
+        [Route("[Action]")]
+        public IActionResult ScoreBoard([FromQuery]int raceroom_id){
+            try{
+                var Response = RaceService.GetScoreBoard(raceroom_id);
+                if(Response != null){
+                    return Ok(new ResponseViewModel<object>{
+                        status_code = 200,
+                        message = "顯示成功",
+                        data = Response
+                    });
+                }
+                else{
+                    return Ok(new ResponseViewModel<object>{
+                        status_code = 200,
+                        message = "尚無資料"
+                    });
+                }
+            }
+            catch(Exception e){
+                return BadRequest(new ResponseViewModel{
+                        status_code = 400,
+                        message = e.Message
+                    });
+            }
+        }
+        #endregion
 
         // 隨機亂碼
         // #region 刪除隨機亂碼

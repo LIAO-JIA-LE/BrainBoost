@@ -308,5 +308,33 @@ namespace BrainBoost.Services
             return conn.QueryFirstOrDefault<int>(sql, new{question_id});
         }
         #endregion
+
+        #region 取得題目答案
+        public List<string> GetOptionByQId(int question_id){
+            string sql = $@"SELECT
+                                option_content
+                            FROM ""Option""
+                            WHERE question_id = @question_id";
+            using var conn = new SqlConnection(cnstr);
+            List<string> option = new List<string>(conn.Query<string>(sql,new{question_id}));
+
+            int type_id = GetQuestionType(question_id);
+            // 是非題
+            if(type_id == 1)
+                option = ["是", "否"];
+            return option;
+        }
+        #endregion
+
+        #region 取得題目類型
+        public int GetQuestionType(int question_id){
+            string sql = $@"SELECT
+                                type_id
+                            FROM Question
+                            WHERE question_id = @question_id";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<int>(sql, new{question_id});
+        }
+        #endregion
     }
 }

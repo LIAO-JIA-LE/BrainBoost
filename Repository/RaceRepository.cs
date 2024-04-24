@@ -1,4 +1,5 @@
 using System.Data.SqlClient;
+using System.Data.SqlTypes;
 using System.Net.Http.Headers;
 using System.Text;
 using BrainBoost.Models;
@@ -60,18 +61,18 @@ namespace BrainBoost.Services
         #endregion
 
         #region 搶答室列表
-        public List<RaceRooms> GetList(){
-            string sql = $@" SELECT	* FROM RaceRoom WHERE is_delete = 0 ORDER BY race_public DESC, race_date DESC ";
+        public List<RaceRooms> GetList(int member_id){
+            string sql = $@" SELECT	* FROM RaceRoom WHERE is_delete = 0 AND member_id = @member_id ORDER BY race_public DESC, race_date DESC ";
             using (var conn = new SqlConnection(cnstr))
-            return (List<RaceRooms>)conn.Query<RaceRooms>(sql);
+            return (List<RaceRooms>)conn.Query<RaceRooms>(sql, new{member_id});
         }
         #endregion
 
         #region 單一搶答室資訊
-        public RaceRooms GetInformation(int Raceroom_id){
-            string sql = $@" SELECT	* FROM RaceRoom WHERE raceroom_id = @raceroom_id AND is_delete = 0 ";
+        public RaceRooms GetInformation(int raceroom_id, int member_id){
+            string sql = $@" SELECT	* FROM RaceRoom WHERE raceroom_id = @raceroom_id AND is_delete = 0 AND member_id = @member_id";
             using var conn = new SqlConnection(cnstr);
-            return conn.QueryFirstOrDefault<RaceRooms>(sql, new { raceroom_id = Raceroom_id });
+            return conn.QueryFirstOrDefault<RaceRooms>(sql, new { raceroom_id, member_id });
         }
         #endregion
 
@@ -122,10 +123,10 @@ namespace BrainBoost.Services
         #endregion
 
         #region 刪除搶答室
-        public void DeleteRoom(int id){
-            string sql = $@" UPDATE RaceRoom SET is_delete = 1 WHERE raceroom_id = @raceroom_id ";
+        public void DeleteRoom(int raceroom_id, int member_id){
+            string sql = $@" UPDATE RaceRoom SET is_delete = 1 WHERE raceroom_id = @raceroom_id AND member_id = @member_id";
             using var conn = new SqlConnection(cnstr);
-            conn.Execute(sql, new{raceroom_id = id});
+            conn.Execute(sql, new{raceroom_id, member_id});
         }
         #endregion
 
@@ -402,11 +403,60 @@ namespace BrainBoost.Services
 
         #region 儲存回應
         public void SaveResponse(int level, float limit, StudentResponse studentResponse, bool check_correct){
-            float score = limit * level;
+            decimal score = 0;
+            if(studentResponse.time_response < 3.0)
+                score = (decimal)Math.Round(studentResponse.time_limit * level, 1, MidpointRounding.AwayFromZero);
+            else
+                score = (decimal)Math.Round(limit * level);
+
             string sql = $@"INSERT INTO Race_Response(raceroom_id, question_id, member_id, race_answer, race_score, check_correct, race_time)
                             VALUES(@raceroom_id, @question_id, @member_id, @race_answer, @race_score, @check_correct, @race_time )";
             using var conn = new SqlConnection(cnstr);
             conn.Execute(sql, new{raceroom_id = studentResponse.raceroom_id, question_id = studentResponse.question_id, member_id = studentResponse.member_id, race_answer = studentResponse.race_answer, race_score = score, check_correct = check_correct, race_time = studentResponse.time_response});
+        }
+        #endregion
+
+        #region 統計回應
+        public object GetStudentReseponse(int raceroom_id, int question_id, List<string> option_content){
+            // 統計
+            string sql = $@"SELECT race_answer, COUNT(member_id) AS option_static FROM Race_Response 
+                            WHERE raceroom_id = @raceroom_id AND question_id = @question_id AND race_answer IN @options GROUP BY race_answer";
+            using var conn = new SqlConnection(cnstr);
+            conn.Open();
+
+            var parameters = new { raceroom_id, question_id, options = option_content };
+            var optionStatics = conn.Query<(string option, int option_static)>(sql, parameters).ToDictionary(t => t.option, t => t.option_static);
+
+            List<StaticOption> staticOptions = option_content.Select(option => new StaticOption
+            {
+                option = option,
+                option_static = optionStatics.ContainsKey(option) ? optionStatics[option] : 0
+            }).ToList();
+
+            conn.Close();
+
+            return staticOptions; // returning a List<StaticOption>, assuming that is the intended return type
+        }
+        #endregion
+
+        #region 記分板
+        public object GetScoreBoard(int raceroom_id){
+            string sql = $@"SELECT
+                                m.member_id,
+                                member_name,
+                                SUM(race_score) race_sum
+                            FROM Member M
+                            INNER JOIN Race_Response R
+                            ON M.member_id = R.member_id
+                            WHERE R.raceroom_id = @raceroom_id
+                            GROUP BY m.member_id, member_name
+                            ORDER BY race_sum DESC";
+            using var conn = new SqlConnection(cnstr);
+            conn.Open();
+            var parameters = new {raceroom_id};
+            var Response = conn.Query<ScoreBoard>(sql, parameters);
+            conn.Close();
+            return Response;
         }
         #endregion
     }

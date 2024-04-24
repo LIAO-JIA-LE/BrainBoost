@@ -8,7 +8,7 @@ namespace BrainBoost.ViewModels
         public int question_id { get; set; }
 
         // 題目內容
-        public string question_content{get;set;} 
+        public string question_content { get; set; }
 
     }
 }

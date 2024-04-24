@@ -18,13 +18,13 @@ namespace BrainBoost.Services
 
         #region 顯示 搶答室資訊
         // 搶答室列表
-        public List<RaceRooms> GetRoomList(){
-            return RaceRepository.GetList();
+        public List<RaceRooms> GetRoomList(int member_id){
+            return RaceRepository.GetList(member_id);
         }
         
         // 搶答室單一（詳細資料）
-        public RaceRooms GetRoom(int id){
-            return RaceRepository.GetInformation(id);
+        public RaceRooms GetRoom(int raceroom_id, int member_id){
+            return RaceRepository.GetInformation(raceroom_id,member_id);
         }
         #endregion
 
@@ -63,8 +63,8 @@ namespace BrainBoost.Services
         // #endregion
 
         #region 刪除搶答室
-        public void DeleteRoom(int id){
-            RaceRepository.DeleteRoom(id);
+        public void DeleteRoom(int raceroom_id, int member_id){
+            RaceRepository.DeleteRoom(raceroom_id, member_id);
         }
         #endregion  
 
@@ -167,6 +167,18 @@ namespace BrainBoost.Services
             else{
                 RaceRepository.SaveResponse(level, limit, studentResponse, false);
             }  
+        }
+        #endregion
+
+        #region 統計學生回應
+        public object GetStudentReseponse(int raceroom_id, int question_id, List<string> option_content){
+            return RaceRepository.GetStudentReseponse(raceroom_id, question_id, option_content);
+        }
+        #endregion
+
+        #region 記分板
+        public object GetScoreBoard(int raceroom_id){
+            return RaceRepository.GetScoreBoard(raceroom_id);
         }
         #endregion
     }
