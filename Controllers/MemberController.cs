@@ -238,21 +238,21 @@ namespace BrainBoost.Controllers
         // 輸入Email後寄驗證信
         [HttpPost]
         [Route("[Action]")]
-        public IActionResult ForgetPassword([FromBody] string Email)
+        public IActionResult ForgetPassword([FromBody]ForgetPassword Email)
         {
             // 看有沒有Email的資料
-            Member Data = MemberService.GetDataByEmail(Email);
+            Member Data = MemberService.GetDataByEmail(Email.Email);
             // 有就寄驗證信，沒有則回傳「查無用戶」
             if (Data != null)
             {
                 Data.Member_AuthCode = MailService.GenerateAuthCode();
                 // 製作AuthCode
-                MemberService.ChangeAuthCode(Data.Member_AuthCode, Email);
+                MemberService.ChangeAuthCode(Data.Member_AuthCode, Email.Email);
                 // 寄驗證信
                 var path = Directory.GetCurrentDirectory() + "/Verificationletter/ForgetPasswordTempMail.html";
                 string TempMail = System.IO.File.ReadAllText(path);
                 string MailBody = MailService.GetMailBody(TempMail, Data.Member_Name, Data.Member_AuthCode);
-                MailService.SendMail(MailBody, Email);
+                MailService.SendForgetMail(MailBody, Email.Email);
                 string str = "寄信成功，請收信。";
                 return Ok(new Response(){
                     status_code = 200,
@@ -260,7 +260,7 @@ namespace BrainBoost.Controllers
                 });
             }
             else
-                return Ok(new Response(){
+                return BadRequest(new Response(){
                     status_code = 400,
                     message = "查無此戶"
                 });
@@ -303,11 +303,14 @@ namespace BrainBoost.Controllers
         [HttpPost]
         [Route("ChangePasswordByForget")]
         [Authorize(Roles = "ForgetPassword")]
-        public IActionResult ChangePassword([FromBody] CheckForgetPassword Data)
+        public IActionResult ChangePassword([FromBody]CheckForgetPassword Data)
         {
             // 取得此Email的會員資訊
             if (User.IsInRole("ForgetPassword"))
             {
+                Member member = MemberService.GetDataByEmail(Data.Email);
+                if(User.Identity.Name != member.Member_Account || member == null)
+                    return BadRequest(new Response(){status_code = 400, message = "電子郵件不符，請重新輸入"});
                 MemberService.ClearAuthCode(Data.Email);
                 MemberService.ChangePasswordByForget(Data);
                 return Ok(new Response(){
@@ -318,7 +321,7 @@ namespace BrainBoost.Controllers
             else
             {
                 // 用戶未獲得足夠的權限
-                return Ok(new Response(){
+                return BadRequest(new Response(){
                     status_code = 400,
                     message = "您無權執行此操作。"
                 });

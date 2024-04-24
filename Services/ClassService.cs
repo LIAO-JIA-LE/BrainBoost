@@ -7,6 +7,7 @@ using BrainBoost.Models;
 using BrainBoost.Parameter;
 using BrainBoost.ViewModels;
 using Dapper;
+using Microsoft.AspNetCore.Mvc;
 using NPOI.SS.Formula.Functions;
 
 namespace BrainBoost.Services
@@ -15,6 +16,7 @@ namespace BrainBoost.Services
     {
         private readonly string? cnstr = _configuration.GetConnectionString("ConnectionStrings");
         //新增班級
+        //防呆student_id/課程名稱不重複
         public int InsertClass(InsertClass Data){
             string sql = $@"
                             DECLARE @ClassID INT
@@ -31,6 +33,24 @@ namespace BrainBoost.Services
             int class_id = conn.QueryFirstOrDefault<int>(sql,new{Data.class_name, member_id = Data.teacher_id});
             return class_id;
         }
+        //檢查課程資訊
+        public bool CheckClass(InsertClass data){
+            string sql = $@"SELECT COUNT(*) FROM ""Class"" WHERE class_name = @class_name";
+            using var conn = new SqlConnection(cnstr);
+            if(conn.QueryFirst<int>(sql,new{data.class_name}) == 1)
+                return true;
+            return false;
+        }
+        //檢查是否有該學生
+        public int CheckStudent(List<int> student_List){
+            string sql = $@"SELECT 
+                                COUNT(*)
+                            FROM Member
+                            WHERE member_id IN @student_List";
+            using var conn = new SqlConnection(cnstr);
+            return conn.QueryFirstOrDefault<int>(sql,new{student_List});
+        }
+        
         //查詢班級資訊
         public ClassViewModel GetClassViewModel(int class_id){
             string class_sql = $@"

@@ -10,6 +10,6 @@ namespace BrainBoost.Parameter
         //班級編號
         public int class_id { get; set; }
         //學生編號
-        public int member_id { get; set; }
+        public List<int> student_id { get; set; }
     }
 }

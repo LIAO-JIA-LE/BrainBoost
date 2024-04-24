@@ -6,6 +6,7 @@ using BrainBoost.Services;
 using BrainBoost.Parameter;
 using Microsoft.AspNetCore.Mvc;
 using BrainBoost.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BrainBoost.Controllers
 {
@@ -18,16 +19,27 @@ namespace BrainBoost.Controllers
         //新增班級
         [HttpPost]
         [Route("")]
+        [Authorize(Roles = "Teacher,Manager,Admin")]
         public IActionResult InsertClass([FromBody]InsertClass insertClass){
             try
             {
-                insertClass.teacher_id = memberService.GetDataByAccount(User.Identity.Name).Member_Id;
-                int class_id = classService.InsertClass(insertClass);
-                return Ok(new Response(){
-                    status_code = Response.StatusCode,
-                    message = "新增成功",
-                    data = classService.GetClassViewModel(class_id)
-                });
+                //是否有登入
+                if(User.Identity.Name == null)
+                    return BadRequest(new Response(){status_code = 400, message = "請先登入"});
+                //是否有班級存在
+                if(classService.CheckClass(insertClass))
+                    return BadRequest(new Response(){status_code = 400, message = "該班級已存在"});
+                //學生都有在資料庫中
+                if(classService.CheckStudent(insertClass.List_student_id) == insertClass.List_student_id.Count){
+                    insertClass.teacher_id = memberService.GetDataByAccount(User.Identity.Name).Member_Id;
+                    int class_id = classService.InsertClass(insertClass);
+                    return Ok(new Response(){
+                        status_code = Response.StatusCode,
+                        message = "新增成功",
+                        data = classService.GetClassViewModel(class_id)
+                    });
+                }
+                return BadRequest(new Response(){status_code = 400, message = "有學生不存在，請重新輸入"});
             }
             catch (System.Exception e)
             {
@@ -92,7 +104,7 @@ namespace BrainBoost.Controllers
         //修改班級資訊
         [HttpPut]
         [Route("")]
-        public IActionResult UpdateClass(UpdateClass updateData){
+        public IActionResult UpdateClass([FromBody]UpdateClass updateData){
             try
             {
                 classService.UpdateClass(updateData);
@@ -114,7 +126,7 @@ namespace BrainBoost.Controllers
         #region 班級學生
         [HttpPost]
         [Route("Student")]
-        public IActionResult InsertStudent(ClassStudent insertData){
+        public IActionResult InsertStudent([FromBody]ClassStudent insertData){
             try
             {
                 classService.InsertStudent(insertData);
