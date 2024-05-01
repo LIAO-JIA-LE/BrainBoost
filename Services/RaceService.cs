@@ -155,18 +155,24 @@ namespace BrainBoost.Services
         public void StorageTimers(int level, string question_answer, StudentResponse studentResponse)
         {
             float limit = 0;
-            if(studentResponse.time_limit > studentResponse.time_response){
-                if(studentResponse.race_answer.Equals(question_answer)){
-                    limit = studentResponse.time_limit - studentResponse.time_response;
-                    RaceRepository.SaveResponse(level, limit, studentResponse, true);
-                }
-                else{
-                    RaceRepository.SaveResponse(level, limit, studentResponse, false);
-                }
-            }
-            else{
-                RaceRepository.SaveResponse(level, limit, studentResponse, false);
-            }  
+            //修改後
+            bool check_correct = studentResponse.race_answer.Equals(question_answer);
+            if(check_correct)
+                limit = studentResponse.time_limit - studentResponse.time_response;
+            RaceRepository.SaveResponse(level, limit, studentResponse,check_correct);
+            //修改前
+            // if(studentResponse.time_limit > studentResponse.time_response){
+            //     if(studentResponse.race_answer.Equals(question_answer)){
+            //         limit = studentResponse.time_limit - studentResponse.time_response;
+            //         RaceRepository.SaveResponse(level, limit, studentResponse, true);
+            //     }
+            //     else{
+            //         RaceRepository.SaveResponse(level, limit, studentResponse, false);
+            //     }
+            // }
+            // else{
+            //     RaceRepository.SaveResponse(level, limit, studentResponse, false);
+            // }  
         }
         #endregion
 

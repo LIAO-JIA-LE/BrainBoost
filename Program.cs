@@ -60,6 +60,7 @@ builder.Host.ConfigureServices((hostContext,services)=>{
     services.AddScoped<RoleService>();
     services.AddScoped<SubjectService>();
     services.AddScoped<ClassService>();
+    services.AddScoped<GuestService>();
 });
 
 var app = builder.Build();

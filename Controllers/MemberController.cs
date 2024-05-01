@@ -160,9 +160,9 @@ namespace BrainBoost.Controllers
                 else{
                     member.member_photo = wwwroot + "default.jpg";
                 }
+                MemberService.UpdateMemberData(member);
                 var memberdata = MemberService.GetDataByAccount(User.Identity.Name);
                 memberdata.Member_Password = string.Empty;
-                MemberService.UpdateMemberData(member);
                 Response result = new(){
                     status_code = 200,
                     message = "修改成功",
